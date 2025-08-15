@@ -1,0 +1,11 @@
+# Ignore secrets
+Secrets.xcconfig
+
+# Xcode user-specific files
+xcuserdata/
+DerivedData/
+
+# macOS metadata
+.DS_Store
+
+
