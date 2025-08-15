@@ -8,17 +8,13 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var viewModel = MovieViewModel()
+    @StateObject private var session: SessionManager.shared
 
     var body: some View {
-        NavigationView {
-            List(viewModel.popularMovies) { movie in
-                Text(movie.title)
-            }
-            .navigationTitle("Popular Movies")
-            .onAppear {
-                viewModel.loadPopularMovies()
-            }
+        if session.session != nil {
+            AppLayout()
+        } else {
+            LoginView()
         }
     }
 }

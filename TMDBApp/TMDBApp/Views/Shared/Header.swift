@@ -11,14 +11,33 @@ struct HeaderView: View {
     
     var body: some View {
         HStack {
-            Text("TMDBApp")
+            Spacer()
+            Text("TMDB")
                 .font(.largeTitle)
                 .bold()
-                .foregroundColor(.white)
+                .foregroundStyle(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color(red: 154/255, green: 203/255, blue: 165/255)
+,                             Color(red: 76/255, green: 178/255, blue: 223/255)
+                        ]),
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+            RoundedRectangle(cornerRadius: 15)
+                .foregroundStyle(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color(red: 154/255, green: 203/255, blue: 165/255)
+,                             Color(red: 76/255, green: 178/255, blue: 223/255)
+                        ]),
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .frame(width: 80, height: 30)
             Spacer()
-            Image(systemName: "person.circle")
-                .font(.title)
-                .foregroundStyle(Color(red: 76/255, green: 178/255, blue: 223/255))
         }
         .padding()
         .background(Color(red: 11/255, green: 37/255, blue: 63/255))

@@ -9,17 +9,15 @@ import SwiftUI
 
 @main
 struct TMDBAppApp: App {
-    @StateObject private var appState = AppState()
+    @StateObject private var session = SessionManager()
     
     var body: some Scene {
         WindowGroup {
-            if appState.isAuthenticated == true {
-                AppLayout()
-                    .environmentObject(appState)
-            } else {
-                LoginView()
-                    .environmentObject(appState)
-            }
+            ContentView()
+                .environmentObject(session)
+                .onAppear {
+                    session.restoreSession()
+                }
         }
     }
 }
