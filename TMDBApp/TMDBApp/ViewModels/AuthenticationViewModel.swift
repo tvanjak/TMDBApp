@@ -21,6 +21,7 @@ class AuthenticationViewModel: ObservableObject {
     private var authStateHandle: AuthStateDidChangeListenerHandle?
     
 
+    // INITIALIZER & DEINTIALIZER
     init() {
         // Observe authentication state changes
         authStateHandle = Auth.auth().addStateDidChangeListener { [weak self] auth, user in
@@ -42,7 +43,7 @@ class AuthenticationViewModel: ObservableObject {
         }
     }
     
-    
+    // SIGNUP, SIGNIN & SIGNOUT
     func signUp() async {
         errorMessage = nil
         do {
@@ -71,8 +72,6 @@ class AuthenticationViewModel: ObservableObject {
         }
     }
     
-    // ... inside AuthenticationViewModel or similar ...
-
     func signIn() async {
         errorMessage = nil
         do {
@@ -85,7 +84,6 @@ class AuthenticationViewModel: ObservableObject {
             self.errorMessage = "Sign-in failed: \(error.localizedDescription)"
         }
     }
-    
 
     func signOut() {
         do {
@@ -97,7 +95,8 @@ class AuthenticationViewModel: ObservableObject {
         }
     }
 
-    // Function to fetch user profile from Firestore
+
+    // FETCH USER PROFILE FROM FIRESTORE
     func fetchUserProfile(uid: String) {
         let db = Firestore.firestore()
         db.collection("users").document(uid).getDocument { (document, error) in

@@ -10,14 +10,24 @@ import SwiftUI
 
 struct HomeView: View {
     @Binding var path: NavigationPath
-
     
-    @StateObject private var viewModel = MovieViewModel()
+    @StateObject private var movieViewModel = MovieViewModel()
+    @StateObject private var tvShowViewModel = TVShowViewModel()
+    
     @State private var searchTerm = ""
     
     @State private var isFavorite = false
 
     let columns = [GridItem(.adaptive(minimum: 120))]
+    
+    enum movieTypes {
+        case streaming
+        case onTV
+        case forRent
+        case inTheatres
+    }
+    
+    @State var selectedMovie: movieTypes = movieTypes.streaming
     
     var body: some View {
         ScrollView {
@@ -34,32 +44,48 @@ struct HomeView: View {
                 .background(Color(.systemGray6))
                 .cornerRadius(8)
                 
-//                MovieSection(title: "What's popular", popularMovies: viewModel.popularMovies) // doesnt work because it doesnt load the movies
+//                MovieSection(title: "What's popular", popularMovies: viewModel.popularMovies) // doesnt work because it doesnt load the moviesith
                 
                 VStack (alignment: .leading) {
                     Text("What's popular")
                         .font(.title2)
                         .fontWeight(.bold)
                     HStack (spacing: 10) {
+                        Button() {
+                            
+                        } label: {
                             Text("Streaming")
                                 .font(.title3)
-                                .fontWeight(.semibold)
+                                .foregroundStyle(.black)
+                        }
+                        Button() {
+                            
+                        } label: {
                             Text("On TV")
                                 .font(.title3)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.gray)
+                        }
+                        Button() {
+                            
+                        } label: {
                             Text("For Rent")
                                 .font(.title3)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.gray)
+                        }
+                        Button() {
+                            
+                        } label: {
                             Text("In Theatres")
                                 .font(.title3)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.gray)
+                        }
                     }
                     .padding(.vertical, 10)
                     
                     
                     ScrollView (.horizontal) {
                         LazyHStack {
-                            ForEach(viewModel.popularMovies) { movie in
+                            ForEach(movieViewModel.popularMovies) { movie in
                                 ZStack(alignment: .topLeading) {
                                     if let posterPath = movie.posterPath {
                                         let fullURLString = "https://image.tmdb.org/t/p/w500\(posterPath)"
@@ -115,7 +141,7 @@ struct HomeView: View {
                     
                     ScrollView (.horizontal) {
                         LazyHStack {
-                            ForEach(viewModel.trendingMovies) { movie in
+                            ForEach(movieViewModel.trendingMovies) { movie in
                                 ZStack(alignment: .topLeading) {
                                     if let posterPath = movie.posterPath {
                                         let fullURLString = "https://image.tmdb.org/t/p/w500\(posterPath)"
@@ -158,8 +184,8 @@ struct HomeView: View {
 
             }
             .onAppear {
-                viewModel.loadPopularMovies()
-                viewModel.loadTrendingMovies()
+                movieViewModel.loadPopularMovies()
+                movieViewModel.loadTrendingMovies()
             }
         }
     }
