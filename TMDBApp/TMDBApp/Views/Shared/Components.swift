@@ -1,10 +1,3 @@
-//
-//  Components.swift
-//  TMDBApp
-//
-//  Created by Toni Vanjak on 15.08.2025..
-//
-
 import SwiftUI
 
 

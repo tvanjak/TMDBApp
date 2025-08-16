@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var session: SessionManager.shared
+    @EnvironmentObject var authViewModel: AuthenticationViewModel
 
     var body: some View {
-        if session.session != nil {
+        if authViewModel.currentUser != nil {
             AppLayout()
         } else {
             LoginView()
@@ -21,4 +21,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .environmentObject(AuthenticationViewModel())
 }

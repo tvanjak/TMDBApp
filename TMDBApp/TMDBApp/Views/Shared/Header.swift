@@ -43,7 +43,6 @@ struct HeaderView: View {
         .background(Color(red: 11/255, green: 37/255, blue: 63/255))
     }
 }
-//#0B253F
 
 
 #Preview {

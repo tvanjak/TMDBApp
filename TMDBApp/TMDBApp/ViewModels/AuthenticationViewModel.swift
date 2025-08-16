@@ -1,0 +1,116 @@
+//
+//  AuthenticationViewModel.swift
+//  TMDBApp
+//
+//  Created by Toni Vanjak on 16.08.2025..
+//
+
+import SwiftUI
+import FirebaseAuth
+import FirebaseFirestore
+
+class AuthenticationViewModel: ObservableObject {
+    @Published var email = ""
+    @Published var password = ""
+    @Published var firstName = ""
+    @Published var lastName = ""
+    @Published var phoneNumber = ""
+    @Published var errorMessage: String?
+    
+    @Published var currentUser: User? // Firebase User object
+    private var authStateHandle: AuthStateDidChangeListenerHandle?
+    
+
+    init() {
+        // Observe authentication state changes
+        authStateHandle = Auth.auth().addStateDidChangeListener { [weak self] auth, user in
+            self?.currentUser = user
+            if let user = user {
+                print("User is signed in: \(user.uid)")
+                // Optionally fetch their full profile data here if needed on app launch
+                self?.fetchUserProfile(uid: user.uid)
+            } else {
+                print("User is signed out.")
+            }
+        }
+    }
+
+    deinit {
+        // Remove the listener when no longer needed to prevent memory leaks
+        if let handle = authStateHandle {
+            Auth.auth().removeStateDidChangeListener(handle)
+        }
+    }
+    
+    
+    func signUp() async {
+        errorMessage = nil
+        do {
+            let result = try await Auth.auth().createUser(withEmail: email, password: password)
+            let uid = result.user.uid
+
+            // Save additional user data to Firestore
+            let db = Firestore.firestore()
+            db.collection("users").document(uid).setData([
+                "firstName": firstName,
+                "lastName": lastName,
+                "phoneNumber": phoneNumber,
+                "email": email // Storing email for easy access, though Auth also has it
+            ]) { err in
+                if let err = err {
+                    print("Error writing document: \(err)")
+                    self.errorMessage = "Failed to save user data."
+                } else {
+                    print("User data successfully written!")
+                    // User is signed in and data is saved. Navigate to main app.
+                }
+            }
+        } catch {
+            print("Error signing up: \(error.localizedDescription)")
+            self.errorMessage = error.localizedDescription
+        }
+    }
+    
+    // ... inside AuthenticationViewModel or similar ...
+
+    func signIn() async {
+        errorMessage = nil
+        do {
+            let result = try await Auth.auth().signIn(withEmail: email, password: password)
+            // User is successfully signed in.
+            // You can optionally fetch their profile data from Firestore here if needed immediately.
+            print("User signed in: \(result.user.email ?? "N/A")")
+        } catch {
+            print("Error signing in: \(error.localizedDescription)")
+            self.errorMessage = "Sign-in failed: \(error.localizedDescription)"
+        }
+    }
+    
+
+    func signOut() {
+        do {
+            try Auth.auth().signOut()
+            print("User signed out successfully.")
+        } catch {
+            print("Error signing out: \(error.localizedDescription)")
+            self.errorMessage = "Sign out failed: \(error.localizedDescription)"
+        }
+    }
+
+    // Function to fetch user profile from Firestore
+    func fetchUserProfile(uid: String) {
+        let db = Firestore.firestore()
+        db.collection("users").document(uid).getDocument { (document, error) in
+            if let document = document, document.exists {
+                let data = document.data()
+                self.firstName = data?["firstName"] as? String ?? ""
+                self.lastName = data?["lastName"] as? String ?? ""
+                self.phoneNumber = data?["phoneNumber"] as? String ?? ""
+                print("Fetched user profile: \(data ?? [:])")
+            } else {
+                print("Document does not exist or error: \(error?.localizedDescription ?? "unknown")")
+            }
+        }
+    }
+}
+
