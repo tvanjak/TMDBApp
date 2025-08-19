@@ -7,6 +7,7 @@ class MovieViewModel: ObservableObject {
     @Published var upcomingMovies: [Movie] = []
     @Published var nowPlayingMovies: [Movie] = []
     @Published var errorMessage: String?
+    @Published var movieDetail: MovieDetails? = nil
 
     func loadPopularMovies() {
         TMDBService.shared.fetchPopularMovies { [weak self] result in
@@ -53,6 +54,19 @@ class MovieViewModel: ObservableObject {
                 switch result {
                 case .success(let movies):
                     self?.nowPlayingMovies = movies
+                case .failure(let error):
+                    self?.errorMessage = error.localizedDescription
+                }
+            }
+        }
+    }
+    
+    func loadMovieDetails(movieId: Int) {
+        TMDBService.shared.fetchMovieDetails(movieId: movieId) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let movie):
+                    self?.movieDetail = movie
                 case .failure(let error):
                     self?.errorMessage = error.localizedDescription
                 }

@@ -123,6 +123,43 @@ class TMDBService {
     }
     
     
+    // MOVIE DETAILS
+    
+    
+    func fetchMovieDetails(movieId: Int, completion: @escaping (Result<MovieDetails, Error>) -> Void) {
+        let urlString = "\(Constants.baseURL)/movie/\(movieId)?api_key=\(Constants.apiKey)&append_to_response=credits"
+
+
+        guard let url = URL(string: urlString) else {
+            completion(.failure(URLError(.badURL)))
+            return
+        }
+
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                completion(.failure(URLError(.badServerResponse)))
+                return
+            }
+
+            do {
+                let decodedResponse = try JSONDecoder().decode(MovieDetails.self, from: data)
+                completion(.success(decodedResponse))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+        .resume()
+    }
+    
+    
+    // TV SHOWS
+    
+    
     func fetchPopularTVShows(completion: @escaping (Result<[TVShow], Error>) -> Void) {
         let urlString = "\(Constants.baseURL)/tv/popular?api_key=\(Constants.apiKey)&language=en-US"
 

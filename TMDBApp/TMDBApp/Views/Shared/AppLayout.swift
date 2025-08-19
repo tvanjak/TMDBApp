@@ -17,8 +17,10 @@ struct AppLayout: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            HeaderView()
-                .padding(.bottom)
+            HeaderView(
+                canGoBack: !path.isEmpty,
+                onBack: { path.removeLast() }
+            )
             
             NavigationStack(path: $path) {
                 Group {
@@ -31,9 +33,12 @@ struct AppLayout: View {
                         ProfileView(path: $path)
                     }
                 }
-                .navigationDestination(for: String.self) { movieID in
-                    Text("Movie Details for \(movieID)")
+                .navigationDestination(for: Int.self) { movieId in
+                    MovieView(movieId: movieId)
+                        .navigationBarBackButtonHidden()
+                        .toolbar(.hidden, for: .navigationBar)
                 }
+                .toolbar(.hidden, for: .navigationBar)
             }
             
             FooterView(selectedSection: $selectedSection)
