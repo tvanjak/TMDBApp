@@ -6,6 +6,40 @@
 //
 
 import SwiftUI
+ 
+
+struct RatingRing: View {
+    var rating: Double
+    
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(Color.gray.opacity(0.3), lineWidth: 6)
+            
+            Circle()
+                .trim(from: 0, to: rating)
+                .stroke(
+                    ratingColor,
+                    style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                )
+                .rotationEffect(.degrees(-90))
+            
+            Text("\(Int(rating * 100))%")
+                .font(.title3)
+                .fontWeight(.semibold)
+                .foregroundColor(ratingColor)
+        }
+        .frame(width: 60, height: 60)
+    }
+    
+    private var ratingColor: Color {
+        switch rating {
+        case 0.75...: return .green
+        case 0.5..<0.75: return .orange
+        default: return .red
+        }
+    }
+}
 
 
 extension String {
@@ -68,7 +102,7 @@ struct MoviePoster: View {
             
             VStack (alignment: .leading) {
                 HStack {
-                    ProgressRing(progress: voteAverage/10)
+                    RatingRing(rating: voteAverage/10)
                         .padding(.trailing, 5)
                     Text("User score")
                         .font(.title3)
@@ -220,40 +254,6 @@ struct CastView: View {
             }
         }
         .padding(.horizontal)
-    }
-}
-
-
-struct ProgressRing: View {
-    var progress: Double
-    
-    var body: some View {
-        ZStack {
-            Circle()
-                .stroke(Color.gray.opacity(0.3), lineWidth: 6)
-            
-            Circle()
-                .trim(from: 0, to: progress)
-                .stroke(
-                    progressColor,
-                    style: StrokeStyle(lineWidth: 6, lineCap: .round)
-                )
-                .rotationEffect(.degrees(-90))
-            
-            Text("\(Int(progress * 100))%")
-                .font(.title3)
-                .fontWeight(.semibold)
-                .foregroundColor(progressColor)
-        }
-        .frame(width: 60, height: 60)
-    }
-    
-    private var progressColor: Color {
-        switch progress {
-        case 0.75...: return .green
-        case 0.5..<0.75: return .orange
-        default: return .red
-        }
     }
 }
 

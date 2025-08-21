@@ -11,8 +11,8 @@ import SwiftUI
 struct HomeView: View {
     @Binding var path: NavigationPath
     
-    @StateObject private var movieViewModel = MovieViewModel()
-    @StateObject private var tvShowViewModel = TVShowViewModel()
+    @ObservedObject var movieViewModel: MovieViewModel
+    @ObservedObject var tvShowViewModel: TVShowViewModel
     
     @State private var searchTerm = ""
     
@@ -195,8 +195,12 @@ struct HomeView: View {
 
             }
             .onAppear {
-                movieViewModel.loadPopularMovies()
-                movieViewModel.loadTrendingMovies()
+                if movieViewModel.popularMovies.isEmpty {
+                    movieViewModel.loadPopularMovies()
+                }
+                if movieViewModel.trendingMovies.isEmpty {
+                    movieViewModel.loadTrendingMovies()
+                }
             }
         }
     }
@@ -207,7 +211,7 @@ struct HomeView_Previews: PreviewProvider {
     @State static var path = NavigationPath()
     
     static var previews: some View {
-        HomeView(path: $path)
+        HomeView(path: $path, movieViewModel: MovieViewModel(), tvShowViewModel: TVShowViewModel())
     }
 }
 

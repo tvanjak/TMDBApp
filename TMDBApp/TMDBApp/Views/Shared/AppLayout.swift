@@ -8,7 +8,13 @@
 import SwiftUI
 
 struct AppLayout: View {
-    @State private var path = NavigationPath()
+    @State private var homePath = NavigationPath()
+    @State private var favoritesPath = NavigationPath()
+    @State private var profilePath = NavigationPath()
+    
+    @StateObject private var movieViewModel = MovieViewModel()
+    @StateObject private var tvShowViewModel = TVShowViewModel()
+    
     @State private var selectedSection: Section = .home
     
     enum Section {
@@ -17,29 +23,48 @@ struct AppLayout: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            HeaderView(
-                canGoBack: !path.isEmpty,
-                onBack: { path.removeLast() }
-            )
+            switch selectedSection {
+            case .home:
+                HeaderView(canGoBack: !homePath.isEmpty, onBack: { homePath.removeLast() })
+            case .favorites:
+                HeaderView(canGoBack: !favoritesPath.isEmpty, onBack: { favoritesPath.removeLast() })
+            case .profile:
+                HeaderView(canGoBack: !profilePath.isEmpty, onBack: { profilePath.removeLast() })
+            }
             
-            NavigationStack(path: $path) {
-                Group {
-                    switch selectedSection {
-                    case .home:
-                        HomeView(path: $path)
-                    case .favorites:
-                        FavoritesView(path: $path)
-                    case .profile:
-                        ProfileView(path: $path)
+            ZStack {
+                switch selectedSection {
+                case .home:
+                    NavigationStack(path: $homePath) {
+                        HomeView(
+                            path: $homePath,
+                            movieViewModel: movieViewModel,
+                            tvShowViewModel: tvShowViewModel
+                        )
+                        .navigationDestination(for: Int.self) { movieId in
+                                MovieView(movieId: movieId)
+                                    .navigationBarBackButtonHidden(true)
+                                    .toolbar(.hidden, for: .navigationBar)
+                            }
+                    }
+                    
+                case .favorites:
+                    NavigationStack(path: $favoritesPath) {
+                        FavoritesView(path: $favoritesPath)
+                            .navigationDestination(for: Int.self) { movieId in
+                                MovieView(movieId: movieId)
+                                    .navigationBarBackButtonHidden(true)
+                                    .toolbar(.hidden, for: .navigationBar)
+                            }
+                    }
+                    
+                case .profile:
+                    NavigationStack(path: $profilePath) {
+                        ProfileView(path: $profilePath)
                     }
                 }
-                .navigationDestination(for: Int.self) { movieId in
-                    MovieView(movieId: movieId)
-                        .navigationBarBackButtonHidden()
-                        .toolbar(.hidden, for: .navigationBar)
-                }
-                .toolbar(.hidden, for: .navigationBar)
             }
+            .toolbar(.hidden, for: .navigationBar)
             
             FooterView(selectedSection: $selectedSection)
                 .padding(.top)
