@@ -21,6 +21,9 @@ struct AppLayout: View {
         case home, favorites, profile
     }
     
+    @EnvironmentObject var authViewModel: AuthenticationViewModel
+
+    
     var body: some View {
         VStack(spacing: 0) {
             switch selectedSection {
@@ -37,30 +40,33 @@ struct AppLayout: View {
                 case .home:
                     NavigationStack(path: $homePath) {
                         HomeView(
-                            path: $homePath,
                             movieViewModel: movieViewModel,
                             tvShowViewModel: tvShowViewModel
                         )
+                        .environmentObject(authViewModel)
                         .navigationDestination(for: Int.self) { movieId in
-                                MovieView(movieId: movieId)
-                                    .navigationBarBackButtonHidden(true)
-                                    .toolbar(.hidden, for: .navigationBar)
-                            }
+                            MovieView(movieId: movieId)
+                                .navigationBarBackButtonHidden(true)
+                                .toolbar(.hidden, for: .navigationBar)
+                                .environmentObject(authViewModel)
+                        }
                     }
                     
                 case .favorites:
                     NavigationStack(path: $favoritesPath) {
-                        FavoritesView(path: $favoritesPath)
+                        FavoritesView()
+                            .environmentObject(authViewModel)
                             .navigationDestination(for: Int.self) { movieId in
                                 MovieView(movieId: movieId)
                                     .navigationBarBackButtonHidden(true)
                                     .toolbar(.hidden, for: .navigationBar)
+                                    .environmentObject(authViewModel)
                             }
                     }
                     
                 case .profile:
                     NavigationStack(path: $profilePath) {
-                        ProfileView(path: $profilePath)
+                        ProfileView()
                     }
                 }
             }
@@ -74,4 +80,5 @@ struct AppLayout: View {
 
 #Preview {
     AppLayout()
+        .environmentObject(AuthenticationViewModel())
 }

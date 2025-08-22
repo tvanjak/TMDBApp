@@ -13,6 +13,7 @@ struct ContentView: View {
     var body: some View {
         if authViewModel.currentUser != nil {
             AppLayout()
+                .environmentObject(authViewModel)
         } else {
             LoginView()
         }

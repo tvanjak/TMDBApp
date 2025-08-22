@@ -66,6 +66,7 @@ extension String {
 }
 
 struct MoviePoster: View {
+    var id: Int
     var posterPath: String?
     var voteAverage: Double
     var releaseDate: String
@@ -73,7 +74,15 @@ struct MoviePoster: View {
     var genres: [Genre]
     var runtime: Int?
     
-    @Binding var isFavorite: Bool
+    var movie: Movie {
+        Movie(
+            id: id,
+            title: title,
+            posterPath: posterPath,
+        )
+    }
+    
+    @EnvironmentObject var authVM: AuthenticationViewModel
     
     var body: some View {
         ZStack (alignment: .bottomLeading) {
@@ -143,10 +152,14 @@ struct MoviePoster: View {
                 
                 HStack {
                     Button(action: {
-                        isFavorite.toggle()
+                        if authVM.isFavorite(movie) {
+                            authVM.removeFavorite(movie)
+                        } else {
+                            authVM.addFavorite(movie)
+                        }
                     }) {
-                        Image(systemName: isFavorite ? "heart.fill" : "heart")
-                            .foregroundColor(isFavorite ? .red : .white)
+                        Image(systemName: authVM.isFavorite(movie) ? "heart.fill" : "heart")
+                            .foregroundColor(authVM.isFavorite(movie) ? .red : .white)
                             .padding(8)
                             .background(Color.black.opacity(0.5))
                             .clipShape(Circle())
@@ -262,8 +275,8 @@ struct MovieView: View {
     var movieId: Int
     @StateObject private var movieViewModel = MovieViewModel()
     
-    @State private var isFavorite: Bool = false
-
+    @EnvironmentObject var authVM: AuthenticationViewModel
+    
     var body: some View {
         ScrollView {
             if let movieDetail = movieViewModel.movieDetail {
@@ -271,7 +284,8 @@ struct MovieView: View {
                 VStack (spacing: 15) {
                     
                     // POSTER AND GENERAL INFO
-                    MoviePoster(posterPath: movieDetail.posterPath, voteAverage: movieDetail.voteAverage, releaseDate: movieDetail.releaseDate, title: movieDetail.title, genres: movieDetail.genres, runtime: movieDetail.runtime, isFavorite: $isFavorite)
+                    MoviePoster(id: movieDetail.id, posterPath: movieDetail.posterPath, voteAverage: movieDetail.voteAverage, releaseDate: movieDetail.releaseDate, title: movieDetail.title, genres: movieDetail.genres, runtime: movieDetail.runtime)
+                        .environmentObject(authVM)
                     
                     // OVERVIEW
                     VStack (alignment: .leading, spacing: 10) {
@@ -305,4 +319,5 @@ struct MovieView: View {
 
 #Preview {
     MovieView(movieId: 2)
+        .environmentObject(AuthenticationViewModel())
 }

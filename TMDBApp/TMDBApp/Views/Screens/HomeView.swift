@@ -8,26 +8,21 @@
 import SwiftUI
 
 
-struct HomeView: View {
-    @Binding var path: NavigationPath
-    
+struct HomeView: View {    
     @ObservedObject var movieViewModel: MovieViewModel
     @ObservedObject var tvShowViewModel: TVShowViewModel
-    
-    @State private var searchTerm = ""
-    
-    @State private var isFavorite = false
 
-    let columns = [GridItem(.adaptive(minimum: 120))]
-    
+    @EnvironmentObject var authVM: AuthenticationViewModel
+
+    @State private var searchTerm = ""
+        
     enum movieTypes {
         case streaming
         case onTV
         case forRent
         case inTheatres
     }
-    
-    @State var selectedMovie: movieTypes = movieTypes.streaming
+    @State var selectedMovieType: movieTypes = movieTypes.streaming
     
     var body: some View {
         ScrollView {
@@ -115,10 +110,14 @@ struct HomeView: View {
                                     }
                                     
                                     Button(action: {
-                                        isFavorite.toggle()
+                                        if authVM.isFavorite(movie) {
+                                            authVM.removeFavorite(movie)
+                                        } else {
+                                            authVM.addFavorite(movie)
+                                        }
                                     }) {
-                                        Image(systemName: isFavorite ? "heart.fill" : "heart")
-                                            .foregroundColor(isFavorite ? .red : .white)
+                                        Image(systemName: authVM.isFavorite(movie) ? "heart.fill" : "heart")
+                                            .foregroundColor(authVM.isFavorite(movie) ? .red : .white)
                                             .padding(8)
                                             .background(Color.black.opacity(0.5))
                                             .clipShape(Circle())
@@ -175,10 +174,14 @@ struct HomeView: View {
                                         }
                                         
                                         Button(action: {
-                                            isFavorite.toggle()
+                                            if authVM.isFavorite(movie) {
+                                                authVM.removeFavorite(movie)
+                                            } else {
+                                                authVM.addFavorite(movie)
+                                            }
                                         }) {
-                                            Image(systemName: isFavorite ? "heart.fill" : "heart")
-                                                .foregroundColor(isFavorite ? .red : .white)
+                                            Image(systemName: authVM.isFavorite(movie) ? "heart.fill" : "heart")
+                                                .foregroundColor(authVM.isFavorite(movie) ? .red : .white)
                                                 .padding(8)
                                                 .background(Color.black.opacity(0.5))
                                                 .clipShape(Circle())
@@ -207,11 +210,8 @@ struct HomeView: View {
 }
 
 
-struct HomeView_Previews: PreviewProvider {
-    @State static var path = NavigationPath()
-    
-    static var previews: some View {
-        HomeView(path: $path, movieViewModel: MovieViewModel(), tvShowViewModel: TVShowViewModel())
-    }
+#Preview {
+    HomeView(movieViewModel: MovieViewModel(), tvShowViewModel: TVShowViewModel())
+        .environmentObject(AuthenticationViewModel())
 }
 

@@ -20,6 +20,8 @@ class AuthenticationViewModel: ObservableObject {
     @Published var currentUser: User? // Firebase User object
     private var authStateHandle: AuthStateDidChangeListenerHandle?
     
+    @Published var favorites: [Movie] = []
+    private let defaults = UserDefaults.standard
 
     // INITIALIZER & DEINTIALIZER
     init() {
@@ -30,8 +32,10 @@ class AuthenticationViewModel: ObservableObject {
                 print("User is signed in: \(user.uid)")
                 // Optionally fetch their full profile data here if needed on app launch
                 self?.fetchUserProfile(uid: user.uid)
+                self?.favorites = FavoritesManager.shared.loadFavorites(for: user.uid)
             } else {
                 print("User is signed out.")
+                self?.favorites = []
             }
         }
     }
@@ -56,7 +60,7 @@ class AuthenticationViewModel: ObservableObject {
                 "firstName": firstName,
                 "lastName": lastName,
                 "phoneNumber": phoneNumber,
-                "email": email // Storing email for easy access, though Auth also has it
+                "email": email
             ]) { err in
                 if let err = err {
                     print("Error writing document: \(err)")
@@ -77,7 +81,7 @@ class AuthenticationViewModel: ObservableObject {
         do {
             let result = try await Auth.auth().signIn(withEmail: email, password: password)
             // User is successfully signed in.
-            // You can optionally fetch their profile data from Firestore here if needed immediately.
+            // Optionally fetch profile data from Firestore here if needed immediately.
             print("User signed in: \(result.user.email ?? "N/A")")
         } catch {
             print("Error signing in: \(error.localizedDescription)")
@@ -110,6 +114,25 @@ class AuthenticationViewModel: ObservableObject {
                 print("Document does not exist or error: \(error?.localizedDescription ?? "unknown")")
             }
         }
+    }
+    
+    
+    // FAVORITES FUNCTIONS
+    
+    func addFavorite(_ movie: Movie) {
+        guard let uid = currentUser?.uid else { return }
+        self.favorites.append(movie)
+        FavoritesManager.shared.saveFavorites(favorites, for: uid)
+    }
+
+    func removeFavorite(_ movie: Movie) {
+        guard let uid = currentUser?.uid else { return }
+        self.favorites.removeAll { $0.id == movie.id }
+        FavoritesManager.shared.saveFavorites(favorites, for: uid)
+    }
+
+    func isFavorite(_ movie: Movie) -> Bool {
+        return self.favorites.contains { $0.id == movie.id }
     }
 }
 
