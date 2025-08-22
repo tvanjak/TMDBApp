@@ -67,6 +67,7 @@ struct AppLayout: View {
                 case .profile:
                     NavigationStack(path: $profilePath) {
                         ProfileView()
+                            .environmentObject(authViewModel)
                     }
                 }
             }

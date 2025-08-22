@@ -8,15 +8,18 @@
 import SwiftUI
 import FirebaseAuth
 import FirebaseFirestore
+import Foundation
 
 class AuthenticationViewModel: ObservableObject {
-    @Published var email = ""
+    @Published var profileEmail = ""
     @Published var password = ""
     @Published var firstName = ""
     @Published var lastName = ""
     @Published var phoneNumber = ""
+    @Published var memberSince = ""
     @Published var errorMessage: String?
     
+    @Published var email = ""
     @Published var currentUser: User? // Firebase User object
     private var authStateHandle: AuthStateDidChangeListenerHandle?
     
@@ -54,13 +57,19 @@ class AuthenticationViewModel: ObservableObject {
             let result = try await Auth.auth().createUser(withEmail: email, password: password)
             let uid = result.user.uid
 
+            // memberSince value
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "dd/MM/yyyy"
+            let memberSinceDateString = dateFormatter.string(from: Date())
+
             // Save additional user data to Firestore
             let db = Firestore.firestore()
             db.collection("users").document(uid).setData([
                 "firstName": firstName,
                 "lastName": lastName,
                 "phoneNumber": phoneNumber,
-                "email": email
+                "email": email,
+                "memberSince": memberSinceDateString
             ]) { err in
                 if let err = err {
                     print("Error writing document: \(err)")
@@ -109,6 +118,8 @@ class AuthenticationViewModel: ObservableObject {
                 self.firstName = data?["firstName"] as? String ?? ""
                 self.lastName = data?["lastName"] as? String ?? ""
                 self.phoneNumber = data?["phoneNumber"] as? String ?? ""
+                self.profileEmail = data?["email"] as? String ?? ""
+                self.memberSince = data?["memberSince"] as? String ?? ""
                 print("Fetched user profile: \(data ?? [:])")
             } else {
                 print("Document does not exist or error: \(error?.localizedDescription ?? "unknown")")
@@ -117,8 +128,97 @@ class AuthenticationViewModel: ObservableObject {
     }
     
     
-    // FAVORITES FUNCTIONS
+    // UPDATE USER PASSWORD
+    func updateUserPassword(currentPassword: String, newPassword: String, confirmNewPassword: String) async {
+        errorMessage = nil
+        guard let user = Auth.auth().currentUser else {
+            errorMessage = "No authenticated user found."
+            return
+        }
+        
+        if newPassword != confirmNewPassword {
+            errorMessage = "New passwords do not match."
+            return
+        }
+        
+        if newPassword.count < 6 {
+            errorMessage = "Password should be at least 6 characters."
+            return
+        }
+        
+        do {
+            // Security-sensitive operation requires recent login.
+            guard let email = user.email else {
+                errorMessage = "User email not found for re-authentication."
+                return
+            }
+            let credential = EmailAuthProvider.credential(withEmail: email, password: currentPassword)
+            
+            try await user.reauthenticate(with: credential)
+            print("User re-authenticated successfully.")
+            
+            // Update password
+            try await user.updatePassword(to: newPassword)
+            print("Password updated successfully for \(user.email ?? "user").")
+//            errorMessage = "Password updated successfully!"
+            
+            self.password = ""
+            
+        } catch let error as NSError {
+            print("Error updating password: \(error.localizedDescription)")
+//            if let errorCode = AuthErrorCode.Code(rawValue: error.code) {
+//                switch errorCode {
+//                case .requiresRecentLogin:
+//                    errorMessage = "Please sign in again to update your password."
+//                case .wrongPassword:
+//                    errorMessage = "The current password you entered is incorrect."
+//                case .weakPassword:
+//                    errorMessage = "The new password is too weak. Please choose a stronger one."
+//                default:
+//                    errorMessage = "Failed to update password: \(error.localizedDescription)"
+//                }
+//            } else {
+//                errorMessage = "Failed to update password: \(error.localizedDescription)"
+//            }
+        }
+    }
+
     
+    // UPDATE USER DATA
+    func updateUserProfileData(newFirstName: String, newLastName: String, newPhoneNumber: String, newEmail: String) async {
+        errorMessage = nil
+        guard let uid = Auth.auth().currentUser?.uid else {
+            errorMessage = "No authenticated user to update profile for."
+            return
+        }
+        
+        let db = Firestore.firestore()
+        let userDocRef = db.collection("users").document(uid)
+        
+        let updates: [String: Any] = [
+            "firstName": newFirstName,
+            "lastName": newLastName,
+            "phoneNumber": newPhoneNumber,
+            "email": newEmail // This updates the email in Firestore, not Auth
+        ]
+        
+        do {
+            try await userDocRef.updateData(updates)
+            print("User profile data updated successfully in Firestore.")
+//            errorMessage = "Profile updated successfully!"
+            
+            self.firstName = newFirstName
+            self.lastName = newLastName
+            self.phoneNumber = newPhoneNumber
+            self.profileEmail = newEmail
+        } catch {
+            print("Error updating user profile data in Firestore: \(error.localizedDescription)")
+            errorMessage = "Failed to update profile: \(error.localizedDescription)"
+        }
+    }
+    
+    
+    // FAVORITES FUNCTIONS
     func addFavorite(_ movie: Movie) {
         guard let uid = currentUser?.uid else { return }
         self.favorites.append(movie)
