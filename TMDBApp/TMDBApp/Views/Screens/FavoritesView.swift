@@ -13,7 +13,6 @@ struct FavoritesView: View {
     let columns = [GridItem(.adaptive(minimum: 115), spacing: 10)]
 
     var body: some View {
-        Text("FavoritesView")
         VStack (alignment: .leading, spacing: 10) {
             Text("Favorites")
                 .font(.title)
