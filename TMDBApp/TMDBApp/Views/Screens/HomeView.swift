@@ -11,8 +11,8 @@ import SwiftUI
 struct HomeView: View {
     @Binding var path: NavigationPath
     
-    @StateObject private var movieViewModel = MovieViewModel()
-    @StateObject private var tvShowViewModel = TVShowViewModel()
+    @ObservedObject var movieViewModel: MovieViewModel
+    @ObservedObject var tvShowViewModel: TVShowViewModel
     
     @State private var searchTerm = ""
     
@@ -43,8 +43,9 @@ struct HomeView: View {
                 .frame(width: 360, height: 40)
                 .background(Color(.systemGray6))
                 .cornerRadius(8)
+                .padding(.top)
                 
-//                MovieSection(title: "What's popular", popularMovies: viewModel.popularMovies) // doesnt work because it doesnt load the moviesith
+//                MovieSection(title: "What's popular", popularMovies: viewModel.popularMovies) // doesnt work because it doesnt load the movies
                 
                 VStack (alignment: .leading) {
                     Text("What's popular")
@@ -87,25 +88,30 @@ struct HomeView: View {
                         LazyHStack {
                             ForEach(movieViewModel.popularMovies) { movie in
                                 ZStack(alignment: .topLeading) {
-                                    if let posterPath = movie.posterPath {
-                                        let fullURLString = "https://image.tmdb.org/t/p/w500\(posterPath)"
-                                        if let url = URL(string: fullURLString) {
-                                            AsyncImage(url: url, scale: 4) { image in
-                                                image
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .cornerRadius(10)
-                                            } placeholder: {
-                                                ProgressView()
+                                    NavigationLink(value:  movie.id) {
+                                        if let posterPath = movie.posterPath {
+                                            let fullURLString = "https://image.tmdb.org/t/p/w500\(posterPath)"
+                                            if let url = URL(string: fullURLString) {
+                                                AsyncImage(url: url, scale: 4) { image in
+                                                    image
+                                                        .resizable()
+                                                        .scaledToFill()
+                                                        .frame(width: 150, height: 225)
+                                                        .clipped()
+                                                        .cornerRadius(10)
+                                                } placeholder: {
+                                                    ProgressView()
+                                                        .frame(width: 150, height: 225)
+                                                }
                                             }
+                                        } else {
+                                            Image(systemName: "photo")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 150, height: 225)
+                                                .foregroundColor(.gray)
+                                                .cornerRadius(10)
                                         }
-                                    } else {
-                                        // Handle no poster case, maybe show a placeholder image or empty view
-                                        Image(systemName: "photo")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .foregroundColor(.gray)
-                                            .cornerRadius(10)
                                     }
                                     
                                     Button(action: {
@@ -119,6 +125,7 @@ struct HomeView: View {
                                     }
                                     .padding(8)
                                 }
+                                
                             }
                         }
                     }
@@ -142,38 +149,42 @@ struct HomeView: View {
                     ScrollView (.horizontal) {
                         LazyHStack {
                             ForEach(movieViewModel.trendingMovies) { movie in
-                                ZStack(alignment: .topLeading) {
-                                    if let posterPath = movie.posterPath {
-                                        let fullURLString = "https://image.tmdb.org/t/p/w500\(posterPath)"
-                                        if let url = URL(string: fullURLString) {
-                                            AsyncImage(url: url, scale: 4) { image in
-                                                image
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .cornerRadius(10)
-                                            } placeholder: {
-                                                ProgressView()
+                                NavigationLink(value: movie.id) {
+                                    ZStack(alignment: .topLeading) {
+                                        if let posterPath = movie.posterPath {
+                                            let fullURLString = "https://image.tmdb.org/t/p/w500\(posterPath)"
+                                            if let url = URL(string: fullURLString) {
+                                                AsyncImage(url: url, scale: 4) { image in
+                                                    image
+                                                        .resizable()
+                                                        .scaledToFill()
+                                                        .frame(width: 150, height: 225)
+                                                        .cornerRadius(10)
+                                                } placeholder: {
+                                                    ProgressView()
+                                                        .frame(width: 150, height: 225)
+                                                }
                                             }
+                                        } else {
+                                            Image(systemName: "photo")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 150, height: 225)
+                                                .foregroundColor(.gray)
+                                                .cornerRadius(10)
                                         }
-                                    } else {
-                                        // Handle no poster case, maybe show a placeholder image or empty view
-                                        Image(systemName: "photo")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .foregroundColor(.gray)
-                                            .cornerRadius(10)
+                                        
+                                        Button(action: {
+                                            isFavorite.toggle()
+                                        }) {
+                                            Image(systemName: isFavorite ? "heart.fill" : "heart")
+                                                .foregroundColor(isFavorite ? .red : .white)
+                                                .padding(8)
+                                                .background(Color.black.opacity(0.5))
+                                                .clipShape(Circle())
+                                        }
+                                        .padding(8)
                                     }
-                                    
-                                    Button(action: {
-                                        isFavorite.toggle()
-                                    }) {
-                                        Image(systemName: isFavorite ? "heart.fill" : "heart")
-                                            .foregroundColor(isFavorite ? .red : .white)
-                                            .padding(8)
-                                            .background(Color.black.opacity(0.5))
-                                            .clipShape(Circle())
-                                    }
-                                    .padding(8)
                                 }
                             }
                         }
@@ -184,8 +195,12 @@ struct HomeView: View {
 
             }
             .onAppear {
-                movieViewModel.loadPopularMovies()
-                movieViewModel.loadTrendingMovies()
+                if movieViewModel.popularMovies.isEmpty {
+                    movieViewModel.loadPopularMovies()
+                }
+                if movieViewModel.trendingMovies.isEmpty {
+                    movieViewModel.loadTrendingMovies()
+                }
             }
         }
     }
@@ -196,7 +211,7 @@ struct HomeView_Previews: PreviewProvider {
     @State static var path = NavigationPath()
     
     static var previews: some View {
-        HomeView(path: $path)
+        HomeView(path: $path, movieViewModel: MovieViewModel(), tvShowViewModel: TVShowViewModel())
     }
 }
 
