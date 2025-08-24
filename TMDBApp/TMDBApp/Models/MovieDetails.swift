@@ -7,8 +7,9 @@
 
 import Foundation
 
+struct MovieDetails: Codable, Identifiable, MediaItemDetails {
+    var displayTitle: String { title }
 
-struct MovieDetails: Codable, Identifiable {
     let id: Int
     let title: String
     let overview: String
@@ -31,42 +32,3 @@ struct MovieDetails: Codable, Identifiable {
         case credits
     }
 }
-
-struct Genre: Codable, Identifiable {
-    let id: Int
-    let name: String
-}
-
-struct Credits: Codable {
-    let cast: [CastMember]
-    let crew: [CrewMember]
-}
-
-struct CastMember: Codable, Identifiable {
-    let id: Int
-    let name: String
-    let character: String
-    let profilePath: String?
-    
-    enum CodingKeys: String, CodingKey {
-        case id
-        case name
-        case character
-        case profilePath = "profile_path"
-    }
-}
-
-struct CrewMember: Codable, Identifiable {
-    let id: Int
-    let name: String
-    let job: String
-    let profilePath: String?
-    
-    enum CodingKeys: String, CodingKey {
-        case id
-        case name
-        case job
-        case profilePath = "profile_path"
-    }
-}
-

@@ -7,6 +7,55 @@
 
 import SwiftUI
 
+struct FavoriteItemCard: View {
+    let mediaItem: MediaItem
+    @EnvironmentObject var authVM: AuthenticationViewModel
+
+    var body: some View {
+        NavigationLink(value: mediaItem.id) {
+            ZStack(alignment: .topLeading) {
+                if let posterPath = mediaItem.posterPath {
+                    let fullURLString = "https://image.tmdb.org/t/p/w500\(posterPath)"
+                    if let url = URL(string: fullURLString) {
+                        AsyncImage(url: url, scale: 4) { image in
+                            image
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 115, height: 170)
+                                .cornerRadius(10)
+                        } placeholder: {
+                            ProgressView()
+                                .frame(width: 115, height: 170)
+                        }
+                    }
+                } else {
+                    Image(systemName: "photo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 115, height: 170)
+                        .foregroundColor(.gray)
+                        .cornerRadius(10)
+                }
+                
+                Button(action: {
+                    if authVM.isFavorite(mediaItem) {
+                        authVM.removeFavorite(mediaItem)
+                    } else {
+                        authVM.addFavorite(mediaItem)
+                    }
+                }) {
+                    Image(systemName: authVM.isFavorite(mediaItem) ? "heart.fill" : "heart")
+                        .foregroundColor(authVM.isFavorite(mediaItem) ? .red : .white)
+                        .padding(8)
+                        .background(Color.black.opacity(0.5))
+                        .clipShape(Circle())
+                }
+                .padding(8)
+            }
+        }
+    }
+}
+
 struct FavoritesView: View {
     @EnvironmentObject var authVM: AuthenticationViewModel
     
@@ -26,48 +75,9 @@ struct FavoritesView: View {
             } else {
                 ScrollView {
                     LazyVGrid (columns: columns) {
-                        ForEach(authVM.favorites) { movie in
-                            NavigationLink(value: movie.id) {
-                                ZStack(alignment: .topLeading) {
-                                    if let posterPath = movie.posterPath {
-                                        let fullURLString = "https://image.tmdb.org/t/p/w500\(posterPath)"
-                                        if let url = URL(string: fullURLString) {
-                                            AsyncImage(url: url, scale: 4) { image in
-                                                image
-                                                    .resizable()
-                                                    .scaledToFill()
-                                                    .frame(width: 115, height: 170)
-                                                    .cornerRadius(10)
-                                            } placeholder: {
-                                                ProgressView()
-                                                    .frame(width: 115, height: 170)
-                                            }
-                                        }
-                                    } else {
-                                        Image(systemName: "photo")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 115, height: 170)
-                                            .foregroundColor(.gray)
-                                            .cornerRadius(10)
-                                    }
-                                    
-                                    Button(action: {
-                                        if authVM.isFavorite(movie) {
-                                            authVM.removeFavorite(movie)
-                                        } else {
-                                            authVM.addFavorite(movie)
-                                        }
-                                    }) {
-                                        Image(systemName: authVM.isFavorite(movie) ? "heart.fill" : "heart")
-                                            .foregroundColor(authVM.isFavorite(movie) ? .red : .white)
-                                            .padding(8)
-                                            .background(Color.black.opacity(0.5))
-                                            .clipShape(Circle())
-                                    }
-                                    .padding(8)
-                                }
-                            }
+                        ForEach(authVM.favorites) { mediaItem in
+                            FavoriteItemCard(mediaItem: mediaItem)
+                                .environmentObject(authVM)
                         }
                     }
                 }

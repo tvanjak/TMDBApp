@@ -1,14 +1,18 @@
 
 import SwiftUI
 
-class MovieViewModel: ObservableObject {
-    @Published var popularMovies: [Movie] = []
-    @Published var trendingMovies: [Movie] = []
-    @Published var upcomingMovies: [Movie] = []
-    @Published var nowPlayingMovies: [Movie] = []
+@MainActor
+class MediaViewModel: ObservableObject {
+    @Published var popularMovies: [MediaItem] = []
+    @Published var trendingMovies: [MediaItem] = []
+    @Published var upcomingMovies: [MediaItem] = []
+    @Published var nowPlayingMovies: [MediaItem] = []
+    @Published var popularTVShows: [MediaItem] = []
+    @Published var topRatedTVShows: [MediaItem] = []
     @Published var errorMessage: String?
-    @Published var movieDetail: MovieDetails? = nil
+    @Published var mediaDetail: (any MediaItemDetails)?
 
+    // MOVIES
     func loadPopularMovies() {
         TMDBService.shared.fetchPopularMovies { [weak self] result in
             DispatchQueue.main.async {
@@ -61,12 +65,44 @@ class MovieViewModel: ObservableObject {
         }
     }
     
-    func loadMovieDetails(movieId: Int) {
-        TMDBService.shared.fetchMovieDetails(movieId: movieId) { [weak self] result in
+    // MEDIA DETAILS
+    func loadDetails(media: MediaType) async {
+        do {
+            switch media {
+            case .movie(let id):
+                let movie: any MediaItemDetails = try await TMDBService.shared.fetchDetails(for: .movie(id: id))
+                self.mediaDetail = movie
+
+            case .tvShow(let id):
+                let tvShow: any MediaItemDetails = try await TMDBService.shared.fetchDetails(for: .tvShow(id: id))
+                self.mediaDetail = tvShow
+            }
+        } catch {
+            self.errorMessage = error.localizedDescription
+        }
+    }
+    
+    
+    // TV SHOWS
+    func loadPopularTVShows() {
+        TMDBService.shared.fetchPopularTVShows { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
-                case .success(let movie):
-                    self?.movieDetail = movie
+                case .success(let shows):
+                    self?.popularTVShows = shows
+                case .failure(let error):
+                    self?.errorMessage = error.localizedDescription
+                }
+            }
+        }
+    }
+    
+    func loadTopRatedTVShows() {
+        TMDBService.shared.fetchTopRatedTVShows { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let shows):
+                    self?.topRatedTVShows = shows
                 case .failure(let error):
                     self?.errorMessage = error.localizedDescription
                 }

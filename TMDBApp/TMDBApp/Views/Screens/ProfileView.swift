@@ -8,7 +8,7 @@
 import SwiftUI
 
 
-struct SectionsBar: View {
+struct ProfileSectionsBar: View {
     @Binding var selectedSection: ProfileView.sections
     
     var body: some View {
@@ -24,7 +24,7 @@ struct SectionsBar: View {
                 }
                 if selectedSection == .details {
                     Rectangle()
-                        .frame(width: 70, height: 4)
+                        .frame(maxWidth: .infinity, maxHeight: 4)
                 }
             }
             VStack (alignment: .center) {
@@ -38,7 +38,7 @@ struct SectionsBar: View {
                 }
                 if selectedSection == .reviews {
                     Rectangle()
-                        .frame(width: 90, height: 4)
+                        .frame(maxWidth: .infinity, maxHeight: 4)
                 }
             }
             VStack (alignment: .center) {
@@ -52,7 +52,7 @@ struct SectionsBar: View {
                 }
                 if selectedSection == .password {
                     Rectangle()
-                        .frame(width: 110, height: 4)
+                        .frame(maxWidth: .infinity, maxHeight: 4)
                 }
             }
             
@@ -360,7 +360,7 @@ struct ProfileView: View {
                         .padding()
                     }
                     
-                    SectionsBar(selectedSection: $selectedSection)
+                    ProfileSectionsBar(selectedSection: $selectedSection)
                     
                     switch selectedSection {
                     case .details:

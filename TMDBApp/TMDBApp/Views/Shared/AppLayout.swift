@@ -12,8 +12,7 @@ struct AppLayout: View {
     @State private var favoritesPath = NavigationPath()
     @State private var profilePath = NavigationPath()
     
-    @StateObject private var movieViewModel = MovieViewModel()
-    @StateObject private var tvShowViewModel = TVShowViewModel()
+    @StateObject private var mediaViewModel = MediaViewModel()
     
     @State private var selectedSection: Section = .home
     
@@ -40,12 +39,11 @@ struct AppLayout: View {
                 case .home:
                     NavigationStack(path: $homePath) {
                         HomeView(
-                            movieViewModel: movieViewModel,
-                            tvShowViewModel: tvShowViewModel
+                            mediaViewModel: mediaViewModel,
                         )
                         .environmentObject(authViewModel)
-                        .navigationDestination(for: Int.self) { movieId in
-                            MovieView(movieId: movieId)
+                        .navigationDestination(for: MediaType.self) { media in
+                            MediaDetailsView(media: media)
                                 .navigationBarBackButtonHidden(true)
                                 .toolbar(.hidden, for: .navigationBar)
                                 .environmentObject(authViewModel)
@@ -56,8 +54,8 @@ struct AppLayout: View {
                     NavigationStack(path: $favoritesPath) {
                         FavoritesView()
                             .environmentObject(authViewModel)
-                            .navigationDestination(for: Int.self) { movieId in
-                                MovieView(movieId: movieId)
+                            .navigationDestination(for: MediaType.self) { media in
+                                MediaDetailsView(media: media)
                                     .navigationBarBackButtonHidden(true)
                                     .toolbar(.hidden, for: .navigationBar)
                                     .environmentObject(authViewModel)

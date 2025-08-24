@@ -2,30 +2,31 @@ import Foundation
 
 class TMDBService {
     static let shared = TMDBService()
-
+    
     private init() {}
-
-    func fetchPopularMovies(completion: @escaping (Result<[Movie], Error>) -> Void) {
+    
+    // MOVIES
+    func fetchPopularMovies(completion: @escaping (Result<[MediaItem], Error>) -> Void) {
         let urlString = "\(Constants.baseURL)/movie/popular?api_key=\(Constants.apiKey)&language=en-US"
-
+        
         guard let url = URL(string: urlString) else {
             completion(.failure(URLError(.badURL)))
             return
         }
-
+        
         URLSession.shared.dataTask(with: url) { data, response, error in
             if let error = error {
                 completion(.failure(error))
                 return
             }
-
+            
             guard let data = data else {
                 completion(.failure(URLError(.badServerResponse)))
                 return
             }
-
+            
             do {
-                let decodedResponse = try JSONDecoder().decode(MovieResponse.self, from: data)
+                let decodedResponse = try JSONDecoder().decode(MediaItemResponse.self, from: data)
                 completion(.success(decodedResponse.results))
             } catch {
                 completion(.failure(error))
@@ -33,29 +34,29 @@ class TMDBService {
         }
         .resume()
     }
-
     
-    func fetchTrendingMovies(completion: @escaping (Result<[Movie], Error>) -> Void) {
+    
+    func fetchTrendingMovies(completion: @escaping (Result<[MediaItem], Error>) -> Void) {
         let urlString = "\(Constants.baseURL)/trending/movie/day?api_key=\(Constants.apiKey)"
-
+        
         guard let url = URL(string: urlString) else {
             completion(.failure(URLError(.badURL)))
             return
         }
-
+        
         URLSession.shared.dataTask(with: url) { data, response, error in
             if let error = error {
                 completion(.failure(error))
                 return
             }
-
+            
             guard let data = data else {
                 completion(.failure(URLError(.badServerResponse)))
                 return
             }
-
+            
             do {
-                let decodedResponse = try JSONDecoder().decode(MovieResponse.self, from: data)
+                let decodedResponse = try JSONDecoder().decode(MediaItemResponse.self, from: data)
                 completion(.success(decodedResponse.results))
             } catch {
                 completion(.failure(error))
@@ -64,27 +65,27 @@ class TMDBService {
         .resume()
     }
     
-    func fetchUpcomingMovies(completion: @escaping (Result<[Movie], Error>) -> Void) {
+    func fetchUpcomingMovies(completion: @escaping (Result<[MediaItem], Error>) -> Void) {
         let urlString = "\(Constants.baseURL)/movie/upcoming?api_key=\(Constants.apiKey)"
-
+        
         guard let url = URL(string: urlString) else {
             completion(.failure(URLError(.badURL)))
             return
         }
-
+        
         URLSession.shared.dataTask(with: url) { data, response, error in
             if let error = error {
                 completion(.failure(error))
                 return
             }
-
+            
             guard let data = data else {
                 completion(.failure(URLError(.badServerResponse)))
                 return
             }
-
+            
             do {
-                let decodedResponse = try JSONDecoder().decode(MovieResponse.self, from: data)
+                let decodedResponse = try JSONDecoder().decode(MediaItemResponse.self, from: data)
                 completion(.success(decodedResponse.results))
             } catch {
                 completion(.failure(error))
@@ -93,27 +94,27 @@ class TMDBService {
         .resume()
     }
     
-    func fetchNowPlayingMovies(completion: @escaping (Result<[Movie], Error>) -> Void) {
+    func fetchNowPlayingMovies(completion: @escaping (Result<[MediaItem], Error>) -> Void) {
         let urlString = "\(Constants.baseURL)/movie/now_playing?api_key=\(Constants.apiKey)"
-
+        
         guard let url = URL(string: urlString) else {
             completion(.failure(URLError(.badURL)))
             return
         }
-
+        
         URLSession.shared.dataTask(with: url) { data, response, error in
             if let error = error {
                 completion(.failure(error))
                 return
             }
-
+            
             guard let data = data else {
                 completion(.failure(URLError(.badServerResponse)))
                 return
             }
-
+            
             do {
-                let decodedResponse = try JSONDecoder().decode(MovieResponse.self, from: data)
+                let decodedResponse = try JSONDecoder().decode(MediaItemResponse.self, from: data)
                 completion(.success(decodedResponse.results))
             } catch {
                 completion(.failure(error))
@@ -123,44 +124,33 @@ class TMDBService {
     }
     
     
-    // MOVIE DETAILS
-    
-    
-    func fetchMovieDetails(movieId: Int, completion: @escaping (Result<MovieDetails, Error>) -> Void) {
-        let urlString = "\(Constants.baseURL)/movie/\(movieId)?api_key=\(Constants.apiKey)&append_to_response=credits"
-
-
+    // MEDIA DETAILS
+    func fetchDetails(for media: MediaType) async throws -> any MediaItemDetails {
+        let urlString: String
+        
+        switch media {
+        case .movie(let id):
+            urlString = "\(Constants.baseURL)/movie/\(id)?api_key=\(Constants.apiKey)&append_to_response=credits"
+        case .tvShow(let id):
+            urlString = "\(Constants.baseURL)/tv/\(id)?api_key=\(Constants.apiKey)&append_to_response=credits"
+        }
+        
         guard let url = URL(string: urlString) else {
-            completion(.failure(URLError(.badURL)))
-            return
+            throw URLError(.badURL)
         }
-
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            if let error = error {
-                completion(.failure(error))
-                return
-            }
-
-            guard let data = data else {
-                completion(.failure(URLError(.badServerResponse)))
-                return
-            }
-
-            do {
-                let decodedResponse = try JSONDecoder().decode(MovieDetails.self, from: data)
-                completion(.success(decodedResponse))
-            } catch {
-                completion(.failure(error))
-            }
+        
+        let (data, _) = try await URLSession.shared.data(from: url)
+        
+        switch media {
+        case .movie:
+            return try JSONDecoder().decode(MovieDetails.self, from: data)
+        case .tvShow:
+            return try JSONDecoder().decode(TVShowDetails.self, from: data)
         }
-        .resume()
     }
-    
-    
+
     // TV SHOWS
-    
-    
-    func fetchPopularTVShows(completion: @escaping (Result<[TVShow], Error>) -> Void) {
+    func fetchPopularTVShows(completion: @escaping (Result<[MediaItem], Error>) -> Void) {
         let urlString = "\(Constants.baseURL)/tv/popular?api_key=\(Constants.apiKey)&language=en-US"
 
         guard let url = URL(string: urlString) else {
@@ -180,7 +170,7 @@ class TMDBService {
             }
 
             do {
-                let decodedResponse = try JSONDecoder().decode(TVShowResponse.self, from: data)
+                let decodedResponse = try JSONDecoder().decode(MediaItemResponse.self, from: data)
                 completion(.success(decodedResponse.results))
             } catch {
                 completion(.failure(error))
@@ -190,7 +180,7 @@ class TMDBService {
     }
     
     
-    func fetchTopRatedTVShows(completion: @escaping (Result<[TVShow], Error>) -> Void) {
+    func fetchTopRatedTVShows(completion: @escaping (Result<[MediaItem], Error>) -> Void) {
         let urlString = "\(Constants.baseURL)/tv/top_rated?api_key=\(Constants.apiKey)&language=en-US"
 
         guard let url = URL(string: urlString) else {
@@ -210,7 +200,7 @@ class TMDBService {
             }
 
             do {
-                let decodedResponse = try JSONDecoder().decode(TVShowResponse.self, from: data)
+                let decodedResponse = try JSONDecoder().decode(MediaItemResponse.self, from: data)
                 completion(.success(decodedResponse.results))
             } catch {
                 completion(.failure(error))

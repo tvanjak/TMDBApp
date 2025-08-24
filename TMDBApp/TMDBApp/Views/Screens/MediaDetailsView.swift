@@ -74,10 +74,9 @@ struct MoviePoster: View {
     var genres: [Genre]
     var runtime: Int?
     
-    var movie: Movie {
-        Movie(
+    var movie: MediaItem {
+        MediaItem(
             id: id,
-            title: title,
             posterPath: posterPath,
         )
     }
@@ -271,20 +270,28 @@ struct CastView: View {
 }
 
 
-struct MovieView: View {
-    var movieId: Int
-    @StateObject private var movieViewModel = MovieViewModel()
-    
+struct MediaDetailsView: View {
+    let media: MediaType
+
+    @StateObject private var mediaViewModel = MediaViewModel()
     @EnvironmentObject var authVM: AuthenticationViewModel
     
     var body: some View {
         ScrollView {
-            if let movieDetail = movieViewModel.movieDetail {
+            if let mediaDetail = mediaViewModel.mediaDetail {
                 
                 VStack (spacing: 15) {
                     
                     // POSTER AND GENERAL INFO
-                    MoviePoster(id: movieDetail.id, posterPath: movieDetail.posterPath, voteAverage: movieDetail.voteAverage, releaseDate: movieDetail.releaseDate, title: movieDetail.title, genres: movieDetail.genres, runtime: movieDetail.runtime)
+                    MoviePoster(
+                        id: mediaDetail.id,
+                        posterPath: mediaDetail.posterPath,
+                        voteAverage: mediaDetail.voteAverage,
+                        releaseDate: mediaDetail.releaseDate,
+                        title: mediaDetail.displayTitle,
+                        genres: mediaDetail.genres,
+                        runtime: mediaDetail.runtime
+                    )
                         .environmentObject(authVM)
                     
                     // OVERVIEW
@@ -292,16 +299,16 @@ struct MovieView: View {
                         Text("Overview")
                             .font(.title)
                             .fontWeight(.bold)
-                        Text(movieDetail.overview)
+                        Text(mediaDetail.overview)
                             .font(.subheadline)
                     }
                     .padding()
                         
                     // CREW
-                    CrewView(crew: movieDetail.credits.crew)
+                    CrewView(crew: mediaDetail.credits.crew)
                     
                     // CAST
-                    CastView(cast: movieDetail.credits.cast)
+                    CastView(cast: mediaDetail.credits.cast)
                                         
                 }
             }
@@ -310,14 +317,16 @@ struct MovieView: View {
             }
         }
         .onAppear {
-            if movieViewModel.movieDetail == nil {
-                movieViewModel.loadMovieDetails(movieId: movieId)
+            if mediaViewModel.mediaDetail == nil {
+                Task {
+                    await mediaViewModel.loadDetails(media: media)
+                }
             }
         }
     }
 }
 
 #Preview {
-    MovieView(movieId: 2)
+    MediaDetailsView(media: MediaType.movie(id: 2))
         .environmentObject(AuthenticationViewModel())
 }

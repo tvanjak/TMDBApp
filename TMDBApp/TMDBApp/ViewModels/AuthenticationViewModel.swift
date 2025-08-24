@@ -10,6 +10,7 @@ import FirebaseAuth
 import FirebaseFirestore
 import Foundation
 
+@MainActor
 class AuthenticationViewModel: ObservableObject {
     @Published var profileEmail = ""
     @Published var password = ""
@@ -23,7 +24,7 @@ class AuthenticationViewModel: ObservableObject {
     @Published var currentUser: User? // Firebase User object
     private var authStateHandle: AuthStateDidChangeListenerHandle?
     
-    @Published var favorites: [Movie] = []
+    @Published var favorites: [MediaItem] = []
     private let defaults = UserDefaults.standard
 
     // INITIALIZER & DEINTIALIZER
@@ -219,20 +220,20 @@ class AuthenticationViewModel: ObservableObject {
     
     
     // FAVORITES FUNCTIONS
-    func addFavorite(_ movie: Movie) {
+    func addFavorite(_ mediaItem: MediaItem) {
         guard let uid = currentUser?.uid else { return }
-        self.favorites.append(movie)
+        favorites.append(mediaItem)
         FavoritesManager.shared.saveFavorites(favorites, for: uid)
     }
 
-    func removeFavorite(_ movie: Movie) {
+    func removeFavorite(_ mediaItem: MediaItem) {
         guard let uid = currentUser?.uid else { return }
-        self.favorites.removeAll { $0.id == movie.id }
+        self.favorites.removeAll { $0.id == mediaItem.id }
         FavoritesManager.shared.saveFavorites(favorites, for: uid)
     }
 
-    func isFavorite(_ movie: Movie) -> Bool {
-        return self.favorites.contains { $0.id == movie.id }
+    func isFavorite(_ mediaItem: MediaItem) -> Bool {
+        return self.favorites.contains { $0.id == mediaItem.id }
     }
 }
 
