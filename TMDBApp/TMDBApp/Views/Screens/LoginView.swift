@@ -37,7 +37,7 @@ struct LoginView: View {
                             CustomTextField(text: $authViewModel.email, subtitle: "Email address", placeholder: "ex. Matt", secure: false)
                             
                             
-                            CustomPasswordTextField(text: $authViewModel.password, subtitle: "Password", placeholder: "Enter your password", secure: true, forgotPasswordAction: {})
+                            CustomTextField(text: $authViewModel.password, subtitle: "Password", placeholder: "Enter your password", secure: true, forgotPasswordAction: {})
                             
                             HStack {
                                 Toggle("Remember me", isOn: $rememberMe)

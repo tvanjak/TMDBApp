@@ -8,133 +8,6 @@
 import SwiftUI
 
 
-struct MovieSectionsBar: View {
-    @Binding var selectedSection: HomeView.MovieTypes
-    
-    var body: some View {
-        VStack (alignment: .leading, spacing: 0){
-            Text("Movies")
-                .font(AppTheme.Typography.title)
-                .fontWeight(.bold)
-            ScrollView (.horizontal, showsIndicators: false) {
-                HStack (alignment: .top, spacing: AppTheme.Spacing.large) {
-                    VStack (alignment: .center) {
-                        Button() {
-                            selectedSection = .popular
-                        } label: {
-                            Text("Popular")
-                                .font(AppTheme.Typography.subtitle)
-                                .foregroundStyle(.black)
-                                .fontWeight(selectedSection == .popular ? .bold : .thin)
-                        }
-                        if selectedSection == .popular {
-                            Rectangle()
-                                .frame(height: 4)
-                                .frame(maxWidth: .infinity)
-                        }
-                    }
-                    VStack (alignment: .center) {
-                        Button() {
-                            selectedSection = .trending
-                        } label: {
-                            Text("Trending")
-                                .font(AppTheme.Typography.subtitle)
-                                .foregroundStyle(.black)
-                                .fontWeight(selectedSection == .trending ? .bold : .thin)
-                        }
-                        if selectedSection == .trending {
-                            Rectangle()
-                                .frame(height: 4)
-                                .frame(maxWidth: .infinity)
-                        }
-                    }
-                    VStack (alignment: .center) {
-                        Button() {
-                            selectedSection = .upcoming
-                        } label: {
-                            Text("Upcoming")
-                                .font(AppTheme.Typography.subtitle)
-                                .foregroundStyle(.black)
-                                .fontWeight(selectedSection == .upcoming ? .bold : .thin)
-                        }
-                        if selectedSection == .upcoming {
-                            Rectangle()
-                                .frame(height: 4)
-                                .frame(maxWidth: .infinity)
-                        }
-                    }
-                    VStack (alignment: .center) {
-                        Button() {
-                            selectedSection = .nowPlaying
-                        } label: {
-                            Text("Now Playing")
-                                .font(AppTheme.Typography.subtitle)
-                                .foregroundStyle(.black)
-                                .fontWeight(selectedSection == .nowPlaying ? .bold : .thin)
-                        }
-                        if selectedSection == .nowPlaying {
-                            Rectangle()
-                                .frame(height: 4)
-                                .frame(maxWidth: .infinity)
-                        }
-                    }
-                }
-                .fixedSize(horizontal: true, vertical: false)
-                .padding(.vertical)
-            }
-        }
-    }
-}
-
-
-struct TVShowSectionsBar: View {
-    @Binding var selectedSection: HomeView.TVShowTypes
-    
-    var body: some View {
-        VStack (alignment: .leading, spacing: 0){
-            Text("TV Shows")
-                .font(AppTheme.Typography.title)
-                .fontWeight(.bold)
-            HStack (alignment: .top, spacing: AppTheme.Spacing.large) {
-                VStack (alignment: .center) {
-                    Button() {
-                        selectedSection = .popular
-                    } label: {
-                        Text("Popular")
-                            .font(AppTheme.Typography.subtitle)
-                            .foregroundStyle(.black)
-                            .fontWeight(selectedSection == .popular ? .bold : .thin)
-                    }
-                    if selectedSection == .popular {
-                        Rectangle()
-                            .frame(height: 4)
-                            .frame(maxWidth: .infinity)
-                    }
-                }
-                VStack (alignment: .center) {
-                    Button() {
-                        selectedSection = .topRated
-                    } label: {
-                        Text("Top Rated")
-                            .font(AppTheme.Typography.subtitle)
-                            .foregroundStyle(.black)
-                            .fontWeight(selectedSection == .topRated ? .bold : .thin)
-                    }
-                    if selectedSection == .topRated {
-                        Rectangle()
-                            .frame(height: 4)
-                            .frame(maxWidth: .infinity)
-                    }
-                }
-            }
-            .fixedSize(horizontal: true, vertical: false)
-            .padding(.vertical)
-        }
-    }
-}
-
-
-
 struct MediaItemCard: View {
     let mediaItem: MediaItem
     @EnvironmentObject var authVM: AuthenticationViewModel
@@ -193,23 +66,23 @@ struct HomeView: View {
 
     @State private var searchTerm = ""
         
-    enum MovieTypes {
+    enum MovieSections: CaseIterable, Hashable {
         case popular
         case trending
         case upcoming
         case nowPlaying
     }
-    @State private var selectedMovieType: MovieTypes = .popular
+    @State private var selectedMovieSection: MovieSections = .popular
     
     
-    enum TVShowTypes {
+    enum TVShowSections: CaseIterable, Hashable {
         case popular
         case topRated
     }
-    @State private var selectedTVShowType: TVShowTypes = .popular
+    @State private var selectedTVShowSection: TVShowSections = .popular
     
     var currentMovies: [MediaItem] {
-        switch selectedMovieType {
+        switch selectedMovieSection {
         case .popular: 
             if mediaViewModel.popularMovies.isEmpty {
                 Task { @MainActor in
@@ -242,7 +115,7 @@ struct HomeView: View {
     }
 
     var currentTVShows: [MediaItem] {
-        switch selectedTVShowType {
+        switch selectedTVShowSection {
         case .popular:
             if mediaViewModel.popularTVShows.isEmpty {
                 Task { @MainActor in
@@ -277,8 +150,19 @@ struct HomeView: View {
                 .padding(.top)
                 
                 VStack (alignment: .leading) {
-                    MovieSectionsBar(selectedSection: $selectedMovieType)
-                    
+                    VStack (alignment: .leading, spacing: 0){
+                        Text("Movies")
+                            .font(AppTheme.Typography.title)
+                            .fontWeight(.bold)
+                        SectionsBar(selectedSection: $selectedMovieSection) { section in
+                            switch section {
+                            case .popular: "Popular"
+                            case .trending: "Trending"
+                            case .nowPlaying: "Now Playing"
+                            case .upcoming: "Upcoming"
+                            }
+                        }
+                    }
                     ScrollView (.horizontal) {
                         LazyHStack {
                             ForEach(currentMovies) { movie in
@@ -293,8 +177,17 @@ struct HomeView: View {
                 .padding()
                 
                 VStack (alignment: .leading) {
-                    TVShowSectionsBar(selectedSection: $selectedTVShowType)
-                    
+                    VStack (alignment: .leading, spacing: 0){
+                        Text("TV Shows")
+                            .font(AppTheme.Typography.title)
+                            .fontWeight(.bold)
+                        SectionsBar(selectedSection: $selectedTVShowSection) { section in
+                            switch section {
+                            case .popular: "Popular"
+                            case .topRated: "Top Rated"
+                            }
+                        }
+                    }
                     ScrollView (.horizontal) {
                         LazyHStack {
                             ForEach(currentTVShows) { tvShow in

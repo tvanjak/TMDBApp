@@ -8,61 +8,6 @@
 import SwiftUI
 
 
-struct ProfileSectionsBar: View {
-    @Binding var selectedSection: ProfileView.sections
-    
-    var body: some View {
-        HStack (alignment: .top, spacing: AppTheme.Spacing.large) {
-            VStack (alignment: .center) {
-                Button() {
-                    selectedSection = .details
-                } label: {
-                    Text("Details")
-                        .font(AppTheme.Typography.subtitle)
-                        .foregroundStyle(.black)
-                        .fontWeight(selectedSection == ProfileView.sections.details ? .bold : .thin)
-                }
-                if selectedSection == .details {
-                    Rectangle()
-                        .frame(height: 4)
-                        .frame(maxWidth: .infinity)                    }
-            }
-            VStack (alignment: .center) {
-                Button() {
-                    selectedSection = .reviews
-                } label: {
-                    Text("Reviews")
-                        .font(AppTheme.Typography.subtitle)
-                        .foregroundStyle(.black)
-                        .fontWeight(selectedSection == ProfileView.sections.reviews ? .bold : .thin)
-                }
-                if selectedSection == .reviews {
-                    Rectangle()
-                        .frame(height: 4)
-                        .frame(maxWidth: .infinity)                    }
-            }
-            VStack (alignment: .center) {
-                Button() {
-                    selectedSection = .password
-                } label: {
-                    Text("Password")
-                        .font(AppTheme.Typography.subtitle)
-                        .foregroundStyle(.black)
-                        .fontWeight(selectedSection == ProfileView.sections.password ? .bold : .thin)
-                }
-                if selectedSection == .password {
-                    Rectangle()
-                        .frame(height: 4)
-                        .frame(maxWidth: .infinity)                    }
-            }
-            
-        }
-        .fixedSize(horizontal: true, vertical: false)
-        .padding(.vertical)
-    }
-}
-
-
 struct DetailsSection: View {
     @Binding var firstName: String
     @Binding var lastName: String
@@ -211,6 +156,15 @@ struct DetailsSection: View {
 }
 
 
+struct ReviewsSection {
+    var body: some View {
+        Text("You have no reviews so far.")
+            .font(AppTheme.Typography.body)
+            .foregroundStyle(.secondary)
+    }
+}
+
+
 struct PasswordSection: View {
     @Binding var password: String
     @Binding var newPassword: String
@@ -285,12 +239,12 @@ struct PasswordSection: View {
 struct ProfileView: View {
     @EnvironmentObject var authViewModel: AuthenticationViewModel
     
-    enum sections {
+    enum ProfileSections: CaseIterable, Hashable {
         case details
         case reviews
         case password
     }
-    @State private var selectedSection: sections = .details
+    @State private var selectedSection: ProfileSections = .details
     @State private var addPhoneNumber: Bool = false
     @State private var editMode: Bool = false
     
@@ -360,15 +314,19 @@ struct ProfileView: View {
                         .padding()
                     }
                     
-                    ProfileSectionsBar(selectedSection: $selectedSection)
+                    SectionsBar(selectedSection: $selectedSection) { section in
+                        switch section {
+                        case .details: "Details"
+                        case .reviews: "Reviews"
+                        case .password: "Password"
+                        }
+                    }
                     
                     switch selectedSection {
                     case .details:
                         DetailsSection(firstName: $firstName, lastName: $lastName, profileEmail: $profileEmail, phoneNumber: $phoneNumber, memberSince: $memberSince, editMode: $editMode, addPhoneNumber: $addPhoneNumber, wantToLogOut: $wantToLogOut)
                     case .reviews:
-                        Text("You have no reviews so far.")
-                            .font(.headline)
-                            .foregroundStyle(.secondary)
+                        ReviewsSection()
                     case .password:
                         PasswordSection(password: $password, newPassword: $newPassword, confirmNewPassword: $confirmNewPassword)
                     }
