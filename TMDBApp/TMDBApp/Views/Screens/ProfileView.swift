@@ -12,52 +12,52 @@ struct ProfileSectionsBar: View {
     @Binding var selectedSection: ProfileView.sections
     
     var body: some View {
-        HStack (alignment: .top, spacing: 20) {
+        HStack (alignment: .top, spacing: AppTheme.Spacing.large) {
             VStack (alignment: .center) {
                 Button() {
                     selectedSection = .details
                 } label: {
                     Text("Details")
-                        .font(.title3)
+                        .font(AppTheme.Typography.subtitle)
                         .foregroundStyle(.black)
                         .fontWeight(selectedSection == ProfileView.sections.details ? .bold : .thin)
                 }
                 if selectedSection == .details {
                     Rectangle()
-                        .frame(maxWidth: .infinity, maxHeight: 4)
-                }
+                        .frame(height: 4)
+                        .frame(maxWidth: .infinity)                    }
             }
             VStack (alignment: .center) {
                 Button() {
                     selectedSection = .reviews
                 } label: {
                     Text("Reviews")
-                        .font(.title3)
+                        .font(AppTheme.Typography.subtitle)
                         .foregroundStyle(.black)
                         .fontWeight(selectedSection == ProfileView.sections.reviews ? .bold : .thin)
                 }
                 if selectedSection == .reviews {
                     Rectangle()
-                        .frame(maxWidth: .infinity, maxHeight: 4)
-                }
+                        .frame(height: 4)
+                        .frame(maxWidth: .infinity)                    }
             }
             VStack (alignment: .center) {
                 Button() {
                     selectedSection = .password
                 } label: {
                     Text("Password")
-                        .font(.title3)
+                        .font(AppTheme.Typography.subtitle)
                         .foregroundStyle(.black)
                         .fontWeight(selectedSection == ProfileView.sections.password ? .bold : .thin)
                 }
                 if selectedSection == .password {
                     Rectangle()
-                        .frame(maxWidth: .infinity, maxHeight: 4)
-                }
+                        .frame(height: 4)
+                        .frame(maxWidth: .infinity)                    }
             }
             
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .fixedSize(horizontal: true, vertical: false)
         .padding(.vertical)
     }
 }
@@ -75,124 +75,124 @@ struct DetailsSection: View {
     @Binding var wantToLogOut: Bool
     
     var body: some View {
-        VStack (spacing: 25){
+        VStack (spacing: AppTheme.Spacing.large){
             if editMode {
-                VStack (alignment: .leading, spacing: 10) {
+                VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
                     Text("First name")
-                        .font(.headline)
+                        .font(AppTheme.Typography.body)
                         .foregroundStyle(.secondary)
                         .fontWeight(.regular)
                     TextField("", text: $firstName)
-                        .font(.title3)
+                        .font(AppTheme.Typography.subtitle)
                         .frame(maxWidth: .infinity)
                         .padding()
                         .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color(red: 76/255, green: 178/255, blue: 223/255), lineWidth: 2)
-                                .shadow(radius: 8)
+                            RoundedRectangle(cornerRadius: AppTheme.Radius.small)
+                                .stroke(AppTheme.Colors.lightBlue, lineWidth: 2)
+                                .shadow(radius: AppTheme.Radius.small)
                         )
                     
                     Text("Last name")
-                        .font(.headline)
+                        .font(AppTheme.Typography.body)
                         .foregroundStyle(.secondary)
                         .fontWeight(.regular)
                     TextField("", text: $lastName)
-                        .font(.title3)
+                        .font(AppTheme.Typography.subtitle)
                         .frame(maxWidth: .infinity)
                         .padding()
                         .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color(red: 76/255, green: 178/255, blue: 223/255), lineWidth: 2)
-                                .shadow(radius: 8)
+                            RoundedRectangle(cornerRadius: AppTheme.Radius.small)
+                                .stroke(AppTheme.Colors.lightBlue, lineWidth: 2)
+                                .shadow(radius: AppTheme.Radius.small)
                         )
                 }
             }
             
-            VStack (alignment: .leading, spacing: 10) {
+            VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
                 Text("Member since")
-                    .font(.headline)
+                    .font(AppTheme.Typography.body)
                     .foregroundStyle(.secondary)
                     .fontWeight(.regular)
                 Text(memberSince)
-                    .font(.title3)
-                
+                    .font(AppTheme.Typography.subtitle)
+
             } .frame(maxWidth: .infinity, alignment: .leading)
             
-            VStack (alignment: .leading, spacing: 10) {
+            VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
                 Text("Email address")
-                    .font(.headline)
+                    .font(AppTheme.Typography.body)
                     .foregroundStyle(.secondary)
                     .fontWeight(.regular)
                 if editMode {
                     TextField("", text: $profileEmail)
-                        .font(.title3)
+                        .font(AppTheme.Typography.subtitle)
                         .frame(maxWidth: .infinity)
                         .padding()
                         .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color(red: 76/255, green: 178/255, blue: 223/255), lineWidth: 2)
-                                .shadow(radius: 8)
+                            RoundedRectangle(cornerRadius: AppTheme.Radius.small)
+                                .stroke(AppTheme.Colors.lightBlue, lineWidth: 2)
+                                .shadow(radius: AppTheme.Radius.small)
                         )
                 } else {
                     Text(profileEmail)
-                        .font(.title3)
+                        .font(AppTheme.Typography.subtitle)
                         .foregroundStyle(.black)
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(.white)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 8)
+                            RoundedRectangle(cornerRadius: AppTheme.Radius.small)
                                 .stroke(Color.gray.opacity(0.2), lineWidth: 2)
-                                .shadow(radius: 8)
+                                .shadow(radius: AppTheme.Radius.small)
                         )
                 }
             } .frame(maxWidth: .infinity, alignment: .leading)
             
-            VStack (alignment: .leading, spacing: 10) {
+            VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
                 Text("Phone number")
-                    .font(.headline)
+                    .font(AppTheme.Typography.body)
                     .foregroundStyle(.secondary)
                     .fontWeight(.regular)
                 if editMode {
                     TextField("", text: $phoneNumber)
-                        .font(.title3)
+                        .font(AppTheme.Typography.subtitle)
                         .frame(maxWidth: .infinity)
                         .padding()
                         .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color(red: 76/255, green: 178/255, blue: 223/255), lineWidth: 2)
-                                .shadow(radius: 8)
+                            RoundedRectangle(cornerRadius: AppTheme.Radius.small)
+                                .stroke(AppTheme.Colors.lightBlue, lineWidth: 2)
+                                .shadow(radius: AppTheme.Radius.small)
                         )
                 }
                 else {
                     if phoneNumber == "" {
                         Button(action: {addPhoneNumber = true}) {
                             Text("Add phone number")
-                                .font(.title3)
+                                .font(AppTheme.Typography.subtitle)
                                 .foregroundStyle(.secondary)
                                 .padding()
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .background(.gray.opacity(0.2))
-                                .cornerRadius(8)
+                                .cornerRadius(AppTheme.Radius.small)
                                 .overlay(
-                                    RoundedRectangle(cornerRadius: 8)
+                                    RoundedRectangle(cornerRadius: AppTheme.Radius.small)
                                         .stroke(Color.gray.opacity(0.2), lineWidth: 2)
-                                        .shadow(radius: 8)
+                                        .shadow(radius: AppTheme.Radius.small)
                                 )
                         } .frame(maxWidth: .infinity, alignment: .leading)
                             .buttonStyle(.plain)
                     }
                     else {
                         Text(phoneNumber)
-                            .font(.title3)
+                            .font(AppTheme.Typography.subtitle)
                             .foregroundStyle(.black)
                             .padding()
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .background(.white)
                             .overlay(
-                                RoundedRectangle(cornerRadius: 8)
+                                RoundedRectangle(cornerRadius: AppTheme.Radius.small)
                                     .stroke(Color.gray.opacity(0.2), lineWidth: 2)
-                                    .shadow(radius: 8)
+                                    .shadow(radius: AppTheme.Radius.small)
                             )
                     }
                 }
@@ -203,7 +203,7 @@ struct DetailsSection: View {
                 wantToLogOut = true
             }
             .buttonStyle(.plain)
-            .font(.title2)
+            .font(AppTheme.Typography.subtitle)
             .foregroundStyle(.secondary)
             .padding()
         }
@@ -219,61 +219,61 @@ struct PasswordSection: View {
     
     
     var body: some View {
-        VStack (spacing: 25) {
+        VStack (spacing: AppTheme.Spacing.large) {
             Text("Please enter your current password to change your password.")
                 .bold()
                 .frame(maxWidth: .infinity, alignment: .leading)
             
-            VStack (alignment: .leading, spacing: 10) {
+            VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
                 Text("Current password")
-                    .font(.headline)
+                    .font(AppTheme.Typography.body)
                     .foregroundStyle(.secondary)
                     .fontWeight(.regular)
                 SecureField("", text: $password)
-                    .font(.title3)
+                    .font(AppTheme.Typography.subtitle)
                     .foregroundStyle(.black)
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(.white)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 8)
+                        RoundedRectangle(cornerRadius: AppTheme.Radius.small)
                             .stroke(Color.gray.opacity(0.2), lineWidth: 2)
-                            .shadow(radius: 8)
+                            .shadow(radius: AppTheme.Radius.small)
                     )
             }
             
-            VStack (alignment: .leading, spacing: 10) {
+            VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
                 Text("New password")
-                    .font(.headline)
+                    .font(AppTheme.Typography.body)
                     .foregroundStyle(.secondary)
                     .fontWeight(.regular)
                 SecureField("Enter new password", text: $newPassword)
-                    .font(.title3)
+                    .font(AppTheme.Typography.subtitle)
                     .foregroundStyle(.secondary)
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(.gray.opacity(0.2))
-                    .cornerRadius(8)
+                    .cornerRadius(AppTheme.Radius.small)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 8)
+                        RoundedRectangle(cornerRadius: AppTheme.Radius.small)
                             .stroke(Color.gray.opacity(0.2), lineWidth: 2)
-                            .shadow(radius: 8)
+                            .shadow(radius: AppTheme.Radius.small)
                     )
             }
             
-            VStack (alignment: .leading, spacing: 10) {
+            VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
                 Text("Confirm new password")
-                    .font(.headline)
+                    .font(AppTheme.Typography.body)
                     .foregroundStyle(.secondary)
                     .fontWeight(.regular)
                 TextField("", text: $confirmNewPassword)
-                    .font(.title3)
+                    .font(AppTheme.Typography.subtitle)
                     .frame(maxWidth: .infinity)
                     .padding()
                     .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color(red: 76/255, green: 178/255, blue: 223/255), lineWidth: 2)
-                            .shadow(radius: 8)
+                        RoundedRectangle(cornerRadius: AppTheme.Radius.small)
+                            .stroke(AppTheme.Colors.lightBlue, lineWidth: 2)
+                            .shadow(radius: AppTheme.Radius.small)
                     )
             }
         } .frame(maxWidth: .infinity, alignment: .leading)
@@ -315,7 +315,7 @@ struct ProfileView: View {
     var body: some View {
         VStack {
             ScrollView {
-                VStack (spacing: 20) {
+                VStack (alignment: .leading, spacing: AppTheme.Spacing.large) {
                     HStack {
                         ZStack (alignment: .bottomTrailing) {
                             ZStack {
@@ -332,7 +332,7 @@ struct ProfileView: View {
                             Button(action: {print("Edit image")}) {
                                 ZStack {
                                     Circle()
-                                        .fill(Color(red: 76/255, green: 178/255, blue: 223/255),)
+                                        .fill(AppTheme.Colors.lightBlue)
                                         .frame(width: 30, height: 30)
                                     
                                     Image(systemName: "pencil")
@@ -345,7 +345,7 @@ struct ProfileView: View {
                         }
                         
                         Text("Hi, \(firstName) \(lastName)")
-                            .font(.title2)
+                            .font(AppTheme.Typography.title)
                             .fontWeight(.bold)
                         
                         Spacer()
@@ -355,7 +355,7 @@ struct ProfileView: View {
                             editMode = true
                         }
                         .buttonStyle(.plain)
-                        .font(.headline)
+                        .font(AppTheme.Typography.body)
                         .foregroundStyle(.secondary)
                         .padding()
                     }
@@ -373,7 +373,7 @@ struct ProfileView: View {
                         PasswordSection(password: $password, newPassword: $newPassword, confirmNewPassword: $confirmNewPassword)
                     }
                 }
-                .padding(25)
+                .padding(AppTheme.Spacing.large)
             }
             
             if editMode {
@@ -399,9 +399,9 @@ struct ProfileView: View {
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color(red: 76/255, green: 178/255, blue: 223/255))
+                        .background(AppTheme.Colors.lightBlue)
                         .foregroundColor(.white)
-                        .cornerRadius(12)
+                        .cornerRadius(AppTheme.Radius.medium)
                         .padding()
                 }
             }
@@ -427,9 +427,9 @@ struct ProfileView: View {
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color(red: 76/255, green: 178/255, blue: 223/255))
+                        .background(AppTheme.Colors.lightBlue)
                         .foregroundColor(.white)
-                        .cornerRadius(12)
+                        .cornerRadius(AppTheme.Radius.small)
                         .padding()
                 }
             }

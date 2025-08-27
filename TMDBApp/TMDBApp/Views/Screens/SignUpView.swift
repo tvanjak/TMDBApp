@@ -10,24 +10,25 @@ import FirebaseAuth
 
 struct SignUpView: View {
     
-    @StateObject var authViewModel = AuthenticationViewModel()
+    @EnvironmentObject var authViewModel: AuthenticationViewModel
+
     @State private var confirmPassword: String = ""
     @State private var localErrorMessage: String?
     
     
     var body: some View {
         ZStack {
-            Color(red: 11/255, green: 37/255, blue: 63/255)
+            AppTheme.Colors.background
                 .ignoresSafeArea(.all)
             NavigationStack {
                 VStack  {
                     HeaderView()
                     ScrollView {
-                        VStack (spacing: 30) {
+                        VStack (spacing: AppTheme.Spacing.large) {
                             
                             HStack {
                                 Text("Sign up to continue")
-                                    .font(.title)
+                                    .font(AppTheme.Typography.title)
                                     .foregroundStyle(.white)
                                 Spacer()
                             } .padding(.horizontal)
@@ -60,7 +61,7 @@ struct SignUpView: View {
                             Rectangle()
                                 .frame(height: 1)
                                 .padding(.horizontal)
-                                .foregroundColor(Color(red: 76/255, green: 178/255, blue: 223/255))
+                                .foregroundColor(AppTheme.Colors.darkBlue)
                             
                             Button {
                                 localErrorMessage = nil
@@ -74,32 +75,32 @@ struct SignUpView: View {
                             } label: {
                                 Text("Sign Up") 
                                     .bold()
-                                    .font(.title3)
+                                    .font(AppTheme.Typography.body)
                                     .foregroundColor(.white)
                                     .frame(maxWidth: .infinity, maxHeight: 20)
                                     .padding()
-                                    .background(Color(red: 76/255, green: 178/255, blue: 223/255))
-                                    .cornerRadius(12)
+                                    .background(AppTheme.Colors.lightBlue)
+                                    .cornerRadius(AppTheme.Radius.medium)
                             }
-                            .padding(.horizontal,30)
+                            .padding(.horizontal, AppTheme.Spacing.large)
                             
                             
                             HStack {
                                 Text("Already have a TMDB account?")
                                     .foregroundStyle(.white)
-                                    .font(.headline)
+                                    .font(AppTheme.Typography.body)
                                     .fontWeight(.regular)
                                 NavigationLink(destination: LoginView()) {
                                     Text("Sign in here")
                                         .foregroundColor(.blue)
-                                        .font(.headline)
+                                        .font(AppTheme.Typography.body)
                                 }
                             }
                             
                         }
                     }
                 }
-                .background(Color(red: 11/255, green: 37/255, blue: 63/255))
+                .background(AppTheme.Colors.background)
             }
         }
     }
@@ -107,4 +108,5 @@ struct SignUpView: View {
 
 #Preview {
     SignUpView()
+        .environmentObject(AuthenticationViewModel())
 }

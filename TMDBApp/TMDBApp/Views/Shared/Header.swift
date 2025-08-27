@@ -24,24 +24,24 @@ struct HeaderView: View {
             
             Spacer()
             Text("TMDB")
-                .font(.largeTitle)
+                .font(AppTheme.Typography.largeTitle)
                 .bold()
                 .foregroundStyle(
                     LinearGradient(
                         gradient: Gradient(colors: [
-                            Color(red: 154/255, green: 203/255, blue: 165/255),
-                            Color(red: 76/255, green: 178/255, blue: 223/255)
+                            AppTheme.Colors.lightGreen,
+                            AppTheme.Colors.lightBlue
                         ]),
                         startPoint: .leading,
                         endPoint: .trailing
                     )
                 )
-            RoundedRectangle(cornerRadius: 15)
+            RoundedRectangle(cornerRadius: AppTheme.Radius.medium)
                 .foregroundStyle(
                     LinearGradient(
                         gradient: Gradient(colors: [
-                            Color(red: 154/255, green: 203/255, blue: 165/255),
-                            Color(red: 76/255, green: 178/255, blue: 223/255)
+                            AppTheme.Colors.lightGreen,
+                            AppTheme.Colors.lightBlue
                         ]),
                         startPoint: .leading,
                         endPoint: .trailing
@@ -55,7 +55,7 @@ struct HeaderView: View {
             }
         }
         .padding()
-        .background(Color(red: 11/255, green: 37/255, blue: 63/255))
+        .background(AppTheme.Colors.background)
     }
 }
 

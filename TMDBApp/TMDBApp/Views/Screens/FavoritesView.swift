@@ -22,7 +22,7 @@ struct FavoriteItemCard: View {
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width: 115, height: 170)
-                                .cornerRadius(10)
+                                .cornerRadius(AppTheme.Radius.medium)
                         } placeholder: {
                             ProgressView()
                                 .frame(width: 115, height: 170)
@@ -34,7 +34,7 @@ struct FavoriteItemCard: View {
                         .scaledToFit()
                         .frame(width: 115, height: 170)
                         .foregroundColor(.gray)
-                        .cornerRadius(10)
+                        .cornerRadius(AppTheme.Radius.medium)
                 }
                 
                 Button(action: {
@@ -46,11 +46,11 @@ struct FavoriteItemCard: View {
                 }) {
                     Image(systemName: authVM.isFavorite(mediaItem) ? "heart.fill" : "heart")
                         .foregroundColor(authVM.isFavorite(mediaItem) ? .red : .white)
-                        .padding(8)
+                        .padding(AppTheme.Spacing.small)
                         .background(Color.black.opacity(0.5))
                         .clipShape(Circle())
                 }
-                .padding(8)
+                .padding(AppTheme.Spacing.small)
             }
         }
     }
@@ -59,17 +59,17 @@ struct FavoriteItemCard: View {
 struct FavoritesView: View {
     @EnvironmentObject var authVM: AuthenticationViewModel
     
-    let columns = [GridItem(.adaptive(minimum: 115), spacing: 10)]
+    let columns = [GridItem(.adaptive(minimum: 115), spacing: AppTheme.Spacing.small)]
 
     var body: some View {
-        VStack (alignment: .leading, spacing: 10) {
+        VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
             Text("Favorites")
-                .font(.title)
+                .font(AppTheme.Typography.title)
                 .fontWeight(.bold)
                 .padding(.vertical)
             if authVM.favorites.isEmpty {
                 Text("Your favorites list is currently empty")
-                    .font(.subheadline)
+                    .font(AppTheme.Typography.body)
                     .fontWeight(.thin)
                 Spacer()
             } else {

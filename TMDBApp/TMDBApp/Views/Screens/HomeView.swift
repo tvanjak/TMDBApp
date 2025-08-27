@@ -14,22 +14,23 @@ struct MovieSectionsBar: View {
     var body: some View {
         VStack (alignment: .leading, spacing: 0){
             Text("Movies")
-                .font(.title2)
+                .font(AppTheme.Typography.title)
                 .fontWeight(.bold)
             ScrollView (.horizontal, showsIndicators: false) {
-                HStack (alignment: .top, spacing: 20) {
+                HStack (alignment: .top, spacing: AppTheme.Spacing.large) {
                     VStack (alignment: .center) {
                         Button() {
                             selectedSection = .popular
                         } label: {
                             Text("Popular")
-                                .font(.title3)
+                                .font(AppTheme.Typography.subtitle)
                                 .foregroundStyle(.black)
                                 .fontWeight(selectedSection == .popular ? .bold : .thin)
                         }
                         if selectedSection == .popular {
                             Rectangle()
-                                .frame(maxWidth: .infinity, maxHeight: 4)
+                                .frame(height: 4)
+                                .frame(maxWidth: .infinity)
                         }
                     }
                     VStack (alignment: .center) {
@@ -37,13 +38,14 @@ struct MovieSectionsBar: View {
                             selectedSection = .trending
                         } label: {
                             Text("Trending")
-                                .font(.title3)
+                                .font(AppTheme.Typography.subtitle)
                                 .foregroundStyle(.black)
                                 .fontWeight(selectedSection == .trending ? .bold : .thin)
                         }
                         if selectedSection == .trending {
                             Rectangle()
-                                .frame(maxWidth: .infinity, maxHeight: 4)
+                                .frame(height: 4)
+                                .frame(maxWidth: .infinity)
                         }
                     }
                     VStack (alignment: .center) {
@@ -51,13 +53,14 @@ struct MovieSectionsBar: View {
                             selectedSection = .upcoming
                         } label: {
                             Text("Upcoming")
-                                .font(.title3)
+                                .font(AppTheme.Typography.subtitle)
                                 .foregroundStyle(.black)
                                 .fontWeight(selectedSection == .upcoming ? .bold : .thin)
                         }
                         if selectedSection == .upcoming {
                             Rectangle()
-                                .frame(maxWidth: .infinity, maxHeight: 4)
+                                .frame(height: 4)
+                                .frame(maxWidth: .infinity)
                         }
                     }
                     VStack (alignment: .center) {
@@ -65,13 +68,14 @@ struct MovieSectionsBar: View {
                             selectedSection = .nowPlaying
                         } label: {
                             Text("Now Playing")
-                                .font(.title3)
+                                .font(AppTheme.Typography.subtitle)
                                 .foregroundStyle(.black)
                                 .fontWeight(selectedSection == .nowPlaying ? .bold : .thin)
                         }
                         if selectedSection == .nowPlaying {
                             Rectangle()
-                                .frame(maxWidth: .infinity, maxHeight: 4)
+                                .frame(height: 4)
+                                .frame(maxWidth: .infinity)
                         }
                     }
                 }
@@ -89,15 +93,15 @@ struct TVShowSectionsBar: View {
     var body: some View {
         VStack (alignment: .leading, spacing: 0){
             Text("TV Shows")
-                .font(.title2)
+                .font(AppTheme.Typography.title)
                 .fontWeight(.bold)
-            HStack (alignment: .top, spacing: 20) {
+            HStack (alignment: .top, spacing: AppTheme.Spacing.large) {
                 VStack (alignment: .center) {
                     Button() {
                         selectedSection = .popular
                     } label: {
                         Text("Popular")
-                            .font(.title3)
+                            .font(AppTheme.Typography.subtitle)
                             .foregroundStyle(.black)
                             .fontWeight(selectedSection == .popular ? .bold : .thin)
                     }
@@ -112,7 +116,7 @@ struct TVShowSectionsBar: View {
                         selectedSection = .topRated
                     } label: {
                         Text("Top Rated")
-                            .font(.title3)
+                            .font(AppTheme.Typography.subtitle)
                             .foregroundStyle(.black)
                             .fontWeight(selectedSection == .topRated ? .bold : .thin)
                     }
@@ -146,7 +150,7 @@ struct MediaItemCard: View {
                                 .scaledToFill()
                                 .frame(width: 150, height: 225)
                                 .clipped()
-                                .cornerRadius(10)
+                                .cornerRadius(AppTheme.Radius.medium)
                         } placeholder: {
                             ProgressView()
                                 .frame(width: 150, height: 225)
@@ -158,7 +162,7 @@ struct MediaItemCard: View {
                         .scaledToFit()
                         .frame(width: 150, height: 225)
                         .foregroundColor(.gray)
-                        .cornerRadius(10)
+                        .cornerRadius(AppTheme.Radius.medium)
                 }
             
             
@@ -171,11 +175,11 @@ struct MediaItemCard: View {
             }) {
                 Image(systemName: authVM.isFavorite(mediaItem) ? "heart.fill" : "heart")
                     .foregroundColor(authVM.isFavorite(mediaItem) ? .red : .white)
-                    .padding(8)
+                    .padding(AppTheme.Spacing.small)
                     .background(Color.black.opacity(0.5))
                     .clipShape(Circle())
             }
-            .padding(8)
+            .padding(AppTheme.Spacing.small)
         }
     }
 }
@@ -266,10 +270,10 @@ struct HomeView: View {
                     TextField("Search", text: $searchTerm)
                         .textFieldStyle(PlainTextFieldStyle())
                 }
-                .padding(10)
+                .padding(AppTheme.Spacing.small)
                 .frame(width: 360, height: 40)
                 .background(Color(.systemGray6))
-                .cornerRadius(8)
+                .cornerRadius(AppTheme.Radius.small)
                 .padding(.top)
                 
                 VStack (alignment: .leading) {

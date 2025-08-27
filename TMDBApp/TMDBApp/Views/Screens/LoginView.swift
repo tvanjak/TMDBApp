@@ -9,31 +9,31 @@ import SwiftUI
 
 struct LoginView: View {
     
-    @StateObject var authViewModel = AuthenticationViewModel()
+    @EnvironmentObject var authViewModel: AuthenticationViewModel
     @State private var rememberMe: Bool = false
     
     var body: some View {
         ZStack {
-            Color(red: 11/255, green: 37/255, blue: 63/255)
+            AppTheme.Colors.background
                 .ignoresSafeArea(.all)
             
             NavigationStack {
                 VStack (spacing: 0) {
                     HeaderView()
                     ScrollView {
-                        VStack (spacing: 30) {
+                        VStack (spacing: AppTheme.Spacing.large) {
                             
                             Text("Sign in to your ")
-                                .font(.title)
+                                .font(AppTheme.Typography.title)
                                 .foregroundStyle(.white)
                             + Text("TMDB")
-                                .font(.title)
+                                .font(AppTheme.Typography.title)
                                 .bold()
                                 .foregroundStyle(.white)
                             + Text(" account to continue.")
                                 .foregroundStyle(.white)
-                                .font(.title)
-                            
+                                .font(AppTheme.Typography.title)
+
                             CustomTextField(text: $authViewModel.email, subtitle: "Email address", placeholder: "ex. Matt", secure: false)
                             
                             
@@ -51,8 +51,8 @@ struct LoginView: View {
                             Rectangle()
                                 .frame(height: 1)
                                 .padding(.horizontal)
-                                .foregroundColor(Color(red: 76/255, green: 178/255, blue: 223/255))
-                            
+                                .foregroundColor(AppTheme.Colors.lightBlue)
+
                             Button {
                                 Task {
                                     await authViewModel.signIn() // add navigation
@@ -60,31 +60,34 @@ struct LoginView: View {
                             } label: {
                                 Text("Sign in")
                                     .bold()
-                                    .font(.title3)
+                                    .font(AppTheme.Typography.body)
                                     .foregroundColor(.white)
                                     .frame(maxWidth: .infinity, maxHeight: 20)
                                     .padding()
-                                    .background(Color(red: 76/255, green: 178/255, blue: 223/255))
-                                    .cornerRadius(12)
+                                    .background(AppTheme.Colors.lightBlue)
+                                    .cornerRadius(AppTheme.Radius.medium)
                             }
-                            .padding(.horizontal,30)
+                            .padding(.horizontal, AppTheme.Spacing.large)
                             
                             HStack {
                                 Text("Don't have a TMDB account?")
                                     .foregroundStyle(.white)
-                                    .font(.headline)
+                                    .font(AppTheme.Typography.body)
                                     .fontWeight(.regular)
-                                NavigationLink(destination: SignUpView()) {
+                                NavigationLink(destination:
+                                    SignUpView()
+                                        .environmentObject(authViewModel)
+                                ) {
                                     Text("Create one here")
                                         .foregroundColor(.blue)
-                                        .font(.headline)
+                                        .font(AppTheme.Typography.body)
                                 }
                             }
                             
                         }
                     }
                 }
-                .background(Color(red: 11/255, green: 37/255, blue: 63/255))
+                .background(AppTheme.Colors.background)
                 // Optional: For iOS 16+ to make the actual navigation bar transparent if it's still showing white
                 .toolbarBackground(.hidden, for: .navigationBar)
                 // Ensures status bar text (time, battery) is visible on a dark background
@@ -96,4 +99,5 @@ struct LoginView: View {
 
 #Preview {
     LoginView()
+        .environmentObject(AuthenticationViewModel())
 }

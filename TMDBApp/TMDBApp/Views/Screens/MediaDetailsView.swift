@@ -96,14 +96,14 @@ struct MoviePoster: View {
                             .clipped()
                     } placeholder: {
                         ProgressView()
-                            .frame(height: 350)
+                            .frame(height: 360)
                     }
                 }
             } else {
                 Image(systemName: "photo")
                     .resizable()
                     .scaledToFill()
-                    .frame(maxWidth: .infinity, maxHeight: 360)
+                    .frame(width: UIScreen.main.bounds.width, height: 360)
                     .clipped()
                     .foregroundColor(.black)
             }
@@ -111,27 +111,28 @@ struct MoviePoster: View {
             VStack (alignment: .leading) {
                 HStack {
                     RatingRing(rating: voteAverage/10)
-                        .padding(.trailing, 5)
+                        .padding(.trailing, AppTheme.Spacing.small)
                     Text("User score")
-                        .font(.title3)
+                        .font(AppTheme.Typography.body)
+                        .fontWeight(.bold)
                         .foregroundStyle(.white)
                         .fontWeight(.semibold)
                 }
                 Text(title)
-                    .font(.largeTitle)
+                    .font(AppTheme.Typography.largeTitle)
                     .fontWeight(.bold)
                     .foregroundStyle(.white)
                 + Text(" (\(releaseDate.releaseYear()))")
-                    .font(.title)
+                    .font(AppTheme.Typography.largeTitle)
                     .foregroundStyle(.white)
-                Text(releaseDate.invertedDate())
-                    .font(.title3)
-                    .foregroundStyle(.white)
-                let genresString = genres.map { $0.name }.joined(separator: ", ")
-                
-                VStack(alignment: .leading, spacing: 5) {
+                VStack(alignment: .leading) {
+                    Text(releaseDate.invertedDate())
+                        .font(AppTheme.Typography.body)
+                        .foregroundStyle(.white)
+                    
+                    let genresString = genres.map { $0.name }.joined(separator: ", ")
                     Text(genresString)
-                        .font(.title3)
+                        .font(AppTheme.Typography.body)
                         .foregroundStyle(.white)
                         .fixedSize(horizontal: false, vertical: true)
                     
@@ -142,10 +143,9 @@ struct MoviePoster: View {
                         Text(hours > 0
                              ? "\(hours)h \(actualMinutes > 0 ? "\(actualMinutes)m" : "")"
                              : "\(actualMinutes)m")
-                        .font(.title3)
+                        .font(AppTheme.Typography.body)
                         .foregroundStyle(.white)
                         .bold()
-                        .padding(.top, 2)
                     }
                 }
                 
@@ -159,17 +159,17 @@ struct MoviePoster: View {
                     }) {
                         Image(systemName: authVM.isFavorite(movie) ? "heart.fill" : "heart")
                             .foregroundColor(authVM.isFavorite(movie) ? .red : .white)
-                            .padding(8)
+                            .padding(AppTheme.Spacing.small)
                             .background(Color.black.opacity(0.5))
                             .clipShape(Circle())
                     }
                     Spacer()
                     Text("Leave a review")
-                        .font(.headline)
+                        .font(AppTheme.Typography.body)
                         .fontWeight(.bold)
                         .frame(width: 180, height: 40)
                         .background(Color.gray)
-                        .cornerRadius(10)
+                        .cornerRadius(AppTheme.Radius.small)
                         .foregroundStyle(.white)
                 }
             }
@@ -185,22 +185,25 @@ struct CrewView: View {
     var body: some View {
         VStack {
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .top, spacing: 15) {
+                HStack(alignment: .top, spacing: AppTheme.Spacing.medium) {
                     ForEach(Array(stride(from: 0, to: crew.count, by: 2)), id: \.self) { index in
-                        VStack (alignment: .leading, spacing: 15) {
-                            VStack(alignment: .leading, spacing: 5) {
+                        VStack (alignment: .leading, spacing: AppTheme.Spacing.medium) {
+                            VStack(alignment: .leading, spacing: AppTheme.Spacing.small) {
                                 Text(crew[index].name)
+                                    .font(AppTheme.Typography.body)
                                     .fontWeight(.bold)
                                 Text(crew[index].job)
+                                    .font(AppTheme.Typography.body)
                                     .font(.subheadline)
                             }
-                            VStack(alignment: .leading, spacing: 5) {
+                            VStack(alignment: .leading, spacing: AppTheme.Spacing.small) {
                                 // rendering second item in this column
                                 if index + 1 < crew.count {
                                     Text(crew[index + 1].name)
+                                        .font(AppTheme.Typography.body)
                                         .fontWeight(.bold)
                                     Text(crew[index + 1].job)
-                                        .font(.subheadline)
+                                        .font(AppTheme.Typography.body)
                                 }
                             }
                         }
@@ -225,9 +228,9 @@ struct CastView: View {
                 .font(.title)
                 .fontWeight(.bold)
             ScrollView (.horizontal, showsIndicators: false) {
-                HStack (spacing: 20) {
+                HStack (spacing: AppTheme.Spacing.medium) {
                     ForEach(cast) {castMember in
-                        VStack (alignment: .leading, spacing: 5) {
+                        VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
                             if let profilePath = castMember.profilePath {
                                 let fullURLString = "https://image.tmdb.org/t/p/w200\(profilePath)"
                                 if let url = URL(string: fullURLString) {
@@ -248,18 +251,19 @@ struct CastView: View {
                                     .foregroundColor(.gray)
                             }
                             Text(castMember.name)
-                                .font(.title3)
-                                .fontWeight(.semibold)
-                                .padding(.horizontal, 5)
+                                .font(AppTheme.Typography.body)
+                                .fontWeight(.bold)
+                                .padding(.horizontal, AppTheme.Spacing.small)
                             Text(castMember.character)
-                                .foregroundStyle(.gray)
-                                .padding(.horizontal, 5)
+                                .font(AppTheme.Typography.body)
+                                .foregroundStyle(AppTheme.Colors.textSecondary)
+                                .padding(.horizontal, AppTheme.Spacing.small)
                             Spacer()
                         }
                         .frame(width: 150, height: 250)
                         .background(Color.white) 
-                        .cornerRadius(20)
-                        .shadow(color: Color.black.opacity(0.2), radius: 5, x: 2, y: 4)
+                        .cornerRadius(AppTheme.Radius.medium)
+                        .shadow(color: Color.black.opacity(0.1), radius: AppTheme.Radius.small)
                         .padding(.vertical)
                     }
                 }
@@ -280,7 +284,7 @@ struct MediaDetailsView: View {
         ScrollView {
             if let mediaDetail = mediaViewModel.mediaDetail {
                 
-                VStack (spacing: 15) {
+                VStack (spacing: AppTheme.Spacing.medium) {
                     
                     // POSTER AND GENERAL INFO
                     MoviePoster(
@@ -295,12 +299,12 @@ struct MediaDetailsView: View {
                         .environmentObject(authVM)
                     
                     // OVERVIEW
-                    VStack (alignment: .leading, spacing: 10) {
+                    VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
                         Text("Overview")
-                            .font(.title)
+                            .font(AppTheme.Typography.title)
                             .fontWeight(.bold)
                         Text(mediaDetail.overview)
-                            .font(.subheadline)
+                            .font(AppTheme.Typography.body)
                     }
                     .padding()
                         
@@ -327,6 +331,6 @@ struct MediaDetailsView: View {
 }
 
 #Preview {
-    MediaDetailsView(media: MediaType.movie(id: 2))
+    MediaDetailsView(media: MediaType.movie(id: 6))
         .environmentObject(AuthenticationViewModel())
 }

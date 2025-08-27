@@ -17,7 +17,7 @@ struct FooterView: View {
                 VStack {
                     Image(systemName: "house")
                     Text("Home")
-                        .font(.subheadline)
+                        .font(AppTheme.Typography.body)
                         .fontWeight(.light)
                 }
             }
@@ -26,7 +26,7 @@ struct FooterView: View {
                 VStack {
                     Image(systemName: "heart")
                     Text("Favorites")
-                        .font(.subheadline)
+                        .font(AppTheme.Typography.body)
                         .fontWeight(.light)
                 }
             }
@@ -35,7 +35,7 @@ struct FooterView: View {
                 VStack {
                     Image(systemName: "person")
                     Text("Profile")
-                        .font(.subheadline)
+                        .font(AppTheme.Typography.body)
                         .fontWeight(.light)
                 }
             }
