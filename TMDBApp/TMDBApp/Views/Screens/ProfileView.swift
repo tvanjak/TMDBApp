@@ -156,7 +156,7 @@ struct DetailsSection: View {
 }
 
 
-struct ReviewsSection {
+struct ReviewsSection: View {
     var body: some View {
         Text("You have no reviews so far.")
             .font(AppTheme.Typography.body)
