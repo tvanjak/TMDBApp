@@ -10,7 +10,7 @@ import SwiftUI
 struct LaunchScreen: View {
     var body: some View {
         ZStack {
-            Color(red: 11/255, green: 37/255, blue: 63/255)
+            AppTheme.Colors.background
                 .ignoresSafeArea()
         }
     }
