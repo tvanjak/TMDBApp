@@ -57,29 +57,23 @@ class AuthenticationViewModel: ObservableObject {
         do {
             let result = try await Auth.auth().createUser(withEmail: email, password: password)
             let uid = result.user.uid
-
+            
             // memberSince value
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "dd/MM/yyyy"
             let memberSinceDateString = dateFormatter.string(from: Date())
-
+            
             // Save additional user data to Firestore
             let db = Firestore.firestore()
-            db.collection("users").document(uid).setData([
+            try await db.collection("users").document(uid).setData([
                 "firstName": firstName,
                 "lastName": lastName,
                 "phoneNumber": phoneNumber,
                 "email": email,
                 "memberSince": memberSinceDateString
-            ]) { err in
-                if let err = err {
-                    print("Error writing document: \(err)")
-                    self.errorMessage = "Failed to save user data."
-                } else {
-                    print("User data successfully written!")
-                    // User is signed in and data is saved. Navigate to main app.
-                }
-            }
+            ])
+            
+            print("User data successfully written!")
         } catch {
             print("Error signing up: \(error.localizedDescription)")
             self.errorMessage = error.localizedDescription
