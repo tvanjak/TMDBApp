@@ -6,29 +6,19 @@ class TVShowViewModel: ObservableObject {
     @Published var topRatedTVShows: [TVShow] = []
     @Published var errorMessage: String?
     
-    func loadPopularTVShows() {
-        TMDBService.shared.fetchPopularTVShows { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let shows):
-                    self?.popularTVShows = shows
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
-                }
-            }
+    func loadPopularTVShows() async {
+        do {
+            popularTVShows = try await TMDBService.shared.fetchPopularTVShows()
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
     
-    func loadTopRatedTVShows() {
-        TMDBService.shared.fetchTopRatedTVShows { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let shows):
-                    self?.topRatedTVShows = shows
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
-                }
-            }
+    func loadTopRatedTVShows() async {
+        do {
+            topRatedTVShows = try await TMDBService.shared.fetchTopRatedTVShows()
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
 }

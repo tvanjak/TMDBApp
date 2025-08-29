@@ -11,8 +11,8 @@ import SwiftUI
 struct HomeView: View {
     @Binding var path: NavigationPath
     
-    @ObservedObject var movieViewModel: MovieViewModel
-    @ObservedObject var tvShowViewModel: TVShowViewModel
+    @EnvironmentObject var movieViewModel: MovieViewModel
+    @EnvironmentObject var tvShowViewModel: TVShowViewModel
     
     @State private var searchTerm = ""
     
@@ -89,8 +89,7 @@ struct HomeView: View {
                             ForEach(movieViewModel.popularMovies) { movie in
                                 ZStack(alignment: .topLeading) {
                                     NavigationLink(value:  movie.id) {
-                                        if let posterPath = movie.posterPath {
-                                            let fullURLString = "https://image.tmdb.org/t/p/w500\(posterPath)"
+                                        if let fullURLString = movie.fullPosterPath {
                                             if let url = URL(string: fullURLString) {
                                                 AsyncImage(url: url, scale: 4) { image in
                                                     image
@@ -151,8 +150,7 @@ struct HomeView: View {
                             ForEach(movieViewModel.trendingMovies) { movie in
                                 NavigationLink(value: movie.id) {
                                     ZStack(alignment: .topLeading) {
-                                        if let posterPath = movie.posterPath {
-                                            let fullURLString = "https://image.tmdb.org/t/p/w500\(posterPath)"
+                                        if let fullURLString = movie.fullPosterPath {
                                             if let url = URL(string: fullURLString) {
                                                 AsyncImage(url: url, scale: 4) { image in
                                                     image
@@ -195,11 +193,13 @@ struct HomeView: View {
 
             }
             .onAppear {
-                if movieViewModel.popularMovies.isEmpty {
-                    movieViewModel.loadPopularMovies()
-                }
-                if movieViewModel.trendingMovies.isEmpty {
-                    movieViewModel.loadTrendingMovies()
+                Task {
+                    if movieViewModel.popularMovies.isEmpty {
+                        await movieViewModel.loadPopularMovies()
+                    }
+                    if movieViewModel.trendingMovies.isEmpty {
+                        await movieViewModel.loadTrendingMovies()
+                    }
                 }
             }
         }
@@ -211,7 +211,9 @@ struct HomeView_Previews: PreviewProvider {
     @State static var path = NavigationPath()
     
     static var previews: some View {
-        HomeView(path: $path, movieViewModel: MovieViewModel(), tvShowViewModel: TVShowViewModel())
+        HomeView(path: $path)
+            .environmentObject(MovieViewModel())
+            .environmentObject(TVShowViewModel())
     }
 }
 

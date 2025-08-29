@@ -10,7 +10,7 @@ import FirebaseAuth
 
 struct SignUpView: View {
     
-    @StateObject var authViewModel = AuthenticationViewModel()
+    @EnvironmentObject var authViewModel: AuthenticationViewModel
     @State private var confirmPassword: String = ""
     @State private var localErrorMessage: String?
     
@@ -89,7 +89,9 @@ struct SignUpView: View {
                                     .foregroundStyle(.white)
                                     .font(.headline)
                                     .fontWeight(.regular)
-                                NavigationLink(destination: LoginView()) {
+                                NavigationLink(destination: LoginView()
+                                    .environmentObject(authViewModel)
+                                ) {
                                     Text("Sign in here")
                                         .foregroundColor(.blue)
                                         .font(.headline)
@@ -107,4 +109,5 @@ struct SignUpView: View {
 
 #Preview {
     SignUpView()
+        .environmentObject(AuthenticationViewModel())
 }
