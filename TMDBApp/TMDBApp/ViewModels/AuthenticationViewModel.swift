@@ -134,5 +134,13 @@ class AuthenticationViewModel: ObservableObject {
     func isFavorite(_ movie: Movie) -> Bool {
         return self.favorites.contains { $0.id == movie.id }
     }
+    
+    func toggleFavorite(_ movie: Movie) {
+        if isFavorite(movie) {
+            removeFavorite(movie)
+        } else {
+            addFavorite(movie)
+        }
+    }
 }
 

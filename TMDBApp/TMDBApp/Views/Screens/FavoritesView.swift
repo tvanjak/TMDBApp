@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FavoritesView: View {
-    @EnvironmentObject var authVM: AuthenticationViewModel
+    @EnvironmentObject var authViewModel: AuthenticationViewModel
     
     let columns = [GridItem(.adaptive(minimum: 115), spacing: 10)]
 
@@ -18,7 +18,7 @@ struct FavoritesView: View {
                 .font(.title)
                 .fontWeight(.bold)
                 .padding(.vertical)
-            if authVM.favorites.isEmpty {
+            if authViewModel.favorites.isEmpty {
                 Text("Your favorites list is currently empty")
                     .font(.subheadline)
                     .fontWeight(.thin)
@@ -26,7 +26,7 @@ struct FavoritesView: View {
             } else {
                 ScrollView {
                     LazyVGrid (columns: columns) {
-                        ForEach(authVM.favorites) { movie in
+                        ForEach(authViewModel.favorites) { movie in
                             NavigationLink(value: movie.id) {
                                 ZStack(alignment: .topLeading) {
                                     if let posterPath = movie.posterPath {
@@ -53,14 +53,10 @@ struct FavoritesView: View {
                                     }
                                     
                                     Button(action: {
-                                        if authVM.isFavorite(movie) {
-                                            authVM.removeFavorite(movie)
-                                        } else {
-                                            authVM.addFavorite(movie)
-                                        }
+                                        authViewModel.toggleFavorite(movie)
                                     }) {
-                                        Image(systemName: authVM.isFavorite(movie) ? "heart.fill" : "heart")
-                                            .foregroundColor(authVM.isFavorite(movie) ? .red : .white)
+                                        Image(systemName: authViewModel.isFavorite(movie) ? "heart.fill" : "heart")
+                                            .foregroundColor(authViewModel.isFavorite(movie) ? .red : .white)
                                             .padding(8)
                                             .background(Color.black.opacity(0.5))
                                             .clipShape(Circle())

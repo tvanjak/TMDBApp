@@ -29,5 +29,4 @@ class FavoritesManager {
             print("Error encoding favorites: \(error)")
         }
     }
-    
 }

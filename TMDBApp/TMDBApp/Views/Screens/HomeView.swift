@@ -8,12 +8,11 @@
 import SwiftUI
 
 
-struct HomeView: View {    
-    @ObservedObject var movieViewModel: MovieViewModel
-    @ObservedObject var tvShowViewModel: TVShowViewModel
-
-    @EnvironmentObject var authVM: AuthenticationViewModel
-
+struct HomeView: View {
+    @EnvironmentObject var authViewModel: AuthenticationViewModel
+    @EnvironmentObject var movieViewModel: MovieViewModel
+    @EnvironmentObject var tvShowViewModel: TVShowViewModel
+    
     @State private var searchTerm = ""
         
     enum movieTypes {
@@ -22,6 +21,7 @@ struct HomeView: View {
         case forRent
         case inTheatres
     }
+    
     @State var selectedMovieType: movieTypes = movieTypes.streaming
     
     var body: some View {
@@ -40,7 +40,6 @@ struct HomeView: View {
                 .cornerRadius(8)
                 .padding(.top)
                 
-//                MovieSection(title: "What's popular", popularMovies: viewModel.popularMovies) // doesnt work because it doesnt load the movies
                 
                 VStack (alignment: .leading) {
                     Text("What's popular")
@@ -84,8 +83,7 @@ struct HomeView: View {
                             ForEach(movieViewModel.popularMovies) { movie in
                                 ZStack(alignment: .topLeading) {
                                     NavigationLink(value:  movie.id) {
-                                        if let posterPath = movie.posterPath {
-                                            let fullURLString = "https://image.tmdb.org/t/p/w500\(posterPath)"
+                                        if let fullURLString = movie.fullPosterPath {
                                             if let url = URL(string: fullURLString) {
                                                 AsyncImage(url: url, scale: 4) { image in
                                                     image
@@ -110,14 +108,10 @@ struct HomeView: View {
                                     }
                                     
                                     Button(action: {
-                                        if authVM.isFavorite(movie) {
-                                            authVM.removeFavorite(movie)
-                                        } else {
-                                            authVM.addFavorite(movie)
-                                        }
+                                        authViewModel.toggleFavorite(movie)
                                     }) {
-                                        Image(systemName: authVM.isFavorite(movie) ? "heart.fill" : "heart")
-                                            .foregroundColor(authVM.isFavorite(movie) ? .red : .white)
+                                        Image(systemName: authViewModel.isFavorite(movie) ? "heart.fill" : "heart")
+                                            .foregroundColor(authViewModel.isFavorite(movie) ? .red : .white)
                                             .padding(8)
                                             .background(Color.black.opacity(0.5))
                                             .clipShape(Circle())
@@ -150,8 +144,7 @@ struct HomeView: View {
                             ForEach(movieViewModel.trendingMovies) { movie in
                                 NavigationLink(value: movie.id) {
                                     ZStack(alignment: .topLeading) {
-                                        if let posterPath = movie.posterPath {
-                                            let fullURLString = "https://image.tmdb.org/t/p/w500\(posterPath)"
+                                        if let fullURLString = movie.fullPosterPath {
                                             if let url = URL(string: fullURLString) {
                                                 AsyncImage(url: url, scale: 4) { image in
                                                     image
@@ -174,14 +167,10 @@ struct HomeView: View {
                                         }
                                         
                                         Button(action: {
-                                            if authVM.isFavorite(movie) {
-                                                authVM.removeFavorite(movie)
-                                            } else {
-                                                authVM.addFavorite(movie)
-                                            }
+                                            authViewModel.toggleFavorite(movie)
                                         }) {
-                                            Image(systemName: authVM.isFavorite(movie) ? "heart.fill" : "heart")
-                                                .foregroundColor(authVM.isFavorite(movie) ? .red : .white)
+                                            Image(systemName: authViewModel.isFavorite(movie) ? "heart.fill" : "heart")
+                                                .foregroundColor(authViewModel.isFavorite(movie) ? .red : .white)
                                                 .padding(8)
                                                 .background(Color.black.opacity(0.5))
                                                 .clipShape(Circle())
@@ -198,11 +187,13 @@ struct HomeView: View {
 
             }
             .onAppear {
-                if movieViewModel.popularMovies.isEmpty {
-                    movieViewModel.loadPopularMovies()
-                }
-                if movieViewModel.trendingMovies.isEmpty {
-                    movieViewModel.loadTrendingMovies()
+                Task {
+                    if movieViewModel.popularMovies.isEmpty {
+                        await movieViewModel.loadPopularMovies()
+                    }
+                    if movieViewModel.trendingMovies.isEmpty {
+                        await movieViewModel.loadTrendingMovies()
+                    }
                 }
             }
         }
@@ -211,7 +202,7 @@ struct HomeView: View {
 
 
 #Preview {
-    HomeView(movieViewModel: MovieViewModel(), tvShowViewModel: TVShowViewModel())
-        .environmentObject(AuthenticationViewModel())
+    HomeView()
+        .environmentObject(MovieViewModel())
+        .environmentObject(TVShowViewModel())
 }
-

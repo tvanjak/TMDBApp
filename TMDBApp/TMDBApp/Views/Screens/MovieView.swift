@@ -42,6 +42,7 @@ struct RatingRing: View {
 }
 
 
+//MOVE THIS TO VIEWMODEL -------------------
 extension String {
     func releaseYear() -> String {
         let formatter = DateFormatter()
@@ -64,15 +65,17 @@ extension String {
         return "N/A"
     }
 }
+// -----------------------------------------
 
 struct MoviePoster: View {
     var id: Int
     var posterPath: String?
+    var fullPosterPath: String?
     var voteAverage: Double
     var releaseDate: String
     var title: String
-    var genres: [Genre]
-    var runtime: Int?
+    var genres: String
+    var runtime: String?
     
     var movie: Movie {
         Movie(
@@ -82,12 +85,11 @@ struct MoviePoster: View {
         )
     }
     
-    @EnvironmentObject var authVM: AuthenticationViewModel
+    @EnvironmentObject var authViewModel: AuthenticationViewModel
     
     var body: some View {
         ZStack (alignment: .bottomLeading) {
-            if let posterPath = posterPath {
-                let fullURLString = "https://image.tmdb.org/t/p/w500\(posterPath)"
+            if let fullURLString = fullPosterPath {
                 if let url = URL(string: fullURLString) {
                     AsyncImage(url: url, scale: 2) { image in
                         image
@@ -128,38 +130,27 @@ struct MoviePoster: View {
                 Text(releaseDate.invertedDate())
                     .font(.title3)
                     .foregroundStyle(.white)
-                let genresString = genres.map { $0.name }.joined(separator: ", ")
                 
                 VStack(alignment: .leading, spacing: 5) {
-                    Text(genresString)
+                    Text(genres)
                         .font(.title3)
                         .foregroundStyle(.white)
                         .fixedSize(horizontal: false, vertical: true)
-                    
-                    if let minutes = runtime {
-                        let hours = minutes / 60
-                        let actualMinutes = minutes % 60
-                        
-                        Text(hours > 0
-                             ? "\(hours)h \(actualMinutes > 0 ? "\(actualMinutes)m" : "")"
-                             : "\(actualMinutes)m")
-                        .font(.title3)
-                        .foregroundStyle(.white)
-                        .bold()
-                        .padding(.top, 2)
+                    if let unwrappedRuntime = runtime {
+                        Text(unwrappedRuntime)
+                            .font(.title3)
+                            .foregroundStyle(.white)
+                            .bold()
+                            .padding(.top, 2)
                     }
                 }
                 
                 HStack {
                     Button(action: {
-                        if authVM.isFavorite(movie) {
-                            authVM.removeFavorite(movie)
-                        } else {
-                            authVM.addFavorite(movie)
-                        }
+                        authViewModel.toggleFavorite(movie)
                     }) {
-                        Image(systemName: authVM.isFavorite(movie) ? "heart.fill" : "heart")
-                            .foregroundColor(authVM.isFavorite(movie) ? .red : .white)
+                        Image(systemName: authViewModel.isFavorite(movie) ? "heart.fill" : "heart")
+                            .foregroundColor(authViewModel.isFavorite(movie) ? .red : .white)
                             .padding(8)
                             .background(Color.black.opacity(0.5))
                             .clipShape(Circle())
@@ -186,7 +177,7 @@ struct CrewView: View {
     var body: some View {
         VStack {
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .top, spacing: 15) {
+                LazyHStack(alignment: .top, spacing: 15) {
                     ForEach(Array(stride(from: 0, to: crew.count, by: 2)), id: \.self) { index in
                         VStack (alignment: .leading, spacing: 15) {
                             VStack(alignment: .leading, spacing: 5) {
@@ -226,11 +217,10 @@ struct CastView: View {
                 .font(.title)
                 .fontWeight(.bold)
             ScrollView (.horizontal, showsIndicators: false) {
-                HStack (spacing: 20) {
+                LazyHStack (spacing: 20) {
                     ForEach(cast) {castMember in
                         VStack (alignment: .leading, spacing: 5) {
-                            if let profilePath = castMember.profilePath {
-                                let fullURLString = "https://image.tmdb.org/t/p/w200\(profilePath)"
+                            if let fullURLString = castMember.fullProfilePath {
                                 if let url = URL(string: fullURLString) {
                                     AsyncImage(url: url) { image in
                                         image
@@ -273,10 +263,9 @@ struct CastView: View {
 
 struct MovieView: View {
     var movieId: Int
-    @StateObject private var movieViewModel = MovieViewModel()
-    
-    @EnvironmentObject var authVM: AuthenticationViewModel
-    
+    @EnvironmentObject var movieViewModel: MovieViewModel
+    @EnvironmentObject var authViewModel: AuthenticationViewModel
+
     var body: some View {
         ScrollView {
             if let movieDetail = movieViewModel.movieDetail {
@@ -284,8 +273,8 @@ struct MovieView: View {
                 VStack (spacing: 15) {
                     
                     // POSTER AND GENERAL INFO
-                    MoviePoster(id: movieDetail.id, posterPath: movieDetail.posterPath, voteAverage: movieDetail.voteAverage, releaseDate: movieDetail.releaseDate, title: movieDetail.title, genres: movieDetail.genres, runtime: movieDetail.runtime)
-                        .environmentObject(authVM)
+                    MoviePoster(id: movieDetail.id, posterPath: movieDetail.posterPath, fullPosterPath: movieDetail.fullPosterPath, voteAverage: movieDetail.voteAverage, releaseDate: movieDetail.releaseDate, title: movieDetail.title, genres: movieDetail.formattedGenres, runtime: movieDetail.formattedRuntime)
+                        .environmentObject(authViewModel)
                     
                     // OVERVIEW
                     VStack (alignment: .leading, spacing: 10) {
@@ -310,8 +299,10 @@ struct MovieView: View {
             }
         }
         .onAppear {
-            if movieViewModel.movieDetail == nil {
-                movieViewModel.loadMovieDetails(movieId: movieId)
+            Task {
+                if movieViewModel.movieDetail == nil {
+                    await movieViewModel.loadMovieDetails(movieId: movieId)
+                }
             }
         }
     }
@@ -319,5 +310,4 @@ struct MovieView: View {
 
 #Preview {
     MovieView(movieId: 2)
-        .environmentObject(AuthenticationViewModel())
 }
