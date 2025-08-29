@@ -1,6 +1,7 @@
 
 import SwiftUI
 
+@MainActor
 class MovieViewModel: ObservableObject {
     @Published var popularMovies: [Movie] = []
     @Published var trendingMovies: [Movie] = []
@@ -9,68 +10,43 @@ class MovieViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var movieDetail: MovieDetails? = nil
 
-    func loadPopularMovies() {
-        TMDBService.shared.fetchPopularMovies { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let movies):
-                    self?.popularMovies = movies
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
-                }
-            }
-        }
-    }
-    
-    func loadTrendingMovies() {
-        TMDBService.shared.fetchTrendingMovies { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let movies):
-                    self?.trendingMovies = movies
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
-                }
-            }
+    func loadPopularMovies() async {
+        do {
+            popularMovies = try await TMDBService.shared.fetchPopularMovies()
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
 
-    func loadUpcomingMovies() {
-        TMDBService.shared.fetchUpcomingMovies { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let movies):
-                    self?.upcomingMovies = movies
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
-                }
-            }
+    func loadTrendingMovies() async {
+        do {
+            trendingMovies = try await TMDBService.shared.fetchTrendingMovies()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func loadUpcomingMovies() async {
+        do {
+            upcomingMovies = try await TMDBService.shared.fetchUpcomingMovies()
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
     
-    func loadNowPlayingMovies() {
-        TMDBService.shared.fetchNowPlayingMovies { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let movies):
-                    self?.nowPlayingMovies = movies
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
-                }
-            }
+    func loadNowPlayingMovies() async {
+        do {
+            nowPlayingMovies = try await TMDBService.shared.fetchNowPlayingMovies()
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
     
-    func loadMovieDetails(movieId: Int) {
-        TMDBService.shared.fetchMovieDetails(movieId: movieId) { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let movie):
-                    self?.movieDetail = movie
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
-                }
-            }
+    func loadMovieDetails(movieId: Int) async {
+        do {
+            movieDetail = try await TMDBService.shared.fetchMovieDetails(movieId: movieId)
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
 }

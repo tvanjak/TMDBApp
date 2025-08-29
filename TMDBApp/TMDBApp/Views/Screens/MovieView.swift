@@ -66,19 +66,18 @@ extension String {
 }
 
 struct MoviePoster: View {
-    var posterPath: String?
+    var fullPosterPath: String?
     var voteAverage: Double
     var releaseDate: String
     var title: String
-    var genres: [Genre]
-    var runtime: Int?
+    var genres: String
+    var runtime: String?
     
     @Binding var isFavorite: Bool
     
     var body: some View {
         ZStack (alignment: .bottomLeading) {
-            if let posterPath = posterPath {
-                let fullURLString = "https://image.tmdb.org/t/p/w500\(posterPath)"
+            if let fullURLString = fullPosterPath {
                 if let url = URL(string: fullURLString) {
                     AsyncImage(url: url, scale: 2) { image in
                         image
@@ -119,25 +118,18 @@ struct MoviePoster: View {
                 Text(releaseDate.invertedDate())
                     .font(.title3)
                     .foregroundStyle(.white)
-                let genresString = genres.map { $0.name }.joined(separator: ", ")
                 
                 VStack(alignment: .leading, spacing: 5) {
-                    Text(genresString)
+                    Text(genres)
                         .font(.title3)
                         .foregroundStyle(.white)
                         .fixedSize(horizontal: false, vertical: true)
-                    
-                    if let minutes = runtime {
-                        let hours = minutes / 60
-                        let actualMinutes = minutes % 60
-                        
-                        Text(hours > 0
-                             ? "\(hours)h \(actualMinutes > 0 ? "\(actualMinutes)m" : "")"
-                             : "\(actualMinutes)m")
-                        .font(.title3)
-                        .foregroundStyle(.white)
-                        .bold()
-                        .padding(.top, 2)
+                    if let unwrappedRuntime = runtime {
+                        Text(unwrappedRuntime)
+                            .font(.title3)
+                            .foregroundStyle(.white)
+                            .bold()
+                            .padding(.top, 2)
                     }
                 }
                 
@@ -173,7 +165,7 @@ struct CrewView: View {
     var body: some View {
         VStack {
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .top, spacing: 15) {
+                LazyHStack(alignment: .top, spacing: 15) {
                     ForEach(Array(stride(from: 0, to: crew.count, by: 2)), id: \.self) { index in
                         VStack (alignment: .leading, spacing: 15) {
                             VStack(alignment: .leading, spacing: 5) {
@@ -213,11 +205,10 @@ struct CastView: View {
                 .font(.title)
                 .fontWeight(.bold)
             ScrollView (.horizontal, showsIndicators: false) {
-                HStack (spacing: 20) {
+                LazyHStack (spacing: 20) {
                     ForEach(cast) {castMember in
                         VStack (alignment: .leading, spacing: 5) {
-                            if let profilePath = castMember.profilePath {
-                                let fullURLString = "https://image.tmdb.org/t/p/w200\(profilePath)"
+                            if let fullURLString = castMember.fullProfilePath {
                                 if let url = URL(string: fullURLString) {
                                     AsyncImage(url: url) { image in
                                         image
@@ -271,7 +262,7 @@ struct MovieView: View {
                 VStack (spacing: 15) {
                     
                     // POSTER AND GENERAL INFO
-                    MoviePoster(posterPath: movieDetail.posterPath, voteAverage: movieDetail.voteAverage, releaseDate: movieDetail.releaseDate, title: movieDetail.title, genres: movieDetail.genres, runtime: movieDetail.runtime, isFavorite: $isFavorite)
+                    MoviePoster(fullPosterPath: movieDetail.fullPosterPath, voteAverage: movieDetail.voteAverage, releaseDate: movieDetail.releaseDate, title: movieDetail.title, genres: movieDetail.formattedGenres, runtime: movieDetail.formattedRuntime, isFavorite: $isFavorite)
                     
                     // OVERVIEW
                     VStack (alignment: .leading, spacing: 10) {
@@ -296,8 +287,10 @@ struct MovieView: View {
             }
         }
         .onAppear {
-            if movieViewModel.movieDetail == nil {
-                movieViewModel.loadMovieDetails(movieId: movieId)
+            Task {
+                if movieViewModel.movieDetail == nil {
+                    await movieViewModel.loadMovieDetails(movieId: movieId)
+                }
             }
         }
     }

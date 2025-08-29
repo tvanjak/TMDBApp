@@ -19,6 +19,32 @@ struct MovieDetails: Codable, Identifiable {
     let genres: [Genre]
     let credits: Credits
     
+    var formattedRuntime: String? {
+        guard let minutes = runtime else { return nil }
+        
+        let hours = minutes / 60
+        let actualMinutes = minutes % 60
+        
+        if hours > 0 {
+            if actualMinutes > 0 {
+                return "\(hours)h \(actualMinutes)m"
+            } else {
+                return "\(hours)h"
+            }
+        } else {
+            return "\(actualMinutes)m"
+        }
+    }
+    
+    var formattedGenres: String {
+        return genres.map { $0.name }.joined(separator: ", ")
+    }
+    
+    var fullPosterPath: String? {
+        guard let path = posterPath else { return nil }
+        return "https://image.tmdb.org/t/p/w500\(path)"
+    }
+    
     enum CodingKeys: String, CodingKey {
         case id
         case title
@@ -48,6 +74,11 @@ struct CastMember: Codable, Identifiable {
     let character: String
     let profilePath: String?
     
+    var fullProfilePath: String? {
+        guard let path = profilePath else { return nil }
+        return "https://image.tmdb.org/t/p/w200\(path)"
+    }
+    
     enum CodingKeys: String, CodingKey {
         case id
         case name
@@ -61,6 +92,11 @@ struct CrewMember: Codable, Identifiable {
     let name: String
     let job: String
     let profilePath: String?
+    
+//    var fullProfilePath: String? {
+//        guard let path = profilePath else { return nil }
+//        return "https://image.tmdb.org/t/p/w500\(path)"
+//    }
     
     enum CodingKeys: String, CodingKey {
         case id
