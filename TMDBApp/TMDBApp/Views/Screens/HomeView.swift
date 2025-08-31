@@ -10,7 +10,6 @@ import SwiftUI
 
 struct HomeView: View {
     @EnvironmentObject var movieViewModel: MovieViewModel
-    @EnvironmentObject var router: Router
     
     @State private var searchTerm = ""
         
@@ -81,10 +80,10 @@ struct HomeView: View {
                         LazyHStack {
                             ForEach(movieViewModel.popularMovies) { movie in
                                 ZStack(alignment: .topLeading) {
-                                    Button(action: { router.navigateTo(.mediaDetail(id: movie.id)) }) {
+                                    Button(action: { movieViewModel.navigateToMovie(movie.id) }) {
                                         if let fullURLString = movie.fullPosterPath {
                                             if let url = URL(string: fullURLString) {
-                                                AsyncImage(url: url, scale: 4) { image in
+                                                AsyncImage(url: url) { image in
                                                     image
                                                         .resizable()
                                                         .scaledToFill()
@@ -141,11 +140,11 @@ struct HomeView: View {
                     ScrollView (.horizontal) {
                         LazyHStack {
                             ForEach(movieViewModel.trendingMovies) { movie in
-                                Button(action: { router.navigateTo(.mediaDetail(id: movie.id)) }) {
+                                Button(action: { movieViewModel.navigateToMovie(movie.id) }) {
                                     ZStack(alignment: .topLeading) {
                                         if let fullURLString = movie.fullPosterPath {
                                             if let url = URL(string: fullURLString) {
-                                                AsyncImage(url: url, scale: 4) { image in
+                                                AsyncImage(url: url) { image in
                                                     image
                                                         .resizable()
                                                         .scaledToFill()
@@ -202,6 +201,9 @@ struct HomeView: View {
 
 #Preview {
     HomeView()
-        .environmentObject(MovieViewModel(favoritesRepo: FavoritesRepository.shared, sessionRepo: SessionRepository.shared))
-        .environmentObject(Router())
+        .environmentObject(MovieViewModel(
+            favoritesRepo: FavoritesRepository.shared,
+            sessionRepo: SessionRepository.shared,
+            navigationService: Router()
+        ))
 }

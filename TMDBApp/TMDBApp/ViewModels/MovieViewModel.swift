@@ -14,13 +14,16 @@ class MovieViewModel: ObservableObject {
     
     private let favoritesRepo: FavoritesRepositoryProtocol
     private let sessionRepo: SessionRepositoryProtocol
+    private let navigationService: NavigationServiceProtocol
     
     init(
         favoritesRepo: FavoritesRepositoryProtocol,
-        sessionRepo: SessionRepositoryProtocol
+        sessionRepo: SessionRepositoryProtocol,
+        navigationService: NavigationServiceProtocol
     ) {
         self.favoritesRepo = favoritesRepo
         self.sessionRepo = sessionRepo
+        self.navigationService = navigationService
         loadFavorites()
     }
     
@@ -97,4 +100,21 @@ class MovieViewModel: ObservableObject {
             errorMessage = error.localizedDescription
         }
     }
+    // ------------------------------------------------------------
+
+    
+    // ROUTER FUNCTIONS
+    func navigateToMovie(_ movieId: Int) {
+        navigationService.navigateToMovie(movieId)
+    }
+    
+    func goBack() {
+        navigationService.goBack()
+    }
+    
+    func canGoBack() -> Bool {
+        return navigationService.canGoBack()
+    }
+    // ------------------------------------------------------------
+
 }

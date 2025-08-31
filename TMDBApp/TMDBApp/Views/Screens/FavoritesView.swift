@@ -9,7 +9,6 @@ import SwiftUI
 
 struct FavoritesView: View {
     @EnvironmentObject var movieViewModel: MovieViewModel
-    @EnvironmentObject var router: Router
 
     let columns = [GridItem(.adaptive(minimum: 115), spacing: 10)]
 
@@ -28,7 +27,7 @@ struct FavoritesView: View {
                 ScrollView {
                     LazyVGrid (columns: columns) {
                         ForEach(movieViewModel.favorites) { movie in
-                            Button(action: { router.navigateTo(.mediaDetail(id: movie.id)) }) {
+                            Button(action: { movieViewModel.navigateToMovie(movie.id) }) {
                                 ZStack(alignment: .topLeading) {
                                     if let fullURLString = movie.fullPosterPath {
                                         if let url = URL(string: fullURLString) {

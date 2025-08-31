@@ -91,7 +91,7 @@ struct MoviePoster: View {
         ZStack (alignment: .bottomLeading) {
             if let fullURLString = fullPosterPath {
                 if let url = URL(string: fullURLString) {
-                    AsyncImage(url: url, scale: 2) { image in
+                    AsyncImage(url: url) { image in
                         image
                             .resizable()
                             .scaledToFill()
@@ -99,7 +99,7 @@ struct MoviePoster: View {
                             .clipped()
                     } placeholder: {
                         ProgressView()
-                            .frame(height: 350)
+                            .frame(width: UIScreen.main.bounds.width, height: 360)
                     }
                 }
             } else {
@@ -319,5 +319,6 @@ struct MovieView: View {
     .environmentObject(MovieViewModel(
             favoritesRepo: FavoritesRepository.shared,
             sessionRepo: SessionRepository.shared,
+            navigationService: Router(),
         ))
 }

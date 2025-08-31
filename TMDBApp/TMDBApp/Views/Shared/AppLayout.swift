@@ -9,9 +9,22 @@ import SwiftUI
 
 struct AppLayout: View {
     @EnvironmentObject var authViewModel: AuthenticationViewModel
-    @StateObject var movieViewModel = MovieViewModel(favoritesRepo: FavoritesRepository.shared, sessionRepo: SessionRepository.shared)
     @StateObject private var router = Router()
-
+    @StateObject private var movieViewModel: MovieViewModel
+    
+    init() {
+        // Create dependencies in the correct order
+        let router = Router()
+        let movieViewModel = MovieViewModel(
+            favoritesRepo: FavoritesRepository.shared,
+            sessionRepo: SessionRepository.shared,
+            navigationService: router
+        )
+        
+        // Assign to StateObjects
+        self._router = StateObject(wrappedValue: router)
+        self._movieViewModel = StateObject(wrappedValue: movieViewModel)
+    }
 
     var body: some View {
         VStack(spacing: 0) {
