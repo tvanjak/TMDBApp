@@ -10,6 +10,7 @@ import SwiftUI
 
 struct HomeView: View {
     @EnvironmentObject var movieViewModel: MovieViewModel
+    @EnvironmentObject var router: Router
     
     @State private var searchTerm = ""
         
@@ -80,7 +81,7 @@ struct HomeView: View {
                         LazyHStack {
                             ForEach(movieViewModel.popularMovies) { movie in
                                 ZStack(alignment: .topLeading) {
-                                    NavigationLink(value:  movie.id) {
+                                    Button(action: { router.navigateTo(.mediaDetail(id: movie.id)) }) {
                                         if let fullURLString = movie.fullPosterPath {
                                             if let url = URL(string: fullURLString) {
                                                 AsyncImage(url: url, scale: 4) { image in
@@ -140,7 +141,7 @@ struct HomeView: View {
                     ScrollView (.horizontal) {
                         LazyHStack {
                             ForEach(movieViewModel.trendingMovies) { movie in
-                                NavigationLink(value: movie.id) {
+                                Button(action: { router.navigateTo(.mediaDetail(id: movie.id)) }) {
                                     ZStack(alignment: .topLeading) {
                                         if let fullURLString = movie.fullPosterPath {
                                             if let url = URL(string: fullURLString) {
@@ -202,4 +203,5 @@ struct HomeView: View {
 #Preview {
     HomeView()
         .environmentObject(MovieViewModel(favoritesRepo: FavoritesRepository.shared, sessionRepo: SessionRepository.shared))
+        .environmentObject(Router())
 }
