@@ -85,7 +85,7 @@ struct MoviePoster: View {
         )
     }
     
-    @EnvironmentObject var authViewModel: AuthenticationViewModel
+    @EnvironmentObject var movieViewModel: MovieViewModel
     
     var body: some View {
         ZStack (alignment: .bottomLeading) {
@@ -147,10 +147,10 @@ struct MoviePoster: View {
                 
                 HStack {
                     Button(action: {
-                        authViewModel.toggleFavorite(movie)
+                        movieViewModel.toggleFavorite(movie)
                     }) {
-                        Image(systemName: authViewModel.isFavorite(movie) ? "heart.fill" : "heart")
-                            .foregroundColor(authViewModel.isFavorite(movie) ? .red : .white)
+                        Image(systemName: movieViewModel.isFavorite(movie) ? "heart.fill" : "heart")
+                            .foregroundColor(movieViewModel.isFavorite(movie) ? .red : .white)
                             .padding(8)
                             .background(Color.black.opacity(0.5))
                             .clipShape(Circle())
@@ -264,7 +264,6 @@ struct CastView: View {
 struct MovieView: View {
     var movieId: Int
     @EnvironmentObject var movieViewModel: MovieViewModel
-    @EnvironmentObject var authViewModel: AuthenticationViewModel
 
     var body: some View {
         ScrollView {
@@ -273,8 +272,15 @@ struct MovieView: View {
                 VStack (spacing: 15) {
                     
                     // POSTER AND GENERAL INFO
-                    MoviePoster(id: movieDetail.id, posterPath: movieDetail.posterPath, fullPosterPath: movieDetail.fullPosterPath, voteAverage: movieDetail.voteAverage, releaseDate: movieDetail.releaseDate, title: movieDetail.title, genres: movieDetail.formattedGenres, runtime: movieDetail.formattedRuntime)
-                        .environmentObject(authViewModel)
+                    MoviePoster(id: movieDetail.id,
+                                posterPath: movieDetail.posterPath,
+                                fullPosterPath: movieDetail.fullPosterPath,
+                                voteAverage: movieDetail.voteAverage,
+                                releaseDate: movieDetail.releaseDate,
+                                title: movieDetail.title,
+                                genres: movieDetail.formattedGenres,
+                                runtime: movieDetail.formattedRuntime)
+                        .environmentObject(movieViewModel)
                     
                     // OVERVIEW
                     VStack (alignment: .leading, spacing: 10) {
@@ -300,7 +306,7 @@ struct MovieView: View {
         }
         .onAppear {
             Task {
-                if movieViewModel.movieDetail == nil {
+                if movieViewModel.movieDetail?.id != movieId {
                     await movieViewModel.loadMovieDetails(movieId: movieId)
                 }
             }
@@ -310,4 +316,8 @@ struct MovieView: View {
 
 #Preview {
     MovieView(movieId: 2)
+    .environmentObject(MovieViewModel(
+            favoritesRepo: FavoritesRepository.shared,
+            sessionRepo: SessionRepository.shared,
+        ))
 }

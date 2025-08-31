@@ -9,9 +9,7 @@ import SwiftUI
 
 
 struct HomeView: View {
-    @EnvironmentObject var authViewModel: AuthenticationViewModel
     @EnvironmentObject var movieViewModel: MovieViewModel
-    @EnvironmentObject var tvShowViewModel: TVShowViewModel
     
     @State private var searchTerm = ""
         
@@ -108,10 +106,10 @@ struct HomeView: View {
                                     }
                                     
                                     Button(action: {
-                                        authViewModel.toggleFavorite(movie)
+                                        movieViewModel.toggleFavorite(movie)
                                     }) {
-                                        Image(systemName: authViewModel.isFavorite(movie) ? "heart.fill" : "heart")
-                                            .foregroundColor(authViewModel.isFavorite(movie) ? .red : .white)
+                                        Image(systemName: movieViewModel.isFavorite(movie) ? "heart.fill" : "heart")
+                                            .foregroundColor(movieViewModel.isFavorite(movie) ? .red : .white)
                                             .padding(8)
                                             .background(Color.black.opacity(0.5))
                                             .clipShape(Circle())
@@ -167,10 +165,10 @@ struct HomeView: View {
                                         }
                                         
                                         Button(action: {
-                                            authViewModel.toggleFavorite(movie)
+                                            movieViewModel.toggleFavorite(movie)
                                         }) {
-                                            Image(systemName: authViewModel.isFavorite(movie) ? "heart.fill" : "heart")
-                                                .foregroundColor(authViewModel.isFavorite(movie) ? .red : .white)
+                                            Image(systemName: movieViewModel.isFavorite(movie) ? "heart.fill" : "heart")
+                                                .foregroundColor(movieViewModel.isFavorite(movie) ? .red : .white)
                                                 .padding(8)
                                                 .background(Color.black.opacity(0.5))
                                                 .clipShape(Circle())
@@ -203,6 +201,5 @@ struct HomeView: View {
 
 #Preview {
     HomeView()
-        .environmentObject(MovieViewModel())
-        .environmentObject(TVShowViewModel())
+        .environmentObject(MovieViewModel(favoritesRepo: FavoritesRepository.shared, sessionRepo: SessionRepository.shared))
 }

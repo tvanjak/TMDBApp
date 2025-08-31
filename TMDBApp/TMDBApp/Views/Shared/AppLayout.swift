@@ -8,11 +8,10 @@
 import SwiftUI
 
 struct AppLayout: View {
-    @EnvironmentObject var router: Router
+    @StateObject private var router = Router()
     @EnvironmentObject var authViewModel: AuthenticationViewModel
-    @EnvironmentObject var movieViewModel: MovieViewModel
-    @EnvironmentObject var tvShowViewModel: TVShowViewModel
-    
+    @StateObject var movieViewModel = MovieViewModel(favoritesRepo: FavoritesRepository.shared, sessionRepo: SessionRepository.shared)
+
     @State private var selectedSection: Section = .home
     enum Section { case home, favorites, profile }
 
@@ -20,11 +19,11 @@ struct AppLayout: View {
         VStack(spacing: 0) {
             switch selectedSection {
             case .home:
-                HeaderView(canGoBack: !router.homePath.isEmpty, onBack: { router.goBack(from: .home) })
+                HeaderView(canGoBack: router.canGoBack(from: .home), onBack: { router.goBack(from: .home) })
             case .favorites:
-                HeaderView(canGoBack: !router.favoritesPath.isEmpty, onBack: { router.goBack(from: .favorites) })
+                HeaderView(canGoBack: router.canGoBack(from: .favorites), onBack: { router.goBack(from: .favorites) })
             case .profile:
-                HeaderView(canGoBack: !router.profilePath.isEmpty, onBack: { router.goBack(from: .profile) })
+                HeaderView(canGoBack: router.canGoBack(from: .profile), onBack: { router.goBack(from: .profile) })
             }
 
             ZStack {
@@ -32,11 +31,10 @@ struct AppLayout: View {
                 case .home:
                     NavigationStack(path: $router.homePath) {
                         HomeView()
-                            .environmentObject(authViewModel)
                             .environmentObject(movieViewModel)
-                            .environmentObject(tvShowViewModel)
                             .navigationDestination(for: Int.self) { movieId in
                                 MovieView(movieId: movieId)
+                                    .environmentObject(movieViewModel)
                                     .navigationBarBackButtonHidden(true)
                                     .toolbar(.hidden, for: .navigationBar)
                             }
@@ -44,8 +42,10 @@ struct AppLayout: View {
                 case .favorites:
                     NavigationStack(path: $router.favoritesPath) {
                         FavoritesView()
+                            .environmentObject(movieViewModel)
                             .navigationDestination(for: Int.self) { movieId in
                                 MovieView(movieId: movieId)
+                                    .environmentObject(movieViewModel)
                                     .navigationBarBackButtonHidden(true)
                                     .toolbar(.hidden, for: .navigationBar)
                             }
@@ -66,8 +66,6 @@ struct AppLayout: View {
 
 #Preview {
     AppLayout()
-        .environmentObject(MovieViewModel())
-        .environmentObject(TVShowViewModel())
         .environmentObject(AuthenticationViewModel())
         .environmentObject(Router())
 }
