@@ -9,7 +9,7 @@ import SwiftUI
 
 struct LoginView: View {
     
-    @StateObject var authViewModel = AuthenticationViewModel()
+    @EnvironmentObject var authViewModel: AuthenticationViewModel
     @State private var rememberMe: Bool = false
     
     var body: some View {
@@ -74,7 +74,10 @@ struct LoginView: View {
                                     .foregroundStyle(.white)
                                     .font(.headline)
                                     .fontWeight(.regular)
-                                NavigationLink(destination: SignUpView()) {
+                                NavigationLink(destination:
+                                                SignUpView()
+                                                    .environmentObject(authViewModel)
+                                    ) {
                                     Text("Create one here")
                                         .foregroundColor(.blue)
                                         .font(.headline)
@@ -96,4 +99,5 @@ struct LoginView: View {
 
 #Preview {
     LoginView()
+        .environmentObject(AuthenticationViewModel())
 }

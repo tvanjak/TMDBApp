@@ -8,78 +8,65 @@
 import SwiftUI
 
 struct AppLayout: View {
-    @State private var homePath = NavigationPath()
-    @State private var favoritesPath = NavigationPath()
-    @State private var profilePath = NavigationPath()
-    
-    @StateObject private var movieViewModel = MovieViewModel()
-    @StateObject private var tvShowViewModel = TVShowViewModel()
-    
-    @State private var selectedSection: Section = .home
-    
-    enum Section {
-        case home, favorites, profile
-    }
-    
     @EnvironmentObject var authViewModel: AuthenticationViewModel
-
+    @StateObject private var router = Router()
+    @StateObject private var movieViewModel: MovieViewModel
     
+    init() {
+        // Create dependencies in the correct order
+        let router = Router()
+        let movieViewModel = MovieViewModel(
+            favoritesRepo: FavoritesRepository.shared,
+            sessionRepo: SessionRepository.shared,
+            navigationService: router
+        )
+        
+        // Assign to StateObjects
+        self._router = StateObject(wrappedValue: router)
+        self._movieViewModel = StateObject(wrappedValue: movieViewModel)
+    }
+
     var body: some View {
         VStack(spacing: 0) {
-            switch selectedSection {
-            case .home:
-                HeaderView(canGoBack: !homePath.isEmpty, onBack: { homePath.removeLast() })
-            case .favorites:
-                HeaderView(canGoBack: !favoritesPath.isEmpty, onBack: { favoritesPath.removeLast() })
-            case .profile:
-                HeaderView(canGoBack: !profilePath.isEmpty, onBack: { profilePath.removeLast() })
-            }
-            
-            ZStack {
-                switch selectedSection {
-                case .home:
-                    NavigationStack(path: $homePath) {
-                        HomeView(
-                            movieViewModel: movieViewModel,
-                            tvShowViewModel: tvShowViewModel
-                        )
-                        .environmentObject(authViewModel)
-                        .navigationDestination(for: Int.self) { movieId in
-                            MovieView(movieId: movieId)
+            HeaderView(canGoBack: router.canGoBack(), onBack: { router.goBack() })
+            NavigationStack(path: $router.path) {
+                HomeView()
+                    .environmentObject(movieViewModel)
+                    .navigationDestination(for: Route.self) { route in
+                        switch route {
+                        case .home:
+                            HomeView()
+                                .environmentObject(movieViewModel)
                                 .navigationBarBackButtonHidden(true)
                                 .toolbar(.hidden, for: .navigationBar)
+                        case .favorites:
+                            FavoritesView()
+                                .environmentObject(movieViewModel)
+                                .navigationBarBackButtonHidden(true)
+                                .toolbar(.hidden, for: .navigationBar)
+                        case .profile:
+                            ProfileView()
                                 .environmentObject(authViewModel)
+                                .navigationBarBackButtonHidden(true)
+                                .toolbar(.hidden, for: .navigationBar)
+                        case .mediaDetail(let id):
+                            MovieView(movieId: id)
+                                .environmentObject(movieViewModel)
+                                .navigationBarBackButtonHidden(true)
+                                .toolbar(.hidden, for: .navigationBar)
                         }
                     }
-                    
-                case .favorites:
-                    NavigationStack(path: $favoritesPath) {
-                        FavoritesView()
-                            .environmentObject(authViewModel)
-                            .navigationDestination(for: Int.self) { movieId in
-                                MovieView(movieId: movieId)
-                                    .navigationBarBackButtonHidden(true)
-                                    .toolbar(.hidden, for: .navigationBar)
-                                    .environmentObject(authViewModel)
-                            }
-                    }
-                    
-                case .profile:
-                    NavigationStack(path: $profilePath) {
-                        ProfileView()
-                            .environmentObject(authViewModel)
-                    }
-                }
             }
-            .toolbar(.hidden, for: .navigationBar)
-            
-            FooterView(selectedSection: $selectedSection)
-                .padding(.top)
+            .environmentObject(router)
+            FooterView()
+                .environmentObject(router)
         }
     }
 }
 
+
 #Preview {
     AppLayout()
         .environmentObject(AuthenticationViewModel())
+        .environmentObject(Router())
 }

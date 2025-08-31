@@ -1,6 +1,7 @@
 
 import SwiftUI
 
+@MainActor
 class MovieViewModel: ObservableObject {
     @Published var popularMovies: [Movie] = []
     @Published var trendingMovies: [Movie] = []
@@ -8,69 +9,112 @@ class MovieViewModel: ObservableObject {
     @Published var nowPlayingMovies: [Movie] = []
     @Published var errorMessage: String?
     @Published var movieDetail: MovieDetails? = nil
+    
+    @Published var favorites: [Movie] = []
+    
+    private let favoritesRepo: FavoritesRepositoryProtocol
+    private let sessionRepo: SessionRepositoryProtocol
+    private let navigationService: NavigationServiceProtocol
+    
+    init(
+        favoritesRepo: FavoritesRepositoryProtocol,
+        sessionRepo: SessionRepositoryProtocol,
+        navigationService: NavigationServiceProtocol
+    ) {
+        self.favoritesRepo = favoritesRepo
+        self.sessionRepo = sessionRepo
+        self.navigationService = navigationService
+        loadFavorites()
+    }
+    
+    // FAVORITES FUNCTIONS -------------------------------
+    private func loadFavorites() {
+        guard let uid = sessionRepo.currentUserId else { return }
+        favorites = favoritesRepo.loadFavorites(for: uid)
+    }
+    
+    func toggleFavorite(_ movie: Movie) {
+        if isFavorite(movie) {
+            removeFavorite(movie)
+        } else {
+            addFavorite(movie)
+        }
+    }
+    
+    func isFavorite(_ movie: Movie) -> Bool {
+        favorites.contains { $0.id == movie.id }
+    }
+    
+    private func addFavorite(_ movie: Movie) {
+        guard let uid = sessionRepo.currentUserId else { return }
+        favorites.append(movie)
+        favoritesRepo.saveFavorites(favorites, for: uid)
+    }
+    
+    private func removeFavorite(_ movie: Movie) {
+        guard let uid = sessionRepo.currentUserId else { return }
+        favorites.removeAll { $0.id == movie.id }
+        favoritesRepo.saveFavorites(favorites, for: uid)
+    }
+    // ------------------------------------------------------------
 
-    func loadPopularMovies() {
-        TMDBService.shared.fetchPopularMovies { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let movies):
-                    self?.popularMovies = movies
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
-                }
-            }
+    
+    // MOVIE LOADING FUNCTIONS -------------------------------
+    func loadPopularMovies() async {
+        do {
+            popularMovies = try await TMDBService.shared.fetchPopularMovies()
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
     
-    func loadTrendingMovies() {
-        TMDBService.shared.fetchTrendingMovies { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let movies):
-                    self?.trendingMovies = movies
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
-                }
-            }
+    func loadTrendingMovies() async {
+        do {
+            trendingMovies = try await TMDBService.shared.fetchTrendingMovies()
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
+    
+    func loadUpcomingMovies() async {
+        do {
+            upcomingMovies = try await TMDBService.shared.fetchUpcomingMovies()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+    
+    func loadNowPlayingMovies() async {
+        do {
+            nowPlayingMovies = try await TMDBService.shared.fetchNowPlayingMovies()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+    
+    func loadMovieDetails(movieId: Int) async {
+        do {
+            movieDetail = nil
+            movieDetail = try await TMDBService.shared.fetchMovieDetails(movieId: movieId)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+    // ------------------------------------------------------------
 
-    func loadUpcomingMovies() {
-        TMDBService.shared.fetchUpcomingMovies { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let movies):
-                    self?.upcomingMovies = movies
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
-                }
-            }
-        }
+    
+    // ROUTER FUNCTIONS
+    func navigateToMovie(_ movieId: Int) {
+        navigationService.navigateToMovie(movieId)
     }
     
-    func loadNowPlayingMovies() {
-        TMDBService.shared.fetchNowPlayingMovies { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let movies):
-                    self?.nowPlayingMovies = movies
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
-                }
-            }
-        }
+    func goBack() {
+        navigationService.goBack()
     }
     
-    func loadMovieDetails(movieId: Int) {
-        TMDBService.shared.fetchMovieDetails(movieId: movieId) { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let movie):
-                    self?.movieDetail = movie
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
-                }
-            }
-        }
+    func canGoBack() -> Bool {
+        return navigationService.canGoBack()
     }
+    // ------------------------------------------------------------
+
 }

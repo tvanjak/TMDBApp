@@ -23,22 +23,19 @@ class AuthenticationViewModel: ObservableObject {
     @Published var currentUser: User? // Firebase User object
     private var authStateHandle: AuthStateDidChangeListenerHandle?
     
-    @Published var favorites: [Movie] = []
-    private let defaults = UserDefaults.standard
-
+    private let sessionRepo: SessionRepositoryProtocol
+    
     // INITIALIZER & DEINTIALIZER
-    init() {
+    init(sessionRepo: SessionRepositoryProtocol = SessionRepository.shared) {
+        self.sessionRepo = sessionRepo
         // Observe authentication state changes
         authStateHandle = Auth.auth().addStateDidChangeListener { [weak self] auth, user in
             self?.currentUser = user
             if let user = user {
                 print("User is signed in: \(user.uid)")
-                // Optionally fetch their full profile data here if needed on app launch
                 self?.fetchUserProfile(uid: user.uid)
-                self?.favorites = FavoritesManager.shared.loadFavorites(for: user.uid)
             } else {
                 print("User is signed out.")
-                self?.favorites = []
             }
         }
     }
@@ -64,21 +61,12 @@ class AuthenticationViewModel: ObservableObject {
 
             // Save additional user data to Firestore
             let db = Firestore.firestore()
-            db.collection("users").document(uid).setData([
+            try await db.collection("users").document(uid).setData([
                 "firstName": firstName,
                 "lastName": lastName,
                 "phoneNumber": phoneNumber,
-                "email": email,
-                "memberSince": memberSinceDateString
-            ]) { err in
-                if let err = err {
-                    print("Error writing document: \(err)")
-                    self.errorMessage = "Failed to save user data."
-                } else {
-                    print("User data successfully written!")
-                    // User is signed in and data is saved. Navigate to main app.
-                }
-            }
+                "email": email
+            ])
         } catch {
             print("Error signing up: \(error.localizedDescription)")
             self.errorMessage = error.localizedDescription
