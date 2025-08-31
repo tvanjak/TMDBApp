@@ -21,11 +21,17 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 struct TMDBApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject var authViewModel = AuthenticationViewModel()
+    @StateObject var movieViewModel = MovieViewModel()
+    @StateObject var tvShowViewModel = TVShowViewModel()
+    @StateObject var router = Router()
     
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(authViewModel)
+                .environmentObject(router)
+                .environmentObject(movieViewModel)
+                .environmentObject(tvShowViewModel)
         }
     }
 }

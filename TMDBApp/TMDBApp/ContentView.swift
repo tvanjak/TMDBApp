@@ -9,12 +9,16 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var authViewModel: AuthenticationViewModel
+    @EnvironmentObject var router: Router
 
     var body: some View {
         if authViewModel.currentUser != nil {
             AppLayout()
+                .environmentObject(authViewModel)
+                .environmentObject(router)
         } else {
             LoginView()
+                .environmentObject(authViewModel)
         }
     }
 }
@@ -22,4 +26,5 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environmentObject(AuthenticationViewModel())
+        .environmentObject(Router())
 }
