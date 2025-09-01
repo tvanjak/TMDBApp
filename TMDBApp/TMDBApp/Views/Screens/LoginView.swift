@@ -60,7 +60,7 @@ struct LoginView: View {
                                     // Sync local state with authViewModel before signing in
                                     authViewModel.email = email
                                     authViewModel.password = password
-                                    await authViewModel.signIn() // add navigation
+                                    await authViewModel.signIn()
                                 }
                             } label: {
                                 Text("Sign in")

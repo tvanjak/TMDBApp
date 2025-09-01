@@ -49,6 +49,14 @@ final class MovieViewModel: ObservableObject {
         favorites.contains { $0.id == movie.id }
     }
     
+    func getFavoriteIcon(_ movie: Movie) -> String {
+        return isFavorite(movie) ? "heart.fill" : "heart"
+    }
+    
+    func getFavoriteColor(_ movie: Movie) -> Color {
+        return isFavorite(movie) ? .red : .white
+    }
+    
     private func addFavorite(_ movie: Movie) {
         guard let uid = sessionRepo.currentUserId else { return }
         favorites.append(movie)

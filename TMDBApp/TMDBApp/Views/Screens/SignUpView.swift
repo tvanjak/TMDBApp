@@ -77,7 +77,7 @@ struct SignUpView: View {
                                         authViewModel.email = email
                                         authViewModel.phoneNumber = phoneNumber
                                         authViewModel.password = password
-                                        await authViewModel.signUp() // add navigation
+                                        await authViewModel.signUp()
                                     }
                                 } else {
                                     localErrorMessage = "Passwords do not match."

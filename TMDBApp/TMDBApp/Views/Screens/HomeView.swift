@@ -108,8 +108,8 @@ struct HomeView: View {
                                     Button(action: {
                                         movieViewModel.toggleFavorite(movie)
                                     }) {
-                                        Image(systemName: movieViewModel.isFavorite(movie) ? "heart.fill" : "heart")
-                                            .foregroundColor(movieViewModel.isFavorite(movie) ? .red : .white)
+                                        Image(systemName: movieViewModel.getFavoriteIcon(movie))
+                                            .foregroundColor(movieViewModel.getFavoriteColor(movie))
                                             .padding(8)
                                             .background(Color.black.opacity(0.5))
                                             .clipShape(Circle())
@@ -168,8 +168,8 @@ struct HomeView: View {
                                         Button(action: {
                                             movieViewModel.toggleFavorite(movie)
                                         }) {
-                                            Image(systemName: movieViewModel.isFavorite(movie) ? "heart.fill" : "heart")
-                                                .foregroundColor(movieViewModel.isFavorite(movie) ? .red : .white)
+                                            Image(systemName: movieViewModel.getFavoriteIcon(movie))
+                                                .foregroundColor(movieViewModel.getFavoriteColor(movie))
                                                 .padding(8)
                                                 .background(Color.black.opacity(0.5))
                                                 .clipShape(Circle())
