@@ -11,13 +11,17 @@ import FirebaseFirestore
 
 @MainActor
 final class AuthenticationViewModel: ObservableObject {
-    @Published var email = ""
+    @Published var profileEmail = ""
     @Published var password = ""
+    @Published var confirmPassword = ""
     @Published var firstName = ""
     @Published var lastName = ""
     @Published var phoneNumber = ""
+    @Published var memberSince = ""
     @Published var errorMessage: String?
     
+    
+    @Published var email = ""
     @Published var currentUser: User? // Firebase User object
     private var authStateHandle: AuthStateDidChangeListenerHandle?
     
@@ -37,7 +41,7 @@ final class AuthenticationViewModel: ObservableObject {
             }
         }
     }
-
+    
     deinit {
         // Remove the listener when no longer needed to prevent memory leaks
         if let handle = authStateHandle {
@@ -52,13 +56,19 @@ final class AuthenticationViewModel: ObservableObject {
             let result = try await Auth.auth().createUser(withEmail: email, password: password)
             let uid = result.user.uid
             
+            // memberSince value
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "dd/MM/yyyy"
+            let memberSinceDateString = dateFormatter.string(from: Date())
+            
             // Save additional user data to Firestore
             let db = Firestore.firestore()
             try await db.collection("users").document(uid).setData([
                 "firstName": firstName,
                 "lastName": lastName,
                 "phoneNumber": phoneNumber,
-                "email": email
+                "email": profileEmail,
+                "memberSince": memberSinceDateString
             ])
         } catch {
             print("Error signing up: \(error.localizedDescription)")
@@ -70,15 +80,13 @@ final class AuthenticationViewModel: ObservableObject {
         errorMessage = nil
         do {
             let result = try await Auth.auth().signIn(withEmail: email, password: password)
-            // User is successfully signed in.
-            // Optionally fetch profile data from Firestore here if needed immediately.
             print("User signed in: \(result.user.email ?? "N/A")")
         } catch {
             print("Error signing in: \(error.localizedDescription)")
             self.errorMessage = "Sign-in failed: \(error.localizedDescription)"
         }
     }
-
+    
     func signOut() {
         do {
             try Auth.auth().signOut()
@@ -88,8 +96,8 @@ final class AuthenticationViewModel: ObservableObject {
             self.errorMessage = "Sign out failed: \(error.localizedDescription)"
         }
     }
-
-
+    
+    
     // FETCH USER PROFILE FROM FIRESTORE
     func fetchUserProfile(uid: String) {
         let db = Firestore.firestore()
@@ -99,11 +107,104 @@ final class AuthenticationViewModel: ObservableObject {
                 self.firstName = data?["firstName"] as? String ?? ""
                 self.lastName = data?["lastName"] as? String ?? ""
                 self.phoneNumber = data?["phoneNumber"] as? String ?? ""
+                self.profileEmail = data?["email"] as? String ?? ""
+                self.memberSince = data?["memberSince"] as? String ?? ""
                 print("Fetched user profile: \(data ?? [:])")
             } else {
                 print("Document does not exist or error: \(error?.localizedDescription ?? "unknown")")
             }
         }
+    }
+    
+    // UPDATE USER PASSWORD
+    func updateUserPassword(currentPassword: String, newPassword: String, confirmNewPassword: String) async {
+        errorMessage = nil
+        guard let user = Auth.auth().currentUser else {
+            errorMessage = "No authenticated user found."
+            return
+        }
+        
+        if newPassword != confirmNewPassword {
+            errorMessage = "New passwords do not match."
+            return
+        }
+        
+        if newPassword.count < 6 {
+            errorMessage = "Password should be at least 6 characters."
+            return
+        }
+        
+        do {
+            // Security-sensitive operation requires recent login.
+            guard let email = user.email else {
+                errorMessage = "User email not found for re-authentication."
+                return
+            }
+            let credential = EmailAuthProvider.credential(withEmail: email, password: currentPassword)
+            
+            try await user.reauthenticate(with: credential)
+            print("User re-authenticated successfully.")
+            
+            // Update password
+            try await user.updatePassword(to: newPassword)
+            print("Password updated successfully for \(user.email ?? "user").")
+            
+            self.password = ""
+            
+        } catch let error as NSError {
+            print("Error updating password: \(error.localizedDescription)")
+            if let errorCode = AuthErrorCode(rawValue: error.code) {
+                switch errorCode {
+                case .requiresRecentLogin:
+                    errorMessage = "Please sign in again to update your password."
+                case .wrongPassword:
+                    errorMessage = "The current password you entered is incorrect."
+                case .weakPassword:
+                    errorMessage = "The new password is too weak. Please choose a stronger one."
+                default:
+                    errorMessage = "Failed to update password: \(error.localizedDescription)"
+                }
+            } else {
+                errorMessage = "Failed to update password: \(error.localizedDescription)"
+            }
+        }
+    }
+    
+    
+    // UPDATE USER DATA
+    func updateUserProfileData(newFirstName: String, newLastName: String, newPhoneNumber: String, newEmail: String) async {
+        errorMessage = nil
+        guard let uid = Auth.auth().currentUser?.uid else {
+            errorMessage = "No authenticated user to update profile for."
+            return
+        }
+        
+        let db = Firestore.firestore()
+        let userDocRef = db.collection("users").document(uid)
+        
+        let updates: [String: Any] = [
+            "firstName": newFirstName,
+            "lastName": newLastName,
+            "phoneNumber": newPhoneNumber,
+            "email": newEmail // This updates the email in Firestore, not Auth
+        ]
+        
+        do {
+            try await userDocRef.updateData(updates)
+            print("User profile data updated successfully in Firestore.")
+            
+            self.firstName = newFirstName
+            self.lastName = newLastName
+            self.phoneNumber = newPhoneNumber
+            self.profileEmail = newEmail
+        } catch {
+            print("Error updating user profile data in Firestore: \(error.localizedDescription)")
+            errorMessage = "Failed to update profile: \(error.localizedDescription)"
+        }
+    }
+    
+    func checkConfirmPassword() -> Bool {
+        return password == confirmPassword
     }
 }
 

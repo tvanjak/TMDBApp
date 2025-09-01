@@ -283,7 +283,7 @@ struct PasswordSection: View {
 
 
 struct ProfileView: View {
-    @EnvironmentObject var authViewModel: AuthenticationViewModel
+    @ObservedObject var authViewModel: AuthenticationViewModel
     
     enum sections {
         case details
@@ -465,13 +465,12 @@ struct ProfileView: View {
 }
 
 #Preview {
-    let authViewModel = AuthenticationViewModel()
+    let authViewModel = AuthenticationViewModel(sessionRepo: SessionRepository())
     authViewModel.firstName = "John"
     authViewModel.lastName = "Doe"
     authViewModel.profileEmail = "john.doe@example.com"
     authViewModel.phoneNumber = "+1234567890"
     authViewModel.memberSince = "24/04/2022"
     
-    return ProfileView()
-        .environmentObject(authViewModel)
+    return ProfileView(authViewModel: authViewModel)
 }

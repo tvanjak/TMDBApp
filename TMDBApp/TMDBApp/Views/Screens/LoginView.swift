@@ -11,8 +11,6 @@ struct LoginView: View {
     
     @ObservedObject var authViewModel: AuthenticationViewModel
     @State private var rememberMe: Bool = false
-    @State private var email: String = ""
-    @State private var password: String = ""
     
     var body: some View {
         ZStack {
@@ -36,10 +34,10 @@ struct LoginView: View {
                                 .foregroundStyle(.white)
                                 .font(.title)
                             
-                            CustomTextField(text: $email, subtitle: "Email address", placeholder: "ex. Matt", secure: false)
+                            CustomTextField(text: $authViewModel.email, subtitle: "Email address", placeholder: "ex. Matt", secure: false)
                             
                             
-                            CustomPasswordTextField(text: $password, subtitle: "Password", placeholder: "Enter your password", secure: true, forgotPasswordAction: {})
+                            CustomPasswordTextField(text: $authViewModel.password, subtitle: "Password", placeholder: "Enter your password", secure: true, forgotPasswordAction: {})
                             
                             HStack {
                                 Toggle("Remember me", isOn: $rememberMe)
@@ -57,9 +55,6 @@ struct LoginView: View {
                             
                             Button {
                                 Task {
-                                    // Sync local state with authViewModel before signing in
-                                    authViewModel.email = email
-                                    authViewModel.password = password
                                     await authViewModel.signIn()
                                 }
                             } label: {
@@ -92,10 +87,6 @@ struct LoginView: View {
                     }
                 }
                 .background(Color(red: 11/255, green: 37/255, blue: 63/255))
-                // Optional: For iOS 16+ to make the actual navigation bar transparent if it's still showing white
-                .toolbarBackground(.hidden, for: .navigationBar)
-                // Ensures status bar text (time, battery) is visible on a dark background
-                .toolbarColorScheme(.dark, for: .navigationBar)
             }
         }
     }
