@@ -20,15 +20,16 @@ class AuthenticationViewModel: ObservableObject {
     @Published var currentUser: User? // Firebase User object
     private var authStateHandle: AuthStateDidChangeListenerHandle?
     
-
+    private let sessionRepo: SessionRepositoryProtocol
+    
     // INITIALIZER & DEINTIALIZER
-    init() {
+    init(sessionRepo: SessionRepositoryProtocol = SessionRepository.shared) {
+        self.sessionRepo = sessionRepo
         // Observe authentication state changes
         authStateHandle = Auth.auth().addStateDidChangeListener { [weak self] auth, user in
             self?.currentUser = user
             if let user = user {
                 print("User is signed in: \(user.uid)")
-                // Optionally fetch their full profile data here if needed on app launch
                 self?.fetchUserProfile(uid: user.uid)
             } else {
                 print("User is signed out.")
@@ -49,23 +50,15 @@ class AuthenticationViewModel: ObservableObject {
         do {
             let result = try await Auth.auth().createUser(withEmail: email, password: password)
             let uid = result.user.uid
-
+            
             // Save additional user data to Firestore
             let db = Firestore.firestore()
-            db.collection("users").document(uid).setData([
+            try await db.collection("users").document(uid).setData([
                 "firstName": firstName,
                 "lastName": lastName,
                 "phoneNumber": phoneNumber,
-                "email": email // Storing email for easy access, though Auth also has it
-            ]) { err in
-                if let err = err {
-                    print("Error writing document: \(err)")
-                    self.errorMessage = "Failed to save user data."
-                } else {
-                    print("User data successfully written!")
-                    // User is signed in and data is saved. Navigate to main app.
-                }
-            }
+                "email": email
+            ])
         } catch {
             print("Error signing up: \(error.localizedDescription)")
             self.errorMessage = error.localizedDescription
@@ -77,7 +70,7 @@ class AuthenticationViewModel: ObservableObject {
         do {
             let result = try await Auth.auth().signIn(withEmail: email, password: password)
             // User is successfully signed in.
-            // You can optionally fetch their profile data from Firestore here if needed immediately.
+            // Optionally fetch profile data from Firestore here if needed immediately.
             print("User signed in: \(result.user.email ?? "N/A")")
         } catch {
             print("Error signing in: \(error.localizedDescription)")

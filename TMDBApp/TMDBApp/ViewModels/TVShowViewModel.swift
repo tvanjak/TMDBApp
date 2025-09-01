@@ -1,6 +1,7 @@
 
 import SwiftUI
 
+@MainActor
 class TVShowViewModel: ObservableObject {
     @Published var popularTVShows: [TVShow] = []
     @Published var topRatedTVShows: [TVShow] = []

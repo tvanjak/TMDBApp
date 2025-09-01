@@ -9,7 +9,57 @@ class MovieViewModel: ObservableObject {
     @Published var nowPlayingMovies: [Movie] = []
     @Published var errorMessage: String?
     @Published var movieDetail: MovieDetails? = nil
+    
+    @Published var favorites: [Movie] = []
+    
+    private let favoritesRepo: FavoritesRepositoryProtocol
+    private let sessionRepo: SessionRepositoryProtocol
+    private let navigationService: NavigationServiceProtocol
+    
+    init(
+        favoritesRepo: FavoritesRepositoryProtocol,
+        sessionRepo: SessionRepositoryProtocol,
+        navigationService: NavigationServiceProtocol
+    ) {
+        self.favoritesRepo = favoritesRepo
+        self.sessionRepo = sessionRepo
+        self.navigationService = navigationService
+        loadFavorites()
+    }
+    
+    // FAVORITES FUNCTIONS -------------------------------
+    private func loadFavorites() {
+        guard let uid = sessionRepo.currentUserId else { return }
+        favorites = favoritesRepo.loadFavorites(for: uid)
+    }
+    
+    func toggleFavorite(_ movie: Movie) {
+        if isFavorite(movie) {
+            removeFavorite(movie)
+        } else {
+            addFavorite(movie)
+        }
+    }
+    
+    func isFavorite(_ movie: Movie) -> Bool {
+        favorites.contains { $0.id == movie.id }
+    }
+    
+    private func addFavorite(_ movie: Movie) {
+        guard let uid = sessionRepo.currentUserId else { return }
+        favorites.append(movie)
+        favoritesRepo.saveFavorites(favorites, for: uid)
+    }
+    
+    private func removeFavorite(_ movie: Movie) {
+        guard let uid = sessionRepo.currentUserId else { return }
+        favorites.removeAll { $0.id == movie.id }
+        favoritesRepo.saveFavorites(favorites, for: uid)
+    }
+    // ------------------------------------------------------------
 
+    
+    // MOVIE LOADING FUNCTIONS -------------------------------
     func loadPopularMovies() async {
         do {
             popularMovies = try await TMDBService.shared.fetchPopularMovies()
@@ -17,7 +67,7 @@ class MovieViewModel: ObservableObject {
             errorMessage = error.localizedDescription
         }
     }
-
+    
     func loadTrendingMovies() async {
         do {
             trendingMovies = try await TMDBService.shared.fetchTrendingMovies()
@@ -25,7 +75,7 @@ class MovieViewModel: ObservableObject {
             errorMessage = error.localizedDescription
         }
     }
-
+    
     func loadUpcomingMovies() async {
         do {
             upcomingMovies = try await TMDBService.shared.fetchUpcomingMovies()
@@ -44,9 +94,27 @@ class MovieViewModel: ObservableObject {
     
     func loadMovieDetails(movieId: Int) async {
         do {
+            movieDetail = nil
             movieDetail = try await TMDBService.shared.fetchMovieDetails(movieId: movieId)
         } catch {
             errorMessage = error.localizedDescription
         }
     }
+    // ------------------------------------------------------------
+
+    
+    // ROUTER FUNCTIONS
+    func navigateToMovie(_ movieId: Int) {
+        navigationService.navigateToMovie(movieId)
+    }
+    
+    func goBack() {
+        navigationService.goBack()
+    }
+    
+    func canGoBack() -> Bool {
+        return navigationService.canGoBack()
+    }
+    // ------------------------------------------------------------
+
 }

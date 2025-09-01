@@ -7,27 +7,46 @@
 
 import SwiftUI
 
-class Router: ObservableObject {
-    @Published var homePath = NavigationPath()
-    @Published var favoritesPath = NavigationPath()
-    @Published var profilePath = NavigationPath()
+// Protocol for ViewModels
+protocol NavigationServiceProtocol {
+    func navigateToMovie(_ movieId: Int)
+    func goBack()
+    func canGoBack() -> Bool
+}
 
-    func goToMovie(from section: AppLayout.Section, id: Int) {
-        switch section {
-        case .home:
-            homePath.append(id)
-        case .favorites:
-            favoritesPath.append(id)
-        case .profile:
-            profilePath.append(id)
-        }
+// Protocol for Views 
+protocol NavigationManagerProtocol {
+    var path: NavigationPath { get set }
+    
+    func goBack()
+    func canGoBack() -> Bool
+    func navigateTo(_ route: Route)
+}
+
+class Router: NavigationManagerProtocol, NavigationServiceProtocol, ObservableObject {
+    @Published var path = NavigationPath()
+    
+    func goBack() {
+        if !path.isEmpty { path.removeLast() }
+    }
+
+    func canGoBack() -> Bool {
+        return !path.isEmpty
     }
     
-    func goBack(from section: AppLayout.Section) {
-        switch section {
-        case .home: if !homePath.isEmpty { homePath.removeLast() }
-        case .favorites: if !favoritesPath.isEmpty { favoritesPath.removeLast() }
-        case .profile: if !profilePath.isEmpty { profilePath.removeLast() }
-        }
+    func navigateTo(_ route: Route) {
+        path.append(route)
     }
+    
+    // Implementation for ViewModels
+    func navigateToMovie(_ movieId: Int) {
+        navigateTo(.mediaDetail(id: movieId))
+    }
+}
+
+enum Route: Hashable {
+    case home
+    case favorites
+    case profile
+    case mediaDetail(id: Int)
 }

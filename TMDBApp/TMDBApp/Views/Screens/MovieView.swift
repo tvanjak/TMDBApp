@@ -42,6 +42,7 @@ struct RatingRing: View {
 }
 
 
+//MOVE THIS TO VIEWMODEL -------------------
 extension String {
     func releaseYear() -> String {
         let formatter = DateFormatter()
@@ -64,8 +65,11 @@ extension String {
         return "N/A"
     }
 }
+// -----------------------------------------
 
 struct MoviePoster: View {
+    var id: Int
+    var posterPath: String?
     var fullPosterPath: String?
     var voteAverage: Double
     var releaseDate: String
@@ -73,13 +77,21 @@ struct MoviePoster: View {
     var genres: String
     var runtime: String?
     
-    @Binding var isFavorite: Bool
+    var movie: Movie {
+        Movie(
+            id: id,
+            title: title,
+            posterPath: posterPath,
+        )
+    }
+    
+    @EnvironmentObject var movieViewModel: MovieViewModel
     
     var body: some View {
         ZStack (alignment: .bottomLeading) {
             if let fullURLString = fullPosterPath {
                 if let url = URL(string: fullURLString) {
-                    AsyncImage(url: url, scale: 2) { image in
+                    AsyncImage(url: url) { image in
                         image
                             .resizable()
                             .scaledToFill()
@@ -87,7 +99,7 @@ struct MoviePoster: View {
                             .clipped()
                     } placeholder: {
                         ProgressView()
-                            .frame(height: 350)
+                            .frame(width: UIScreen.main.bounds.width, height: 360)
                     }
                 }
             } else {
@@ -135,10 +147,10 @@ struct MoviePoster: View {
                 
                 HStack {
                     Button(action: {
-                        isFavorite.toggle()
+                        movieViewModel.toggleFavorite(movie)
                     }) {
-                        Image(systemName: isFavorite ? "heart.fill" : "heart")
-                            .foregroundColor(isFavorite ? .red : .white)
+                        Image(systemName: movieViewModel.isFavorite(movie) ? "heart.fill" : "heart")
+                            .foregroundColor(movieViewModel.isFavorite(movie) ? .red : .white)
                             .padding(8)
                             .background(Color.black.opacity(0.5))
                             .clipShape(Circle())
@@ -251,9 +263,7 @@ struct CastView: View {
 
 struct MovieView: View {
     var movieId: Int
-    @StateObject private var movieViewModel = MovieViewModel()
-    
-    @State private var isFavorite: Bool = false
+    @EnvironmentObject var movieViewModel: MovieViewModel
 
     var body: some View {
         ScrollView {
@@ -262,7 +272,15 @@ struct MovieView: View {
                 VStack (spacing: 15) {
                     
                     // POSTER AND GENERAL INFO
-                    MoviePoster(fullPosterPath: movieDetail.fullPosterPath, voteAverage: movieDetail.voteAverage, releaseDate: movieDetail.releaseDate, title: movieDetail.title, genres: movieDetail.formattedGenres, runtime: movieDetail.formattedRuntime, isFavorite: $isFavorite)
+                    MoviePoster(id: movieDetail.id,
+                                posterPath: movieDetail.posterPath,
+                                fullPosterPath: movieDetail.fullPosterPath,
+                                voteAverage: movieDetail.voteAverage,
+                                releaseDate: movieDetail.releaseDate,
+                                title: movieDetail.title,
+                                genres: movieDetail.formattedGenres,
+                                runtime: movieDetail.formattedRuntime)
+                        .environmentObject(movieViewModel)
                     
                     // OVERVIEW
                     VStack (alignment: .leading, spacing: 10) {
@@ -288,7 +306,7 @@ struct MovieView: View {
         }
         .onAppear {
             Task {
-                if movieViewModel.movieDetail == nil {
+                if movieViewModel.movieDetail?.id != movieId {
                     await movieViewModel.loadMovieDetails(movieId: movieId)
                 }
             }
@@ -298,4 +316,9 @@ struct MovieView: View {
 
 #Preview {
     MovieView(movieId: 2)
+    .environmentObject(MovieViewModel(
+            favoritesRepo: FavoritesRepository.shared,
+            sessionRepo: SessionRepository.shared,
+            navigationService: Router(),
+        ))
 }

@@ -11,8 +11,6 @@ import SwiftUI
 struct ProfileView: View {
     @EnvironmentObject var authViewModel: AuthenticationViewModel
 
-    @Binding var path: NavigationPath
-
     var body: some View {
         VStack {
             Text("ProfileView")
@@ -28,7 +26,6 @@ struct ProfileView: View {
 }
 
 #Preview {
-    @Previewable @State var path = NavigationPath()
-    return ProfileView(path: $path)
+    ProfileView()
         .environmentObject(AuthenticationViewModel())
 }

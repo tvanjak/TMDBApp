@@ -9,17 +9,10 @@ import SwiftUI
 
 
 struct HomeView: View {
-    @Binding var path: NavigationPath
-    
     @EnvironmentObject var movieViewModel: MovieViewModel
-    @EnvironmentObject var tvShowViewModel: TVShowViewModel
     
     @State private var searchTerm = ""
-    
-    @State private var isFavorite = false
-
-    let columns = [GridItem(.adaptive(minimum: 120))]
-    
+        
     enum movieTypes {
         case streaming
         case onTV
@@ -27,7 +20,7 @@ struct HomeView: View {
         case inTheatres
     }
     
-    @State var selectedMovie: movieTypes = movieTypes.streaming
+    @State var selectedMovieType: movieTypes = movieTypes.streaming
     
     var body: some View {
         ScrollView {
@@ -45,7 +38,6 @@ struct HomeView: View {
                 .cornerRadius(8)
                 .padding(.top)
                 
-//                MovieSection(title: "What's popular", popularMovies: viewModel.popularMovies) // doesnt work because it doesnt load the movies
                 
                 VStack (alignment: .leading) {
                     Text("What's popular")
@@ -88,10 +80,10 @@ struct HomeView: View {
                         LazyHStack {
                             ForEach(movieViewModel.popularMovies) { movie in
                                 ZStack(alignment: .topLeading) {
-                                    NavigationLink(value:  movie.id) {
+                                    Button(action: { movieViewModel.navigateToMovie(movie.id) }) {
                                         if let fullURLString = movie.fullPosterPath {
                                             if let url = URL(string: fullURLString) {
-                                                AsyncImage(url: url, scale: 4) { image in
+                                                AsyncImage(url: url) { image in
                                                     image
                                                         .resizable()
                                                         .scaledToFill()
@@ -114,10 +106,10 @@ struct HomeView: View {
                                     }
                                     
                                     Button(action: {
-                                        isFavorite.toggle()
+                                        movieViewModel.toggleFavorite(movie)
                                     }) {
-                                        Image(systemName: isFavorite ? "heart.fill" : "heart")
-                                            .foregroundColor(isFavorite ? .red : .white)
+                                        Image(systemName: movieViewModel.isFavorite(movie) ? "heart.fill" : "heart")
+                                            .foregroundColor(movieViewModel.isFavorite(movie) ? .red : .white)
                                             .padding(8)
                                             .background(Color.black.opacity(0.5))
                                             .clipShape(Circle())
@@ -148,11 +140,11 @@ struct HomeView: View {
                     ScrollView (.horizontal) {
                         LazyHStack {
                             ForEach(movieViewModel.trendingMovies) { movie in
-                                NavigationLink(value: movie.id) {
+                                Button(action: { movieViewModel.navigateToMovie(movie.id) }) {
                                     ZStack(alignment: .topLeading) {
                                         if let fullURLString = movie.fullPosterPath {
                                             if let url = URL(string: fullURLString) {
-                                                AsyncImage(url: url, scale: 4) { image in
+                                                AsyncImage(url: url) { image in
                                                     image
                                                         .resizable()
                                                         .scaledToFill()
@@ -173,10 +165,10 @@ struct HomeView: View {
                                         }
                                         
                                         Button(action: {
-                                            isFavorite.toggle()
+                                            movieViewModel.toggleFavorite(movie)
                                         }) {
-                                            Image(systemName: isFavorite ? "heart.fill" : "heart")
-                                                .foregroundColor(isFavorite ? .red : .white)
+                                            Image(systemName: movieViewModel.isFavorite(movie) ? "heart.fill" : "heart")
+                                                .foregroundColor(movieViewModel.isFavorite(movie) ? .red : .white)
                                                 .padding(8)
                                                 .background(Color.black.opacity(0.5))
                                                 .clipShape(Circle())
@@ -207,13 +199,11 @@ struct HomeView: View {
 }
 
 
-struct HomeView_Previews: PreviewProvider {
-    @State static var path = NavigationPath()
-    
-    static var previews: some View {
-        HomeView(path: $path)
-            .environmentObject(MovieViewModel())
-            .environmentObject(TVShowViewModel())
-    }
+#Preview {
+    HomeView()
+        .environmentObject(MovieViewModel(
+            favoritesRepo: FavoritesRepository.shared,
+            sessionRepo: SessionRepository.shared,
+            navigationService: Router()
+        ))
 }
-
