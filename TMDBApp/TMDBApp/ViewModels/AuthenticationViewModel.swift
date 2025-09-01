@@ -24,7 +24,7 @@ final class AuthenticationViewModel: ObservableObject {
     private let sessionRepo: SessionRepositoryProtocol
     
     // INITIALIZER & DEINTIALIZER
-    init(sessionRepo: SessionRepositoryProtocol = SessionRepository.shared) {
+    init(sessionRepo: SessionRepositoryProtocol) {
         self.sessionRepo = sessionRepo
         // Observe authentication state changes
         authStateHandle = Auth.auth().addStateDidChangeListener { [weak self] auth, user in

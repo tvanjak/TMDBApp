@@ -315,8 +315,8 @@ struct MovieView: View {
 
 #Preview {
     MovieView(movieId: 2, movieViewModel: MovieViewModel(
-            favoritesRepo: FavoritesRepository.shared,
-            sessionRepo: SessionRepository.shared,
+            favoritesRepo: FavoritesRepository(),
+            sessionRepo: SessionRepository(),
             navigationService: Router(),
         ))
 }

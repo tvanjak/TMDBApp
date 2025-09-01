@@ -102,5 +102,5 @@ struct LoginView: View {
 }
 
 #Preview {
-    LoginView(authViewModel: AuthenticationViewModel())
+    LoginView(authViewModel: AuthenticationViewModel(sessionRepo: SessionRepository()))
 }

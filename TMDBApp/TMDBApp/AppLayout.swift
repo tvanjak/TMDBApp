@@ -6,25 +6,12 @@
 //
 
 import SwiftUI
+import Factory
 
 struct AppLayout: View {
-    @StateObject private var router: Router
-    @StateObject private var movieViewModel: MovieViewModel
-    @StateObject private var authViewModel = AuthenticationViewModel()
-
-    init() {
-        // Create dependencies in the correct order
-        let router = Router()
-        let movieViewModel = MovieViewModel(
-            favoritesRepo: FavoritesRepository.shared,
-            sessionRepo: SessionRepository.shared,
-            navigationService: router
-        )
-        
-        // Assign to StateObjects
-        self._router = StateObject(wrappedValue: router)
-        self._movieViewModel = StateObject(wrappedValue: movieViewModel)
-    }
+    @StateObject private var router = Container.shared.router()
+    @StateObject private var movieViewModel = Container.shared.movieViewModel()
+    @StateObject private var authViewModel = Container.shared.authViewModel()
 
     var body: some View {
         if authViewModel.currentUser != nil {

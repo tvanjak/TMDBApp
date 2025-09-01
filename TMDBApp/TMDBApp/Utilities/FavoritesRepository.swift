@@ -14,8 +14,8 @@ protocol FavoritesRepositoryProtocol {
 
 
 class FavoritesRepository: FavoritesRepositoryProtocol {
-    static let shared = FavoritesRepository()
-    private init() {}
+//    static let shared = FavoritesRepository()
+//    private init() {}
     
     private let userDefaults: UserDefaults = .standard
     

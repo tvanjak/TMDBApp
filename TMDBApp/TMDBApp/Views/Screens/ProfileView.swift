@@ -26,5 +26,5 @@ struct ProfileView: View {
 }
 
 #Preview {
-    ProfileView(authViewModel: AuthenticationViewModel())
+    ProfileView(authViewModel: AuthenticationViewModel(sessionRepo: SessionRepository()))
 }

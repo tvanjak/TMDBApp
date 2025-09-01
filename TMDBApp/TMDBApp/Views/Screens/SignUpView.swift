@@ -118,5 +118,5 @@ struct SignUpView: View {
 }
 
 #Preview {
-    SignUpView(authViewModel: AuthenticationViewModel())
+    SignUpView(authViewModel: AuthenticationViewModel(sessionRepo: SessionRepository()))
 }
