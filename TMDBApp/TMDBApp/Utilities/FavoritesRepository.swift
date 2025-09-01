@@ -13,7 +13,7 @@ protocol FavoritesRepositoryProtocol {
 }
 
 
-class FavoritesRepository: FavoritesRepositoryProtocol, ObservableObject {
+class FavoritesRepository: FavoritesRepositoryProtocol {
     static let shared = FavoritesRepository()
     private init() {}
     

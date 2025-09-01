@@ -10,9 +10,14 @@ import FirebaseAuth
 
 struct SignUpView: View {
     
-    @EnvironmentObject var authViewModel: AuthenticationViewModel
+    @ObservedObject var authViewModel: AuthenticationViewModel
     @State private var confirmPassword: String = ""
     @State private var localErrorMessage: String?
+    @State private var firstName: String = ""
+    @State private var lastName: String = ""
+    @State private var email: String = ""
+    @State private var phoneNumber: String = ""
+    @State private var password: String = ""
     
     
     var body: some View {
@@ -33,16 +38,16 @@ struct SignUpView: View {
                             } .padding(.horizontal)
                             
                             HStack {
-                                CustomTextField(text: $authViewModel.firstName, subtitle: "First name", placeholder: "ex. Matt", secure: false)
+                                CustomTextField(text: $firstName, subtitle: "First name", placeholder: "ex. Matt", secure: false)
                                 
-                                CustomTextField(text: $authViewModel.lastName,subtitle: "Last name", placeholder: "ex. Smith", secure: false)
+                                CustomTextField(text: $lastName,subtitle: "Last name", placeholder: "ex. Smith", secure: false)
                             }
                             
-                            CustomTextField(text: $authViewModel.email, subtitle: "Email address", placeholder: "email@example.com", secure: false)
+                            CustomTextField(text: $email, subtitle: "Email address", placeholder: "email@example.com", secure: false)
                             
-                            CustomTextField(text: $authViewModel.phoneNumber, subtitle: "Phone number", placeholder: "Enter your phone number", secure: false)
+                            CustomTextField(text: $phoneNumber, subtitle: "Phone number", placeholder: "Enter your phone number", secure: false)
                             
-                            CustomTextField(text: $authViewModel.password,subtitle: "Password", placeholder: "Enter your password", secure: true)
+                            CustomTextField(text: $password,subtitle: "Password", placeholder: "Enter your password", secure: true)
                             
                             CustomTextField(text: $confirmPassword,subtitle: "Confirm password", placeholder: "Repeat your password", secure: true)
                             
@@ -64,8 +69,14 @@ struct SignUpView: View {
                             
                             Button {
                                 localErrorMessage = nil
-                                if authViewModel.password == confirmPassword {
+                                if password == confirmPassword {
                                     Task {
+                                        // Sync local state with authViewModel before signing up
+                                        authViewModel.firstName = firstName
+                                        authViewModel.lastName = lastName
+                                        authViewModel.email = email
+                                        authViewModel.phoneNumber = phoneNumber
+                                        authViewModel.password = password
                                         await authViewModel.signUp() // add navigation
                                     }
                                 } else {
@@ -79,7 +90,7 @@ struct SignUpView: View {
                                     .frame(maxWidth: .infinity, maxHeight: 20)
                                     .padding()
                                     .background(Color(red: 76/255, green: 178/255, blue: 223/255))
-                                    .cornerRadius(12)
+                                    .cornerRadius(10)
                             }
                             .padding(.horizontal,30)
                             
@@ -89,8 +100,7 @@ struct SignUpView: View {
                                     .foregroundStyle(.white)
                                     .font(.headline)
                                     .fontWeight(.regular)
-                                NavigationLink(destination: LoginView()
-                                    .environmentObject(authViewModel)
+                                NavigationLink(destination: LoginView(authViewModel: authViewModel)
                                 ) {
                                     Text("Sign in here")
                                         .foregroundColor(.blue)
@@ -108,6 +118,5 @@ struct SignUpView: View {
 }
 
 #Preview {
-    SignUpView()
-        .environmentObject(AuthenticationViewModel())
+    SignUpView(authViewModel: AuthenticationViewModel())
 }

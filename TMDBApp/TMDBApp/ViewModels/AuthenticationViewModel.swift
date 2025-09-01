@@ -9,7 +9,8 @@ import SwiftUI
 import FirebaseAuth
 import FirebaseFirestore
 
-class AuthenticationViewModel: ObservableObject {
+@MainActor
+final class AuthenticationViewModel: ObservableObject {
     @Published var email = ""
     @Published var password = ""
     @Published var firstName = ""

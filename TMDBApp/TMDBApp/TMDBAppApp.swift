@@ -20,12 +20,10 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct TMDBApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    @StateObject var authViewModel = AuthenticationViewModel()
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environmentObject(authViewModel)
+            AppLayout()
         }
     }
 }

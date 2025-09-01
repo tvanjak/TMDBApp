@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FavoritesView: View {
-    @EnvironmentObject var movieViewModel: MovieViewModel
+    @ObservedObject var movieViewModel: MovieViewModel
 
     let columns = [GridItem(.adaptive(minimum: 115), spacing: 10)]
 
@@ -74,6 +74,9 @@ struct FavoritesView: View {
 }
 
 #Preview {
-    FavoritesView()
-        .environmentObject(AuthenticationViewModel())
+    FavoritesView(movieViewModel: MovieViewModel(
+        favoritesRepo: FavoritesRepository.shared,
+        sessionRepo: SessionRepository.shared,
+        navigationService: Router()
+    ))
 }

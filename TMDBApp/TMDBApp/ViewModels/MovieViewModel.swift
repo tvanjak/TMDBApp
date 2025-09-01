@@ -2,11 +2,15 @@
 import SwiftUI
 
 @MainActor
-class MovieViewModel: ObservableObject {
+final class MovieViewModel: ObservableObject {
     @Published var popularMovies: [Movie] = []
     @Published var trendingMovies: [Movie] = []
     @Published var upcomingMovies: [Movie] = []
     @Published var nowPlayingMovies: [Movie] = []
+    
+    @Published var popularTVShows: [TVShow] = []
+    @Published var topRatedTVShows: [TVShow] = []
+    
     @Published var errorMessage: String?
     @Published var movieDetail: MovieDetails? = nil
     
@@ -114,6 +118,25 @@ class MovieViewModel: ObservableObject {
     
     func canGoBack() -> Bool {
         return navigationService.canGoBack()
+    }
+    // ------------------------------------------------------------
+    
+    
+    // TVShow FUNCTIONS
+    func loadPopularTVShows() async {
+        do {
+            popularTVShows = try await TMDBService.shared.fetchPopularTVShows()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+    
+    func loadTopRatedTVShows() async {
+        do {
+            topRatedTVShows = try await TMDBService.shared.fetchTopRatedTVShows()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
     // ------------------------------------------------------------
 

@@ -9,8 +9,10 @@ import SwiftUI
 
 struct LoginView: View {
     
-    @EnvironmentObject var authViewModel: AuthenticationViewModel
+    @ObservedObject var authViewModel: AuthenticationViewModel
     @State private var rememberMe: Bool = false
+    @State private var email: String = ""
+    @State private var password: String = ""
     
     var body: some View {
         ZStack {
@@ -34,10 +36,10 @@ struct LoginView: View {
                                 .foregroundStyle(.white)
                                 .font(.title)
                             
-                            CustomTextField(text: $authViewModel.email, subtitle: "Email address", placeholder: "ex. Matt", secure: false)
+                            CustomTextField(text: $email, subtitle: "Email address", placeholder: "ex. Matt", secure: false)
                             
                             
-                            CustomPasswordTextField(text: $authViewModel.password, subtitle: "Password", placeholder: "Enter your password", secure: true, forgotPasswordAction: {})
+                            CustomPasswordTextField(text: $password, subtitle: "Password", placeholder: "Enter your password", secure: true, forgotPasswordAction: {})
                             
                             HStack {
                                 Toggle("Remember me", isOn: $rememberMe)
@@ -55,6 +57,9 @@ struct LoginView: View {
                             
                             Button {
                                 Task {
+                                    // Sync local state with authViewModel before signing in
+                                    authViewModel.email = email
+                                    authViewModel.password = password
                                     await authViewModel.signIn() // add navigation
                                 }
                             } label: {
@@ -75,8 +80,7 @@ struct LoginView: View {
                                     .font(.headline)
                                     .fontWeight(.regular)
                                 NavigationLink(destination:
-                                                SignUpView()
-                                                    .environmentObject(authViewModel)
+                                                SignUpView(authViewModel: authViewModel)
                                     ) {
                                     Text("Create one here")
                                         .foregroundColor(.blue)
@@ -98,6 +102,5 @@ struct LoginView: View {
 }
 
 #Preview {
-    LoginView()
-        .environmentObject(AuthenticationViewModel())
+    LoginView(authViewModel: AuthenticationViewModel())
 }
