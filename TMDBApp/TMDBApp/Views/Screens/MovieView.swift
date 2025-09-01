@@ -76,6 +76,7 @@ struct MoviePoster: View {
     var title: String
     var genres: String
     var runtime: String?
+    @ObservedObject var movieViewModel: MovieViewModel
     
     var movie: Movie {
         Movie(
@@ -84,8 +85,6 @@ struct MoviePoster: View {
             posterPath: posterPath,
         )
     }
-    
-    @EnvironmentObject var movieViewModel: MovieViewModel
     
     var body: some View {
         ZStack (alignment: .bottomLeading) {
@@ -149,8 +148,8 @@ struct MoviePoster: View {
                     Button(action: {
                         movieViewModel.toggleFavorite(movie)
                     }) {
-                        Image(systemName: movieViewModel.isFavorite(movie) ? "heart.fill" : "heart")
-                            .foregroundColor(movieViewModel.isFavorite(movie) ? .red : .white)
+                        Image(systemName: movieViewModel.getFavoriteIcon(movie))
+                            .foregroundColor(movieViewModel.getFavoriteColor(movie))
                             .padding(8)
                             .background(Color.black.opacity(0.5))
                             .clipShape(Circle())
@@ -263,7 +262,7 @@ struct CastView: View {
 
 struct MovieView: View {
     var movieId: Int
-    @EnvironmentObject var movieViewModel: MovieViewModel
+    @ObservedObject var movieViewModel: MovieViewModel
 
     var body: some View {
         ScrollView {
@@ -279,8 +278,8 @@ struct MovieView: View {
                                 releaseDate: movieDetail.releaseDate,
                                 title: movieDetail.title,
                                 genres: movieDetail.formattedGenres,
-                                runtime: movieDetail.formattedRuntime)
-                        .environmentObject(movieViewModel)
+                                runtime: movieDetail.formattedRuntime,
+                                movieViewModel: movieViewModel)
                     
                     // OVERVIEW
                     VStack (alignment: .leading, spacing: 10) {
@@ -315,10 +314,9 @@ struct MovieView: View {
 }
 
 #Preview {
-    MovieView(movieId: 2)
-    .environmentObject(MovieViewModel(
-            favoritesRepo: FavoritesRepository.shared,
-            sessionRepo: SessionRepository.shared,
+    MovieView(movieId: 2, movieViewModel: MovieViewModel(
+            favoritesRepo: FavoritesRepository(),
+            sessionRepo: SessionRepository(),
             navigationService: Router(),
         ))
 }

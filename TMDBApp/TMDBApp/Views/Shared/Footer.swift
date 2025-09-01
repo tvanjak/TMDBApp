@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FooterView: View {
-    @EnvironmentObject var router: Router
+    let router: Router
     
     var body: some View {
         HStack {
@@ -47,6 +47,5 @@ struct FooterView: View {
 }
 
 #Preview {
-    FooterView()
-        .environmentObject(Router())
+    FooterView(router: Router())
 }
