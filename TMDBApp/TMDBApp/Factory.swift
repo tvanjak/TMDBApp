@@ -38,7 +38,6 @@ extension Container {
         .singleton
     }
     
-    @MainActor
     var authViewModel: Factory<AuthenticationViewModel> {
         self { @MainActor in
             AuthenticationViewModel(

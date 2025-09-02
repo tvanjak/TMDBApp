@@ -105,3 +105,11 @@ struct CheckboxToggleStyle: ToggleStyle {
     }
 }
 
+struct CustomDivider: View {
+    var body: some View {
+        Rectangle()
+            .frame(height: 1)
+            .padding(.horizontal)
+            .foregroundColor(Color(red: 76/255, green: 178/255, blue: 223/255))
+    }
+}

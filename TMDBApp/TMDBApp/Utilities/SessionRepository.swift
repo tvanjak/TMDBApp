@@ -13,8 +13,6 @@ protocol SessionRepositoryProtocol {
 }
 
 class SessionRepository: SessionRepositoryProtocol {
-//    static let shared = SessionRepository()
-//    private init() {}
     
     private let auth = Auth.auth()
     var currentUserId: String? {
