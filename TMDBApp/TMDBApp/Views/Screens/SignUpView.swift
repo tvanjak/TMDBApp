@@ -8,12 +8,50 @@
 import SwiftUI
 import FirebaseAuth
 
-struct SignUpView: View {
+struct SignUpInputTextfields: View {
+    @ObservedObject var authViewModel: AuthenticationViewModel
     
+    var body: some View {
+        HStack {
+            CustomTextField(text: $authViewModel.firstName, subtitle: "First name", placeholder: "ex. Matt", secure: false)
+            
+            CustomTextField(text: $authViewModel.lastName,subtitle: "Last name", placeholder: "ex. Smith", secure: false)
+        }
+        
+        CustomTextField(text: $authViewModel.email, subtitle: "Email address", placeholder: "email@example.com", secure: false)
+        
+        CustomTextField(text: $authViewModel.phoneNumber, subtitle: "Phone number", placeholder: "Enter your phone number", secure: false)
+        
+        CustomTextField(text: $authViewModel.password, subtitle: "Password", placeholder: "Enter your password", secure: true)
+        
+        CustomTextField(text: $authViewModel.confirmPassword, subtitle: "Confirm password", placeholder: "Repeat your password", secure: true)
+        
+    }
+}
+
+struct LoginLink: View {
+    @ObservedObject var authViewModel: AuthenticationViewModel
+
+    var body: some View {
+        HStack {
+            Text("Already have a TMDB account?")
+                .foregroundStyle(.white)
+                .font(.headline)
+                .fontWeight(.regular)
+            NavigationLink(destination: LoginView(authViewModel: authViewModel)
+            ) {
+                Text("Sign in here")
+                    .foregroundColor(.blue)
+                    .font(.headline)
+            }
+        }
+    }
+}
+
+
+struct SignUpView: View {
     @ObservedObject var authViewModel: AuthenticationViewModel
     @State private var localErrorMessage: String?
-
-    
     
     var body: some View {
         ZStack {
@@ -32,19 +70,7 @@ struct SignUpView: View {
                                 Spacer()
                             } .padding(.horizontal)
                             
-                            HStack {
-                                CustomTextField(text: $authViewModel.firstName, subtitle: "First name", placeholder: "ex. Matt", secure: false)
-                                
-                                CustomTextField(text: $authViewModel.lastName,subtitle: "Last name", placeholder: "ex. Smith", secure: false)
-                            }
-                            
-                            CustomTextField(text: $authViewModel.email, subtitle: "Email address", placeholder: "email@example.com", secure: false)
-                            
-                            CustomTextField(text: $authViewModel.phoneNumber, subtitle: "Phone number", placeholder: "Enter your phone number", secure: false)
-                            
-                            CustomTextField(text: $authViewModel.password, subtitle: "Password", placeholder: "Enter your password", secure: true)
-                            
-                            CustomTextField(text: $authViewModel.confirmPassword, subtitle: "Confirm password", placeholder: "Repeat your password", secure: true)
+                            SignUpInputTextfields(authViewModel: authViewModel)
                             
                             // Display error messages
                             if let errorMessage = authViewModel.errorMessage {
@@ -84,19 +110,7 @@ struct SignUpView: View {
                             .padding(.horizontal,30)
                             
                             
-                            HStack {
-                                Text("Already have a TMDB account?")
-                                    .foregroundStyle(.white)
-                                    .font(.headline)
-                                    .fontWeight(.regular)
-                                NavigationLink(destination: LoginView(authViewModel: authViewModel)
-                                ) {
-                                    Text("Sign in here")
-                                        .foregroundColor(.blue)
-                                        .font(.headline)
-                                }
-                            }
-                            
+                            LoginLink(authViewModel: authViewModel)
                         }
                     }
                 }
