@@ -64,11 +64,7 @@ struct SectionsBar: View {
 
 
 struct DetailsSection: View {
-    @Binding var firstName: String
-    @Binding var lastName: String
-    @Binding var profileEmail: String
-    @Binding var phoneNumber: String
-    @Binding var memberSince: String
+    @ObservedObject var authViewModel: AuthenticationViewModel
     
     @Binding var editMode: Bool
     @Binding var addPhoneNumber: Bool
@@ -82,7 +78,7 @@ struct DetailsSection: View {
                         .font(.headline)
                         .foregroundStyle(.secondary)
                         .fontWeight(.regular)
-                    TextField("", text: $firstName)
+                    TextField("", text: $authViewModel.firstName)
                         .font(.title3)
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -96,7 +92,7 @@ struct DetailsSection: View {
                         .font(.headline)
                         .foregroundStyle(.secondary)
                         .fontWeight(.regular)
-                    TextField("", text: $lastName)
+                    TextField("", text: $authViewModel.lastName)
                         .font(.title3)
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -113,7 +109,7 @@ struct DetailsSection: View {
                     .font(.headline)
                     .foregroundStyle(.secondary)
                     .fontWeight(.regular)
-                Text(memberSince)
+                Text(authViewModel.memberSince)
                     .font(.title3)
                 
             } .frame(maxWidth: .infinity, alignment: .leading)
@@ -124,7 +120,7 @@ struct DetailsSection: View {
                     .foregroundStyle(.secondary)
                     .fontWeight(.regular)
                 if editMode {
-                    TextField("", text: $profileEmail)
+                    TextField("", text: $authViewModel.profileEmail)
                         .font(.title3)
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -134,7 +130,7 @@ struct DetailsSection: View {
                                 .shadow(radius: 8)
                         )
                 } else {
-                    Text(profileEmail)
+                    Text(authViewModel.profileEmail)
                         .font(.title3)
                         .foregroundStyle(.black)
                         .padding()
@@ -154,7 +150,7 @@ struct DetailsSection: View {
                     .foregroundStyle(.secondary)
                     .fontWeight(.regular)
                 if editMode {
-                    TextField("", text: $phoneNumber)
+                    TextField("", text: $authViewModel.phoneNumber)
                         .font(.title3)
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -165,7 +161,7 @@ struct DetailsSection: View {
                         )
                 }
                 else {
-                    if phoneNumber == "" {
+                    if authViewModel.phoneNumber == "" {
                         Button(action: {addPhoneNumber = true}) {
                             Text("Add phone number")
                                 .font(.title3)
@@ -183,7 +179,7 @@ struct DetailsSection: View {
                             .buttonStyle(.plain)
                     }
                     else {
-                        Text(phoneNumber)
+                        Text(authViewModel.phoneNumber)
                             .font(.title3)
                             .foregroundStyle(.black)
                             .padding()
@@ -212,11 +208,7 @@ struct DetailsSection: View {
 
 
 struct PasswordSection: View {
-    @Binding var password: String
-    @Binding var newPassword: String
-    @Binding var confirmNewPassword: String
-    
-    
+    @ObservedObject var authViewModel: AuthenticationViewModel
     
     var body: some View {
         VStack (spacing: 25) {
@@ -229,7 +221,7 @@ struct PasswordSection: View {
                     .font(.headline)
                     .foregroundStyle(.secondary)
                     .fontWeight(.regular)
-                SecureField("", text: $password)
+                SecureField("", text: $authViewModel.password)
                     .font(.title3)
                     .foregroundStyle(.black)
                     .padding()
@@ -247,7 +239,7 @@ struct PasswordSection: View {
                     .font(.headline)
                     .foregroundStyle(.secondary)
                     .fontWeight(.regular)
-                SecureField("Enter new password", text: $newPassword)
+                SecureField("Enter new password", text: $authViewModel.newPassword)
                     .font(.title3)
                     .foregroundStyle(.secondary)
                     .padding()
@@ -266,7 +258,7 @@ struct PasswordSection: View {
                     .font(.headline)
                     .foregroundStyle(.secondary)
                     .fontWeight(.regular)
-                TextField("", text: $confirmNewPassword)
+                TextField("", text: $authViewModel.confirmNewPassword)
                     .font(.title3)
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -294,15 +286,6 @@ struct ProfileView: View {
     @State private var addPhoneNumber: Bool = false
     @State private var editMode: Bool = false
     
-    @State private var firstName = ""
-    @State private var lastName = ""
-    @State private var profileEmail = ""
-    @State private var phoneNumber = ""
-    @State private var memberSince = ""
-    
-    @State private var password: String = ""
-    @State private var newPassword: String = ""
-    @State private var confirmNewPassword: String = ""
     
     @State private var wantToLogOut: Bool = false
     
@@ -344,7 +327,7 @@ struct ProfileView: View {
                             }
                         }
                         
-                        Text("Hi, \(firstName) \(lastName)")
+                        Text("Hi, \(authViewModel.firstName) \(authViewModel.lastName)")
                             .font(.title2)
                             .fontWeight(.bold)
                         
@@ -364,13 +347,13 @@ struct ProfileView: View {
                     
                     switch selectedSection {
                     case .details:
-                        DetailsSection(firstName: $firstName, lastName: $lastName, profileEmail: $profileEmail, phoneNumber: $phoneNumber, memberSince: $memberSince, editMode: $editMode, addPhoneNumber: $addPhoneNumber, wantToLogOut: $wantToLogOut)
+                        DetailsSection(authViewModel: authViewModel, editMode: $editMode, addPhoneNumber: $addPhoneNumber, wantToLogOut: $wantToLogOut)
                     case .reviews:
                         Text("You have no reviews so far.")
                             .font(.headline)
                             .foregroundStyle(.secondary)
                     case .password:
-                        PasswordSection(password: $password, newPassword: $newPassword, confirmNewPassword: $confirmNewPassword)
+                        PasswordSection(authViewModel: authViewModel)
                     }
                 }
                 .padding(25)
@@ -379,12 +362,7 @@ struct ProfileView: View {
             if editMode {
                 Button(action: {
                     Task {
-                        await authViewModel.updateUserProfileData(
-                            newFirstName: firstName,
-                            newLastName: lastName,
-                            newPhoneNumber: phoneNumber,
-                            newEmail: profileEmail
-                        )
+                        await authViewModel.updateUserProfileData()
                         if let error = authViewModel.errorMessage {
                             saveAlertMessage = error
                             showSaveAlert = true
@@ -408,11 +386,7 @@ struct ProfileView: View {
             if selectedSection == .password {
                 Button(action: {
                     Task {
-                        await authViewModel.updateUserPassword(
-                            currentPassword: password,
-                            newPassword: newPassword,
-                            confirmNewPassword: confirmNewPassword
-                        )
+                        await authViewModel.updateUserPassword()
                         if let error = authViewModel.errorMessage {
                             updateAlertMessage = error
                             showUpdateAlert = true
@@ -433,13 +407,6 @@ struct ProfileView: View {
                         .padding()
                 }
             }
-        }
-        .onAppear {
-            firstName = authViewModel.firstName
-            lastName = authViewModel.lastName
-            profileEmail = authViewModel.profileEmail
-            phoneNumber = authViewModel.phoneNumber
-            memberSince = authViewModel.memberSince
         }
         .alert("Log out?", isPresented: $wantToLogOut) {
             Button("Cancel") {

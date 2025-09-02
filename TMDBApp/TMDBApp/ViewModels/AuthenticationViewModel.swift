@@ -14,6 +14,8 @@ final class AuthenticationViewModel: ObservableObject {
     @Published var profileEmail = ""
     @Published var password = ""
     @Published var confirmPassword = ""
+    @Published var newPassword = ""
+    @Published var confirmNewPassword = ""
     @Published var firstName = ""
     @Published var lastName = ""
     @Published var phoneNumber = ""
@@ -68,7 +70,7 @@ final class AuthenticationViewModel: ObservableObject {
                 "lastName": lastName,
                 "phoneNumber": phoneNumber,
                 "email": profileEmail,
-                "memberSince": memberSinceDateString
+                "memberSince": memberSinceDateString,
             ])
         } catch {
             print("Error signing up: \(error.localizedDescription)")
@@ -117,7 +119,7 @@ final class AuthenticationViewModel: ObservableObject {
     }
     
     // UPDATE USER PASSWORD
-    func updateUserPassword(currentPassword: String, newPassword: String, confirmNewPassword: String) async {
+    func updateUserPassword() async {
         errorMessage = nil
         guard let user = Auth.auth().currentUser else {
             errorMessage = "No authenticated user found."
@@ -140,7 +142,7 @@ final class AuthenticationViewModel: ObservableObject {
                 errorMessage = "User email not found for re-authentication."
                 return
             }
-            let credential = EmailAuthProvider.credential(withEmail: email, password: currentPassword)
+            let credential = EmailAuthProvider.credential(withEmail: email, password: password)
             
             try await user.reauthenticate(with: credential)
             print("User re-authenticated successfully.")
@@ -172,7 +174,7 @@ final class AuthenticationViewModel: ObservableObject {
     
     
     // UPDATE USER DATA
-    func updateUserProfileData(newFirstName: String, newLastName: String, newPhoneNumber: String, newEmail: String) async {
+    func updateUserProfileData() async {
         errorMessage = nil
         guard let uid = Auth.auth().currentUser?.uid else {
             errorMessage = "No authenticated user to update profile for."
@@ -183,20 +185,15 @@ final class AuthenticationViewModel: ObservableObject {
         let userDocRef = db.collection("users").document(uid)
         
         let updates: [String: Any] = [
-            "firstName": newFirstName,
-            "lastName": newLastName,
-            "phoneNumber": newPhoneNumber,
-            "email": newEmail // This updates the email in Firestore, not Auth
+            "firstName": self.firstName,
+            "lastName": self.lastName,
+            "phoneNumber": self.phoneNumber,
+            "email": self.profileEmail // This updates the email in Firestore, not Auth
         ]
         
         do {
             try await userDocRef.updateData(updates)
             print("User profile data updated successfully in Firestore.")
-            
-            self.firstName = newFirstName
-            self.lastName = newLastName
-            self.phoneNumber = newPhoneNumber
-            self.profileEmail = newEmail
         } catch {
             print("Error updating user profile data in Firestore: \(error.localizedDescription)")
             errorMessage = "Failed to update profile: \(error.localizedDescription)"
@@ -205,6 +202,10 @@ final class AuthenticationViewModel: ObservableObject {
     
     func checkConfirmPassword() -> Bool {
         return password == confirmPassword
+    }
+    
+    func checkConfirmNewPassword() -> Bool {
+        return newPassword == confirmNewPassword
     }
 }
 
