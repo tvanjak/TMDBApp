@@ -29,6 +29,35 @@ struct SignUpInputTextfields: View {
     }
 }
 
+struct SignUpButton: View {
+    @ObservedObject var authViewModel: AuthenticationViewModel
+    @Binding var localErrorMessage: String?
+
+    var body: some View {
+        Button {
+            localErrorMessage = nil
+            if authViewModel.checkConfirmPassword() {
+                Task {
+                    await authViewModel.signUp()
+                }
+            } else {
+                localErrorMessage = "Passwords do not match."
+            }
+        } label: {
+            Text("Sign Up")
+                .bold()
+                .font(.title3)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity, maxHeight: 20)
+                .padding()
+                .background(Color(red: 76/255, green: 178/255, blue: 223/255))
+                .cornerRadius(10)
+        }
+        .padding(.horizontal,30)
+    }
+}
+
+
 struct LoginLink: View {
     @ObservedObject var authViewModel: AuthenticationViewModel
 
@@ -88,26 +117,7 @@ struct SignUpView: View {
                                 .padding(.horizontal)
                                 .foregroundColor(Color(red: 76/255, green: 178/255, blue: 223/255))
                             
-                            Button {
-                                localErrorMessage = nil
-                                if authViewModel.checkConfirmPassword() {
-                                    Task {
-                                        await authViewModel.signUp()
-                                    }
-                                } else {
-                                    localErrorMessage = "Passwords do not match."
-                                }
-                            } label: {
-                                Text("Sign Up") 
-                                    .bold()
-                                    .font(.title3)
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity, maxHeight: 20)
-                                    .padding()
-                                    .background(Color(red: 76/255, green: 178/255, blue: 223/255))
-                                    .cornerRadius(10)
-                            }
-                            .padding(.horizontal,30)
+                            SignUpButton(authViewModel: authViewModel, localErrorMessage: $localErrorMessage)
                             
                             
                             LoginLink(authViewModel: authViewModel)
