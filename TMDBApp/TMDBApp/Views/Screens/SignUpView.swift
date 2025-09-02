@@ -8,6 +8,17 @@
 import SwiftUI
 import FirebaseAuth
 
+struct SignUpHeader: View {
+    var body: some View {
+        HStack {
+            Text("Sign up to continue")
+                .font(.title)
+                .foregroundStyle(.white)
+            Spacer()
+        } .padding(.horizontal)
+    }
+}
+
 struct SignUpInputTextfields: View {
     @ObservedObject var authViewModel: AuthenticationViewModel
     
@@ -26,6 +37,23 @@ struct SignUpInputTextfields: View {
         
         CustomTextField(text: $authViewModel.confirmPassword, subtitle: "Confirm password", placeholder: "Repeat your password", secure: true)
         
+    }
+}
+
+struct ErrorMessage: View {
+    @ObservedObject var authViewModel: AuthenticationViewModel
+    @Binding var localErrorMessage: String?
+    
+    var body: some View {
+        if let errorMessage = authViewModel.errorMessage {
+            Text(errorMessage)
+                .foregroundColor(.red)
+                .padding(.horizontal)
+        } else if let localError = localErrorMessage {
+            Text(localError)
+                .foregroundColor(.red)
+                .padding(.horizontal)
+        }
     }
 }
 
@@ -91,31 +119,14 @@ struct SignUpView: View {
                     HeaderView()
                     ScrollView {
                         VStack (spacing: 30) {
-                            
-                            HStack {
-                                Text("Sign up to continue")
-                                    .font(.title)
-                                    .foregroundStyle(.white)
-                                Spacer()
-                            } .padding(.horizontal)
+                            SignUpHeader()
                             
                             SignUpInputTextfields(authViewModel: authViewModel)
                             
                             // Display error messages
-                            if let errorMessage = authViewModel.errorMessage {
-                                Text(errorMessage)
-                                    .foregroundColor(.red)
-                                    .padding(.horizontal)
-                            } else if let localError = localErrorMessage {
-                                Text(localError)
-                                    .foregroundColor(.red)
-                                    .padding(.horizontal)
-                            }
+                            ErrorMessage(authViewModel: authViewModel, localErrorMessage: $localErrorMessage)
                             
-                            Rectangle()
-                                .frame(height: 1)
-                                .padding(.horizontal)
-                                .foregroundColor(Color(red: 76/255, green: 178/255, blue: 223/255))
+                            CustomDivider()
                             
                             SignUpButton(authViewModel: authViewModel, localErrorMessage: $localErrorMessage)
                             

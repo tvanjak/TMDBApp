@@ -105,17 +105,13 @@ struct LoginView: View {
                     HeaderView()
                     ScrollView {
                         VStack (spacing: 30) {
-                            
                             LoginHeader()
                             
                             LoginInputTextFields(authViewModel: authViewModel)
                             
                             RememberMe(rememberMe: $rememberMe)
                             
-                            Rectangle()
-                                .frame(height: 1)
-                                .padding(.horizontal)
-                                .foregroundColor(Color(red: 76/255, green: 178/255, blue: 223/255))
+                            CustomDivider()
                             
                             SignInButton(authViewModel: authViewModel)
                             
