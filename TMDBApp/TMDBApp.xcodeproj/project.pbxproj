@@ -10,6 +10,7 @@
 		E26766022E506F2700902E46 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = E26766012E506F2700902E46 /* FirebaseAuth */; };
 		E26766042E506F2700902E46 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = E26766032E506F2700902E46 /* FirebaseCore */; };
 		E26766062E506F2700902E46 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = E26766052E506F2700902E46 /* FirebaseFirestore */; };
+		E26DBCD02E65CFF500C73583 /* Factory in Frameworks */ = {isa = PBXBuildFile; productRef = E26DBCCF2E65CFF500C73583 /* Factory */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +47,7 @@
 				E26766042E506F2700902E46 /* FirebaseCore in Frameworks */,
 				E26766022E506F2700902E46 /* FirebaseAuth in Frameworks */,
 				E26766062E506F2700902E46 /* FirebaseFirestore in Frameworks */,
+				E26DBCD02E65CFF500C73583 /* Factory in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -91,6 +93,7 @@
 				E26766012E506F2700902E46 /* FirebaseAuth */,
 				E26766032E506F2700902E46 /* FirebaseCore */,
 				E26766052E506F2700902E46 /* FirebaseFirestore */,
+				E26DBCCF2E65CFF500C73583 /* Factory */,
 			);
 			productName = TMDBApp;
 			productReference = E2A6DFE42E49E24A0079AACD /* TMDBApp.app */;
@@ -122,6 +125,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				E26766002E506F2700902E46 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				E26DBCCE2E65CFF500C73583 /* XCRemoteSwiftPackageReference "Factory" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E2A6DFE52E49E24A0079AACD /* Products */;
@@ -371,6 +375,14 @@
 				minimumVersion = 12.1.0;
 			};
 		};
+		E26DBCCE2E65CFF500C73583 /* XCRemoteSwiftPackageReference "Factory" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hmlongco/Factory";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.3;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -388,6 +400,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E26766002E506F2700902E46 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestore;
+		};
+		E26DBCCF2E65CFF500C73583 /* Factory */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E26DBCCE2E65CFF500C73583 /* XCRemoteSwiftPackageReference "Factory" */;
+			productName = Factory;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

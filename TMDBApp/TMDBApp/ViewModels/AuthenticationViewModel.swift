@@ -9,7 +9,8 @@ import SwiftUI
 import FirebaseAuth
 import FirebaseFirestore
 
-class AuthenticationViewModel: ObservableObject {
+@MainActor
+final class AuthenticationViewModel: ObservableObject {
     @Published var email = ""
     @Published var password = ""
     @Published var firstName = ""
@@ -23,7 +24,7 @@ class AuthenticationViewModel: ObservableObject {
     private let sessionRepo: SessionRepositoryProtocol
     
     // INITIALIZER & DEINTIALIZER
-    init(sessionRepo: SessionRepositoryProtocol = SessionRepository.shared) {
+    init(sessionRepo: SessionRepositoryProtocol) {
         self.sessionRepo = sessionRepo
         // Observe authentication state changes
         authStateHandle = Auth.auth().addStateDidChangeListener { [weak self] auth, user in

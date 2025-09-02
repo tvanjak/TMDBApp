@@ -9,7 +9,7 @@ import SwiftUI
 
 
 struct HomeView: View {
-    @EnvironmentObject var movieViewModel: MovieViewModel
+    @ObservedObject var movieViewModel: MovieViewModel
     
     @State private var searchTerm = ""
         
@@ -108,8 +108,8 @@ struct HomeView: View {
                                     Button(action: {
                                         movieViewModel.toggleFavorite(movie)
                                     }) {
-                                        Image(systemName: movieViewModel.isFavorite(movie) ? "heart.fill" : "heart")
-                                            .foregroundColor(movieViewModel.isFavorite(movie) ? .red : .white)
+                                        Image(systemName: movieViewModel.getFavoriteIcon(movie))
+                                            .foregroundColor(movieViewModel.getFavoriteColor(movie))
                                             .padding(8)
                                             .background(Color.black.opacity(0.5))
                                             .clipShape(Circle())
@@ -149,6 +149,7 @@ struct HomeView: View {
                                                         .resizable()
                                                         .scaledToFill()
                                                         .frame(width: 150, height: 225)
+                                                        .clipped()
                                                         .cornerRadius(10)
                                                 } placeholder: {
                                                     ProgressView()
@@ -167,8 +168,8 @@ struct HomeView: View {
                                         Button(action: {
                                             movieViewModel.toggleFavorite(movie)
                                         }) {
-                                            Image(systemName: movieViewModel.isFavorite(movie) ? "heart.fill" : "heart")
-                                                .foregroundColor(movieViewModel.isFavorite(movie) ? .red : .white)
+                                            Image(systemName: movieViewModel.getFavoriteIcon(movie))
+                                                .foregroundColor(movieViewModel.getFavoriteColor(movie))
                                                 .padding(8)
                                                 .background(Color.black.opacity(0.5))
                                                 .clipShape(Circle())
@@ -200,10 +201,9 @@ struct HomeView: View {
 
 
 #Preview {
-    HomeView()
-        .environmentObject(MovieViewModel(
-            favoritesRepo: FavoritesRepository.shared,
-            sessionRepo: SessionRepository.shared,
-            navigationService: Router()
-        ))
+    HomeView(movieViewModel: MovieViewModel(
+        favoritesRepo: FavoritesRepository(),
+        sessionRepo: SessionRepository(),
+        navigationService: Router()
+    ))
 }
