@@ -149,7 +149,7 @@ struct DetailsSection: View {
                     .font(.headline)
                     .foregroundStyle(.secondary)
                     .fontWeight(.regular)
-                if editMode {
+                if editMode || addPhoneNumber {
                     TextField("", text: $authViewModel.phoneNumber)
                         .font(.title3)
                         .frame(maxWidth: .infinity)
