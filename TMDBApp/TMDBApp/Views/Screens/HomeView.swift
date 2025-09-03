@@ -161,8 +161,7 @@ struct HomeView: View {
                     ScrollView (.horizontal) {
                         LazyHStack {
                             ForEach(currentMovies) { movie in
-                                // Button(action: { movieViewModel.navigateToMovie(movie.id) }) {
-                                NavigationLink(value: MediaType.movie(id: movie.id)) {
+                                Button(action: { mediaViewModel.navigateToMedia(MediaType.movie(id: movie.id)) }) {
                                     MediaItemCard(mediaItem: movie, mediaViewModel: mediaViewModel)
                                 }
                             }
@@ -186,8 +185,7 @@ struct HomeView: View {
                     ScrollView (.horizontal) {
                         LazyHStack {
                             ForEach(currentTVShows) { tvShow in
-                                // Button(action: { movieViewModel.navigateToMovie(movie.id) }) {
-                                NavigationLink(value: MediaType.tvShow(id: tvShow.id)) {
+                                Button(action: { mediaViewModel.navigateToMedia(MediaType.tvShow(id: tvShow.id)) }) {
                                     MediaItemCard(mediaItem: tvShow, mediaViewModel: mediaViewModel)
                                 }
                             }

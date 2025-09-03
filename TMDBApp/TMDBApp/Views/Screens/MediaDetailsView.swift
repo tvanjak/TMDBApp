@@ -67,7 +67,7 @@ extension String {
 }
 // -----------------------------------------
 
-struct MoviePoster: View {
+struct MediaPoster: View {
     var id: Int
     var posterPath: String?
     var fullPosterPath: String?
@@ -211,7 +211,7 @@ struct CastView: View {
 }
 
 
-struct MovieView: View {
+struct MediaDetailsView: View {
     let media: MediaType
     @ObservedObject var mediaViewModel: MediaViewModel
 
@@ -222,15 +222,15 @@ struct MovieView: View {
                 VStack (spacing: AppTheme.Spacing.medium) {
                     
                     // POSTER AND GENERAL INFO
-                    MoviePoster(id: mediaDetail.id,
+                    MediaPoster(id: mediaDetail.id,
                                 posterPath: mediaDetail.posterPath,
                                 fullPosterPath: mediaDetail.fullPosterPath,
                                 voteAverage: mediaDetail.voteAverage,
                                 releaseDate: mediaDetail.releaseDate,
-                                title: mediaDetail.title,
+                                title: mediaDetail.displayTitle,
                                 genres: mediaDetail.formattedGenres,
                                 runtime: mediaDetail.formattedRuntime,
-                                movieViewModel: mediaViewModel)
+                                mediaViewModel: mediaViewModel)
                     
                     // OVERVIEW
                     VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
@@ -265,7 +265,7 @@ struct MovieView: View {
 }
 
 #Preview {
-    MovieView(media: MediaType.movie(id: 6), mediaViewModel: MediaViewModel(
+    MediaDetailsView(media: MediaType.movie(id: 6), mediaViewModel: MediaViewModel(
             favoritesRepo: FavoritesRepository(),
             sessionRepo: SessionRepository(),
             navigationService: Router(),

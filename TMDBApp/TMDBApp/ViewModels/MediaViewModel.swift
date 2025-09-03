@@ -104,20 +104,36 @@ final class MediaViewModel: ObservableObject {
         }
     }
     
-    func loadMovieDetails(media: MediaItem) async {
+//    func loadMovieDetails(media: MediaItem) async {
+//        do {
+//            mediaDetail = nil
+//            mediaDetail = try await TMDBService.shared.fetchDetails(media: media)
+//        } catch {
+//            errorMessage = error.localizedDescription
+//        }
+//    }
+    
+    func loadDetails(media: MediaType) async {
         do {
-            mediaDetail = nil
-            mediaDetail = try await TMDBService.shared.fetchMovieDetails(movieId: movieId)
+            switch media {
+            case .movie(let id):
+                let movie: any MediaItemDetails = try await TMDBService.shared.fetchDetails(for: .movie(id: id))
+                self.mediaDetail = movie
+                
+            case .tvShow(let id):
+                let tvShow: any MediaItemDetails = try await TMDBService.shared.fetchDetails(for: .tvShow(id: id))
+                self.mediaDetail = tvShow
+            }
         } catch {
-            errorMessage = error.localizedDescription
+            self.errorMessage = error.localizedDescription
         }
     }
     // ------------------------------------------------------------
 
     
     // ROUTER FUNCTIONS
-    func navigateToMovie(_ movieId: Int) {
-        navigationService.navigateToMovie(movieId)
+    func navigateToMedia(_ media: MediaType) {
+        navigationService.navigateToMedia(media)
     }
     
     func goBack() {

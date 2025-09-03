@@ -33,8 +33,8 @@ struct AppLayout: View {
                                 ProfileView(authViewModel: authViewModel)
                                     .navigationBarBackButtonHidden(true)
                                     .toolbar(.hidden, for: .navigationBar)
-                            case .mediaDetail(let id):
-                                MovieView(movieId: id, mediaViewModel: mediaViewModel)
+                            case .mediaDetail(let media):
+                                MediaDetailsView(media: media, mediaViewModel: mediaViewModel)
                                     .navigationBarBackButtonHidden(true)
                                     .toolbar(.hidden, for: .navigationBar)
                             }

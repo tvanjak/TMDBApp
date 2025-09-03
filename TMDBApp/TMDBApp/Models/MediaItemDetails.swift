@@ -17,4 +17,8 @@ protocol MediaItemDetails: Identifiable {
     var genres: [Genre] { get }
     var credits: Credits { get }
     var releaseDate: String { get }
+    
+    var formattedGenres: String { get }
+    var formattedRuntime: String? { get }
+    var fullPosterPath: String? { get }
 }

@@ -23,6 +23,10 @@ struct CastMember: Codable, Identifiable {
     let character: String
     let profilePath: String?
     
+//    var fullProfilePath {
+//        
+//    }
+    
     enum CodingKeys: String, CodingKey {
         case id
         case name
