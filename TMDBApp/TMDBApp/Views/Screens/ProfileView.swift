@@ -29,7 +29,7 @@ struct ProfileHeader: View {
                 Button(action: {print("Edit image")}) {
                     ZStack {
                         Circle()
-                            .fill(Color(red: 76/255, green: 178/255, blue: 223/255),)
+                            .fill(AppTheme.Colors.lightBlue)
                             .frame(width: 30, height: 30)
                         
                         Image(systemName: "pencil")
@@ -42,7 +42,7 @@ struct ProfileHeader: View {
             }
             
             Text("Hi, \(authViewModel.firstName) \(authViewModel.lastName)")
-                .font(.title2)
+                .font(AppTheme.Typography.title)
                 .fontWeight(.bold)
             
             Spacer()
@@ -52,7 +52,7 @@ struct ProfileHeader: View {
                 editMode = true
             }
             .buttonStyle(.plain)
-            .font(.headline)
+            .font(AppTheme.Typography.body)
             .foregroundStyle(.secondary)
             .padding()
         }
@@ -68,29 +68,29 @@ struct DetailsSection: View {
     @Binding var wantToLogOut: Bool
     
     var body: some View {
-        VStack (spacing: 25){
+        VStack (spacing: AppTheme.Spacing.large){
             if editMode {
-                VStack (alignment: .leading, spacing: 10) {
+                VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
                     FirstNameInput(authViewModel: authViewModel)
                     LastNameInput(authViewModel: authViewModel)
                 }
             }
             
             
-            VStack (alignment: .leading, spacing: 10) {
+            VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
                 MemberSince(authViewModel: authViewModel)
                 
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             
             
-            VStack (alignment: .leading, spacing: 10) {
+            VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
                 EmailInput(authViewModel: authViewModel, editMode: $editMode)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             
             
-            VStack (alignment: .leading, spacing: 10) {
+            VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
                 PhoneNumberInput(authViewModel: authViewModel, editMode: $editMode, addPhoneNumber: $addPhoneNumber)
             }
             
@@ -100,7 +100,7 @@ struct DetailsSection: View {
                 wantToLogOut = true
             }
             .buttonStyle(.plain)
-            .font(.title2)
+            .font(AppTheme.Typography.subtitle)
             .foregroundStyle(.secondary)
             .padding()
         }
@@ -111,7 +111,7 @@ struct DetailsSection: View {
 struct ReviewsSection: View {
     var body: some View {
         Text("You have no reviews so far.")
-            .font(.headline)
+            .font(AppTheme.Typography.body)
             .foregroundStyle(.secondary)
     }
 }
@@ -121,7 +121,7 @@ struct PasswordSection: View {
     @ObservedObject var authViewModel: AuthenticationViewModel
     
     var body: some View {
-        VStack (spacing: 25) {
+        VStack (spacing: AppTheme.Spacing.large) {
             Text("Please enter your current password to change your password.")
                 .bold()
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -161,7 +161,7 @@ struct ProfileView: View {
     var body: some View {
         VStack {
             ScrollView {
-                VStack (spacing: 20) {
+                VStack (spacing: AppTheme.Spacing.medium) {
                     ProfileHeader(authViewModel: authViewModel, selectedSection: $selectedSection, editMode: $editMode)
                     
                     SectionsBar(selectedSection: $selectedSection) { section in
@@ -181,7 +181,7 @@ struct ProfileView: View {
                         PasswordSection(authViewModel: authViewModel)
                     }
                 }
-                .padding(25)
+                .padding(AppTheme.Spacing.large)
             }
             
             if editMode {

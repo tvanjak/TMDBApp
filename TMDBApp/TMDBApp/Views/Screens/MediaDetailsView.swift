@@ -25,7 +25,7 @@ struct RatingRing: View {
                 .rotationEffect(.degrees(-90))
             
             Text("\(Int(rating * 100))%")
-                .font(.title3)
+                .font(AppTheme.Typography.body)
                 .fontWeight(.semibold)
                 .foregroundColor(ratingColor)
         }
@@ -115,7 +115,6 @@ struct MediaPoster: View {
                         .padding(.trailing, AppTheme.Spacing.small)
                     Text("User score")
                         .font(AppTheme.Typography.body)
-                        .fontWeight(.bold)
                         .foregroundStyle(.white)
                         .fontWeight(.semibold)
                 }
@@ -127,20 +126,19 @@ struct MediaPoster: View {
                     .font(AppTheme.Typography.largeTitle)
                     .foregroundStyle(.white)
                 Text(releaseDate.invertedDate())
-                    .font(.title3)
+                    .font(AppTheme.Typography.body)
                     .foregroundStyle(.white)
                 
-                VStack(alignment: .leading, spacing: 5) {
+                VStack(alignment: .leading, spacing: AppTheme.Spacing.small) {
                     Text(genres)
-                        .font(.title3)
+                        .font(AppTheme.Typography.body)
                         .foregroundStyle(.white)
                         .fixedSize(horizontal: false, vertical: true)
                     if let unwrappedRuntime = runtime {
                         Text(unwrappedRuntime)
-                            .font(.title3)
+                            .font(AppTheme.Typography.body)
                             .foregroundStyle(.white)
                             .bold()
-                            .padding(.top, 2)
                     }
                 }
                 
@@ -150,7 +148,7 @@ struct MediaPoster: View {
                     }) {
                         Image(systemName: mediaViewModel.getFavoriteIcon(movie))
                             .foregroundColor(mediaViewModel.getFavoriteColor(movie))
-                            .padding(8)
+                            .padding(AppTheme.Spacing.small)
                             .background(Color.black.opacity(0.5))
                             .clipShape(Circle())
                     }
@@ -176,7 +174,7 @@ struct CrewView: View {
     var body: some View {
         VStack {
             ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(alignment: .top, spacing: 15) {
+                LazyHStack(alignment: .top, spacing: AppTheme.Spacing.medium) {
                     ForEach(Array(stride(from: 0, to: crew.count, by: 2)), id: \.self) { index in
                         CrewMemberCard(crew: crew, index: index)
                     }
@@ -199,7 +197,7 @@ struct CastView: View {
                 .font(.title)
                 .fontWeight(.bold)
             ScrollView (.horizontal, showsIndicators: false) {
-                LazyHStack (spacing: 20) {
+                LazyHStack (spacing: AppTheme.Spacing.medium) {
                     ForEach(cast) {castMember in
                         CastMemberCard(castMember: castMember)
                     }

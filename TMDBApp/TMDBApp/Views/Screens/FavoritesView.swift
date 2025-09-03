@@ -16,7 +16,7 @@ struct FavoriteCardView: View {
             ZStack(alignment: .topLeading) {
                 if let fullURLString = media.fullPosterPath {
                     if let url = URL(string: fullURLString) {
-                        AsyncImage(url: url, scale: 4) { image in
+                        AsyncImage(url: url) { image in
                             image
                                 .resizable()
                                 .scaledToFill()
@@ -33,7 +33,7 @@ struct FavoriteCardView: View {
                         .scaledToFit()
                         .frame(width: 115, height: 170)
                         .foregroundColor(.gray)
-                        .cornerRadius(10)
+                        .cornerRadius(AppTheme.Radius.small)
                 }
                 
                 Button(action: {
@@ -41,11 +41,11 @@ struct FavoriteCardView: View {
                 }) {
                     Image(systemName: mediaViewModel.getFavoriteIcon(media))
                         .foregroundColor(mediaViewModel.getFavoriteColor(media))
-                        .padding(8)
+                        .padding(AppTheme.Spacing.small)
                         .background(Color.black.opacity(0.5))
                         .clipShape(Circle())
                 }
-                .padding(8)
+                .padding(AppTheme.Spacing.small)
             }
 //        }
     }
@@ -53,7 +53,7 @@ struct FavoriteCardView: View {
 
 struct FavoritesList: View {
     @ObservedObject var mediaViewModel: MediaViewModel
-    let columns = [GridItem(.adaptive(minimum: 115), spacing: 10)]
+    let columns = [GridItem(.adaptive(minimum: 115), spacing: AppTheme.Spacing.small)]
 
     var body: some View {
         ScrollView {
@@ -71,7 +71,7 @@ struct FavoritesView: View {
     @ObservedObject var mediaViewModel: MediaViewModel
 
     var body: some View {
-        VStack (alignment: .leading, spacing: 10) {
+        VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
             Text("Favorites")
                 .font(.title)
                 .fontWeight(.bold)

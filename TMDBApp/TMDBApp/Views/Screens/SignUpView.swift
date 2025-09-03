@@ -12,7 +12,7 @@ struct SignUpHeader: View {
     var body: some View {
         HStack {
             Text("Sign up to continue")
-                .font(.title)
+                .font(AppTheme.Typography.title)
                 .foregroundStyle(.white)
             Spacer()
         } .padding(.horizontal)
@@ -74,14 +74,14 @@ struct SignUpButton: View {
         } label: {
             Text("Sign Up")
                 .bold()
-                .font(.title3)
+                .font(AppTheme.Typography.body)
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity, maxHeight: 20)
                 .padding()
-                .background(Color(red: 76/255, green: 178/255, blue: 223/255))
-                .cornerRadius(10)
+                .background(AppTheme.Colors.lightBlue)
+                .cornerRadius(AppTheme.Radius.small)
         }
-        .padding(.horizontal,30)
+        .padding(.horizontal,AppTheme.Spacing.large)
     }
 }
 
@@ -93,13 +93,13 @@ struct LoginLink: View {
         HStack {
             Text("Already have a TMDB account?")
                 .foregroundStyle(.white)
-                .font(.headline)
+                .font(AppTheme.Typography.body)
                 .fontWeight(.regular)
             NavigationLink(destination: LoginView(authViewModel: authViewModel)
             ) {
                 Text("Sign in here")
                     .foregroundColor(.blue)
-                    .font(.headline)
+                    .font(AppTheme.Typography.body)
             }
         }
     }
@@ -112,13 +112,13 @@ struct SignUpView: View {
     
     var body: some View {
         ZStack {
-            Color(red: 11/255, green: 37/255, blue: 63/255)
+            AppTheme.Colors.background
                 .ignoresSafeArea(.all)
             NavigationStack {
                 VStack  {
                     HeaderView()
                     ScrollView {
-                        VStack (spacing: 30) {
+                        VStack (spacing: AppTheme.Spacing.large) {
                             SignUpHeader()
                             
                             SignUpInputTextfields(authViewModel: authViewModel)
@@ -135,7 +135,7 @@ struct SignUpView: View {
                         }
                     }
                 }
-                .background(Color(red: 11/255, green: 37/255, blue: 63/255))
+                .background(AppTheme.Colors.background)
             }
         }
     }

@@ -10,15 +10,15 @@ import SwiftUI
 struct LoginHeader: View {
     var body: some View {
         Text("Sign in to your ")
-            .font(.title)
+            .font(AppTheme.Typography.title)
             .foregroundStyle(.white)
         + Text("TMDB")
-            .font(.title)
+            .font(AppTheme.Typography.title)
             .bold()
             .foregroundStyle(.white)
         + Text(" account to continue.")
             .foregroundStyle(.white)
-            .font(.title)
+            .font(AppTheme.Typography.title)
     }
 }
 
@@ -59,14 +59,14 @@ struct SignInButton: View {
         } label: {
             Text("Sign in")
                 .bold()
-                .font(.title3)
+                .font(AppTheme.Typography.body)
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity, maxHeight: 20)
                 .padding()
-                .background(Color(red: 76/255, green: 178/255, blue: 223/255))
-                .cornerRadius(12)
+                .background(AppTheme.Colors.lightBlue)
+                .cornerRadius(AppTheme.Radius.medium)
         }
-        .padding(.horizontal,30)
+        .padding(.horizontal, AppTheme.Spacing.large)
     }
 }
 
@@ -77,14 +77,14 @@ struct SignUpLink: View {
         HStack {
             Text("Don't have a TMDB account?")
                 .foregroundStyle(.white)
-                .font(.headline)
+                .font(AppTheme.Typography.body)
                 .fontWeight(.regular)
             NavigationLink(destination:
                             SignUpView(authViewModel: authViewModel)
                 ) {
                 Text("Create one here")
                     .foregroundColor(.blue)
-                    .font(.headline)
+                    .font(AppTheme.Typography.body)
             }
         }
     }
@@ -97,14 +97,14 @@ struct LoginView: View {
     
     var body: some View {
         ZStack {
-            Color(red: 11/255, green: 37/255, blue: 63/255)
+            AppTheme.Colors.background
                 .ignoresSafeArea(.all)
             
             NavigationStack {
                 VStack (spacing: 0) {
                     HeaderView()
                     ScrollView {
-                        VStack (spacing: 30) {
+                        VStack (spacing: AppTheme.Spacing.large) {
                             LoginHeader()
                             
                             LoginInputTextFields(authViewModel: authViewModel)
@@ -119,7 +119,7 @@ struct LoginView: View {
                         }
                     }
                 }
-                .background(Color(red: 11/255, green: 37/255, blue: 63/255))
+                .background(AppTheme.Colors.background)
             }
         }
     }

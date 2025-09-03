@@ -13,17 +13,17 @@ struct FirstNameInput: View {
     
     var body: some View {
         Text("First name")
-            .font(.headline)
+            .font(AppTheme.Typography.body)
             .foregroundStyle(.secondary)
             .fontWeight(.regular)
         TextField("", text: $authViewModel.firstName)
-            .font(.title3)
+            .font(AppTheme.Typography.subtitle)
             .frame(maxWidth: .infinity)
             .padding()
             .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color(red: 76/255, green: 178/255, blue: 223/255), lineWidth: 2)
-                    .shadow(radius: 8)
+                RoundedRectangle(cornerRadius: AppTheme.Radius.small)
+                    .stroke(AppTheme.Colors.lightBlue, lineWidth: 2)
+                    .shadow(radius: AppTheme.Radius.small)
             )
     }
 }
@@ -32,18 +32,18 @@ struct LastNameInput: View {
     @ObservedObject var authViewModel: AuthenticationViewModel
     
     var body: some View {
-        Text("First name")
-            .font(.headline)
+        Text("Last name")
+            .font(AppTheme.Typography.body)
             .foregroundStyle(.secondary)
             .fontWeight(.regular)
-        TextField("", text: $authViewModel.firstName)
-            .font(.title3)
+        TextField("", text: $authViewModel.lastName)
+            .font(AppTheme.Typography.subtitle)
             .frame(maxWidth: .infinity)
             .padding()
             .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color(red: 76/255, green: 178/255, blue: 223/255), lineWidth: 2)
-                    .shadow(radius: 8)
+                RoundedRectangle(cornerRadius: AppTheme.Radius.small)
+                    .stroke(AppTheme.Colors.lightBlue, lineWidth: 2)
+                    .shadow(radius: AppTheme.Radius.small)
             )
     }
 }
@@ -53,11 +53,11 @@ struct MemberSince: View {
     
     var body: some View {
         Text("Member since")
-            .font(.headline)
+            .font(AppTheme.Typography.body)
             .foregroundStyle(.secondary)
             .fontWeight(.regular)
         Text(authViewModel.memberSince)
-            .font(.title3)
+            .font(AppTheme.Typography.subtitle)
     }
 }
 
@@ -67,30 +67,30 @@ struct EmailInput: View {
     
     var body: some View {
         Text("Email address")
-            .font(.headline)
+            .font(AppTheme.Typography.body)
             .foregroundStyle(.secondary)
             .fontWeight(.regular)
         if editMode {
             TextField("", text: $authViewModel.profileEmail)
-                .font(.title3)
+                .font(AppTheme.Typography.subtitle)
                 .frame(maxWidth: .infinity)
                 .padding()
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color(red: 76/255, green: 178/255, blue: 223/255), lineWidth: 2)
-                        .shadow(radius: 8)
+                    RoundedRectangle(cornerRadius: AppTheme.Radius.small)
+                        .stroke(AppTheme.Colors.lightBlue, lineWidth: 2)
+                        .shadow(radius: AppTheme.Radius.small)
                 )
         } else {
             Text(authViewModel.profileEmail)
-                .font(.title3)
+                .font(AppTheme.Typography.subtitle)
                 .foregroundStyle(.black)
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(.white)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
+                    RoundedRectangle(cornerRadius: AppTheme.Radius.small)
                         .stroke(Color.gray.opacity(0.2), lineWidth: 2)
-                        .shadow(radius: 8)
+                        .shadow(radius: AppTheme.Radius.small)
                 )
         }
     }
@@ -103,49 +103,49 @@ struct PhoneNumberInput: View {
 
     var body: some View {
         Text("Phone number")
-            .font(.headline)
+            .font(AppTheme.Typography.body)
             .foregroundStyle(.secondary)
             .fontWeight(.regular)
         if editMode || addPhoneNumber {
             TextField("", text: $authViewModel.phoneNumber)
-                .font(.title3)
+                .font(AppTheme.Typography.subtitle)
                 .frame(maxWidth: .infinity)
                 .padding()
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color(red: 76/255, green: 178/255, blue: 223/255), lineWidth: 2)
-                        .shadow(radius: 8)
+                    RoundedRectangle(cornerRadius: AppTheme.Radius.small)
+                        .stroke(AppTheme.Colors.lightBlue, lineWidth: 2)
+                        .shadow(radius: AppTheme.Radius.small)
                 )
         }
         else {
             if authViewModel.phoneNumber == "" {
                 Button(action: {addPhoneNumber = true}) {
                     Text("Add phone number")
-                        .font(.title3)
+                        .font(AppTheme.Typography.subtitle)
                         .foregroundStyle(.secondary)
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(.gray.opacity(0.2))
-                        .cornerRadius(8)
+                        .cornerRadius(AppTheme.Radius.small)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 8)
+                            RoundedRectangle(cornerRadius: AppTheme.Radius.small)
                                 .stroke(Color.gray.opacity(0.2), lineWidth: 2)
-                                .shadow(radius: 8)
+                                .shadow(radius: AppTheme.Radius.small)
                         )
                 } .frame(maxWidth: .infinity, alignment: .leading)
                     .buttonStyle(.plain)
             }
             else {
                 Text(authViewModel.phoneNumber)
-                    .font(.title3)
+                    .font(AppTheme.Typography.subtitle)
                     .foregroundStyle(.black)
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(.white)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 8)
+                        RoundedRectangle(cornerRadius: AppTheme.Radius.small)
                             .stroke(Color.gray.opacity(0.2), lineWidth: 2)
-                            .shadow(radius: 8)
+                            .shadow(radius: AppTheme.Radius.small)
                     )
             }
         }
@@ -158,21 +158,21 @@ struct CurrentPasswordInput: View {
     @ObservedObject var authViewModel: AuthenticationViewModel
     
     var body: some View {
-        VStack (alignment: .leading, spacing: 10) {
+        VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
             Text("Current password")
-                .font(.headline)
+                .font(AppTheme.Typography.body)
                 .foregroundStyle(.secondary)
                 .fontWeight(.regular)
             SecureField("", text: $authViewModel.password)
-                .font(.title3)
+                .font(AppTheme.Typography.subtitle)
                 .foregroundStyle(.black)
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(.white)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
+                    RoundedRectangle(cornerRadius: AppTheme.Radius.small)
                         .stroke(Color.gray.opacity(0.2), lineWidth: 2)
-                        .shadow(radius: 8)
+                        .shadow(radius: AppTheme.Radius.small)
                 )
         }
     }
@@ -182,22 +182,22 @@ struct NewPasswordInput: View {
     @ObservedObject var authViewModel: AuthenticationViewModel
     
     var body: some View {
-        VStack (alignment: .leading, spacing: 10) {
+        VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
             Text("New password")
-                .font(.headline)
+                .font(AppTheme.Typography.body)
                 .foregroundStyle(.secondary)
                 .fontWeight(.regular)
             SecureField("Enter new password", text: $authViewModel.newPassword)
-                .font(.title3)
+                .font(AppTheme.Typography.subtitle)
                 .foregroundStyle(.secondary)
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(.gray.opacity(0.2))
-                .cornerRadius(8)
+                .cornerRadius(AppTheme.Radius.small)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
+                    RoundedRectangle(cornerRadius: AppTheme.Radius.small)
                         .stroke(Color.gray.opacity(0.2), lineWidth: 2)
-                        .shadow(radius: 8)
+                        .shadow(radius: AppTheme.Radius.small)
                 )
         }
     }
@@ -209,17 +209,17 @@ struct ConfirmNewPasswordInput: View {
     var body: some View {
         VStack (alignment: .leading, spacing: 10) {
             Text("Confirm new password")
-                .font(.headline)
+                .font(AppTheme.Typography.body)
                 .foregroundStyle(.secondary)
                 .fontWeight(.regular)
             TextField("", text: $authViewModel.confirmNewPassword)
-                .font(.title3)
+                .font(AppTheme.Typography.subtitle)
                 .frame(maxWidth: .infinity)
                 .padding()
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color(red: 76/255, green: 178/255, blue: 223/255), lineWidth: 2)
-                        .shadow(radius: 8)
+                    RoundedRectangle(cornerRadius: AppTheme.Radius.small)
+                        .stroke(AppTheme.Colors.lightBlue, lineWidth: 2)
+                        .shadow(radius: AppTheme.Radius.small)
                 )
         }
     }
@@ -248,12 +248,12 @@ struct UpdatePasswordButton: View {
             selectedSection = .details
         }) {
             Text("Update")
-                .font(.headline)
+                .font(AppTheme.Typography.body)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color(red: 76/255, green: 178/255, blue: 223/255))
+                .background(AppTheme.Colors.lightBlue)
                 .foregroundColor(.white)
-                .cornerRadius(12)
+                .cornerRadius(AppTheme.Radius.medium)
                 .padding()
         }
     }
@@ -281,12 +281,12 @@ struct SaveUserDataButton: View {
             editMode = false
         }) {
             Text("Save")
-                .font(.headline)
+                .font(AppTheme.Typography.body)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color(red: 76/255, green: 178/255, blue: 223/255))
+                .background(AppTheme.Colors.lightBlue)
                 .foregroundColor(.white)
-                .cornerRadius(12)
+                .cornerRadius(AppTheme.Radius.medium)
                 .padding()
         }
     }

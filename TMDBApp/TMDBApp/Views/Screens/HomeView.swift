@@ -17,7 +17,7 @@ struct MediaItemCard: View {
                 if let posterPath = mediaItem.posterPath {
                     let fullURLString = "https://image.tmdb.org/t/p/w500\(posterPath)"
                     if let url = URL(string: fullURLString) {
-                        AsyncImage(url: url, scale: 4) { image in
+                        AsyncImage(url: url) { image in
                             image
                                 .resizable()
                                 .scaledToFill()

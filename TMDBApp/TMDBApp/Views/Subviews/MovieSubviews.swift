@@ -13,20 +13,22 @@ struct CrewMemberCard: View {
     var index: Int
     
     var body: some View {
-        VStack (alignment: .leading, spacing: 15) {
-            VStack(alignment: .leading, spacing: 5) {
+        VStack (alignment: .leading, spacing: AppTheme.Spacing.medium) {
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.small) {
                 Text(crew[index].name)
+                    .font(AppTheme.Typography.body)
                     .fontWeight(.bold)
                 Text(crew[index].job)
-                    .font(.subheadline)
+                    .font(AppTheme.Typography.body)
             }
-            VStack(alignment: .leading, spacing: 5) {
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.small) {
                 // rendering second item in this column
                 if index + 1 < crew.count {
                     Text(crew[index + 1].name)
+                        .font(AppTheme.Typography.body)
                         .fontWeight(.bold)
                     Text(crew[index + 1].job)
-                        .font(.subheadline)
+                        .font(AppTheme.Typography.body)
                 }
             }
         }
@@ -39,7 +41,7 @@ struct CastMemberCard: View {
     var castMember: CastMember
     
     var body: some View {
-        VStack (alignment: .leading, spacing: 5) {
+        VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
             if let fullURLString = castMember.fullProfilePath {
                 if let url = URL(string: fullURLString) {
                     AsyncImage(url: url) { image in
@@ -61,16 +63,16 @@ struct CastMemberCard: View {
             Text(castMember.name)
                 .font(.title3)
                 .fontWeight(.semibold)
-                .padding(.horizontal, 5)
+                .padding(.horizontal, AppTheme.Spacing.small)
             Text(castMember.character)
                 .foregroundStyle(.gray)
-                .padding(.horizontal, 5)
+                .padding(.horizontal, AppTheme.Spacing.small)
             Spacer()
         }
         .frame(width: 150, height: 250)
         .background(Color.white)
-        .cornerRadius(20)
-        .shadow(color: Color.black.opacity(0.2), radius: 5, x: 2, y: 4)
+        .cornerRadius(AppTheme.Radius.medium)
+        .shadow(color: Color.black.opacity(0.2), radius: AppTheme.Radius.small)
         .padding(.vertical)
     }
 }

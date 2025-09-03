@@ -54,7 +54,7 @@ struct CustomTextField: View {
                 }
             }
             ZStack(alignment: .leading) {
-                RoundedRectangle(cornerRadius: 10)
+                RoundedRectangle(cornerRadius: AppTheme.Radius.small)
                     .fill(AppTheme.Colors.darkBlue)
                 
                 if text.isEmpty {
@@ -103,6 +103,6 @@ struct CustomDivider: View {
         Rectangle()
             .frame(height: 1)
             .padding(.horizontal)
-            .foregroundColor(Color(red: 76/255, green: 178/255, blue: 223/255))
+            .foregroundColor(AppTheme.Colors.lightBlue)
     }
 }
