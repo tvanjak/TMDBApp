@@ -166,6 +166,7 @@ struct HomeView: View {
                     ScrollView (.horizontal) {
                         LazyHStack {
                             ForEach(currentMovies) { movie in
+                                // Button(action: { movieViewModel.navigateToMovie(movie.id) }) {
                                 NavigationLink(value: MediaType.movie(id: movie.id)) {
                                     MediaItemCard(mediaItem: movie)
                                         .environmentObject(authVM)
@@ -191,6 +192,7 @@ struct HomeView: View {
                     ScrollView (.horizontal) {
                         LazyHStack {
                             ForEach(currentTVShows) { tvShow in
+                                // Button(action: { movieViewModel.navigateToMovie(movie.id) }) {
                                 NavigationLink(value: MediaType.tvShow(id: tvShow.id)) {
                                     MediaItemCard(mediaItem: tvShow)
                                         .environmentObject(authVM)
@@ -204,15 +206,12 @@ struct HomeView: View {
 
             }
             .onAppear {
-                // Data for the default selected section
-                if mediaViewModel.popularMovies.isEmpty {
-                    Task { @MainActor in
-                        mediaViewModel.loadPopularMovies()
+                Task {
+                    if mediaViewModel.popularMovies.isEmpty {
+                        await movieViewModel.loadPopularMovies()
                     }
-                }
-                if mediaViewModel.popularTVShows.isEmpty {
-                    Task { @MainActor in
-                        mediaViewModel.loadPopularTVShows()
+                    if mediaViewModel.popularTVShows.isEmpty {
+                        await movieViewModel.loadTrendingMovies()
                     }
                 }
             }
@@ -222,9 +221,9 @@ struct HomeView: View {
 
 
 #Preview {
-    NavigationStack {
-        HomeView(mediaViewModel: MediaViewModel())
-            .environmentObject(AuthenticationViewModel())
-    }
+    HomeView(movieViewModel: MovieViewModel(
+        favoritesRepo: FavoritesRepository(),
+        sessionRepo: SessionRepository(),
+        navigationService: Router()
+    ))
 }
-

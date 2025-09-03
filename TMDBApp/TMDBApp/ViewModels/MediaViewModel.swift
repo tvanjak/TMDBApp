@@ -2,111 +2,150 @@
 import SwiftUI
 
 @MainActor
-class MediaViewModel: ObservableObject {
-    @Published var popularMovies: [MediaItem] = []
-    @Published var trendingMovies: [MediaItem] = []
-    @Published var upcomingMovies: [MediaItem] = []
-    @Published var nowPlayingMovies: [MediaItem] = []
-    @Published var popularTVShows: [MediaItem] = []
-    @Published var topRatedTVShows: [MediaItem] = []
+final class MovieViewModel: ObservableObject {
+    @Published var popularMovies: [Movie] = []
+    @Published var trendingMovies: [Movie] = []
+    @Published var upcomingMovies: [Movie] = []
+    @Published var nowPlayingMovies: [Movie] = []
+    
+    @Published var popularTVShows: [TVShow] = []
+    @Published var topRatedTVShows: [TVShow] = []
+    
     @Published var errorMessage: String?
-    @Published var mediaDetail: (any MediaItemDetails)?
+    @Published var movieDetail: MovieDetails? = nil
+    
+    @Published var favorites: [Movie] = []
+    
+    private let favoritesRepo: FavoritesRepositoryProtocol
+    private let sessionRepo: SessionRepositoryProtocol
+    private let navigationService: NavigationServiceProtocol
+    
+    init(
+        favoritesRepo: FavoritesRepositoryProtocol,
+        sessionRepo: SessionRepositoryProtocol,
+        navigationService: NavigationServiceProtocol
+    ) {
+        self.favoritesRepo = favoritesRepo
+        self.sessionRepo = sessionRepo
+        self.navigationService = navigationService
+        loadFavorites()
+    }
+    
+    // FAVORITES FUNCTIONS -------------------------------
+    private func loadFavorites() {
+        guard let uid = sessionRepo.currentUserId else { return }
+        favorites = favoritesRepo.loadFavorites(for: uid)
+    }
+    
+    func toggleFavorite(_ movie: Movie) {
+        if isFavorite(movie) {
+            removeFavorite(movie)
+        } else {
+            addFavorite(movie)
+        }
+    }
+    
+    func isFavorite(_ movie: Movie) -> Bool {
+        favorites.contains { $0.id == movie.id }
+    }
+    
+    func getFavoriteIcon(_ movie: Movie) -> String {
+        return isFavorite(movie) ? "heart.fill" : "heart"
+    }
+    
+    func getFavoriteColor(_ movie: Movie) -> Color {
+        return isFavorite(movie) ? .red : .white
+    }
+    
+    private func addFavorite(_ movie: Movie) {
+        guard let uid = sessionRepo.currentUserId else { return }
+        favorites.append(movie)
+        favoritesRepo.saveFavorites(favorites, for: uid)
+    }
+    
+    private func removeFavorite(_ movie: Movie) {
+        guard let uid = sessionRepo.currentUserId else { return }
+        favorites.removeAll { $0.id == movie.id }
+        favoritesRepo.saveFavorites(favorites, for: uid)
+    }
+    // ------------------------------------------------------------
 
-    // MOVIES
-    func loadPopularMovies() {
-        TMDBService.shared.fetchPopularMovies { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let movies):
-                    self?.popularMovies = movies
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
-                }
-            }
-        }
-    }
     
-    func loadTrendingMovies() {
-        TMDBService.shared.fetchTrendingMovies { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let movies):
-                    self?.trendingMovies = movies
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
-                }
-            }
-        }
-    }
-
-    func loadUpcomingMovies() {
-        TMDBService.shared.fetchUpcomingMovies { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let movies):
-                    self?.upcomingMovies = movies
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
-                }
-            }
-        }
-    }
-    
-    func loadNowPlayingMovies() {
-        TMDBService.shared.fetchNowPlayingMovies { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let movies):
-                    self?.nowPlayingMovies = movies
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
-                }
-            }
-        }
-    }
-    
-    // MEDIA DETAILS
-    func loadDetails(media: MediaType) async {
+    // MOVIE LOADING FUNCTIONS -------------------------------
+    func loadPopularMovies() async {
         do {
-            switch media {
-            case .movie(let id):
-                let movie: any MediaItemDetails = try await TMDBService.shared.fetchDetails(for: .movie(id: id))
-                self.mediaDetail = movie
-
-            case .tvShow(let id):
-                let tvShow: any MediaItemDetails = try await TMDBService.shared.fetchDetails(for: .tvShow(id: id))
-                self.mediaDetail = tvShow
-            }
+            popularMovies = try await TMDBService.shared.fetchPopularMovies()
         } catch {
-            self.errorMessage = error.localizedDescription
+            errorMessage = error.localizedDescription
         }
     }
     
-    
-    // TV SHOWS
-    func loadPopularTVShows() {
-        TMDBService.shared.fetchPopularTVShows { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let shows):
-                    self?.popularTVShows = shows
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
-                }
-            }
+    func loadTrendingMovies() async {
+        do {
+            trendingMovies = try await TMDBService.shared.fetchTrendingMovies()
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
     
-    func loadTopRatedTVShows() {
-        TMDBService.shared.fetchTopRatedTVShows { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let shows):
-                    self?.topRatedTVShows = shows
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
-                }
-            }
+    func loadUpcomingMovies() async {
+        do {
+            upcomingMovies = try await TMDBService.shared.fetchUpcomingMovies()
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
+    
+    func loadNowPlayingMovies() async {
+        do {
+            nowPlayingMovies = try await TMDBService.shared.fetchNowPlayingMovies()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+    
+    func loadMovieDetails(movieId: Int) async {
+        do {
+            movieDetail = nil
+            movieDetail = try await TMDBService.shared.fetchMovieDetails(movieId: movieId)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+    // ------------------------------------------------------------
+
+    
+    // ROUTER FUNCTIONS
+    func navigateToMovie(_ movieId: Int) {
+        navigationService.navigateToMovie(movieId)
+    }
+    
+    func goBack() {
+        navigationService.goBack()
+    }
+    
+    func canGoBack() -> Bool {
+        return navigationService.canGoBack()
+    }
+    // ------------------------------------------------------------
+    
+    
+    // TVShow FUNCTIONS
+    func loadPopularTVShows() async {
+        do {
+            popularTVShows = try await TMDBService.shared.fetchPopularTVShows()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+    
+    func loadTopRatedTVShows() async {
+        do {
+            topRatedTVShows = try await TMDBService.shared.fetchTopRatedTVShows()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+    // ------------------------------------------------------------
+
 }

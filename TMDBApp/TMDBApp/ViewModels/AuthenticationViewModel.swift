@@ -8,42 +8,42 @@
 import SwiftUI
 import FirebaseAuth
 import FirebaseFirestore
-import Foundation
 
 @MainActor
-class AuthenticationViewModel: ObservableObject {
+final class AuthenticationViewModel: ObservableObject {
     @Published var profileEmail = ""
     @Published var password = ""
+    @Published var confirmPassword = ""
+    @Published var newPassword = ""
+    @Published var confirmNewPassword = ""
     @Published var firstName = ""
     @Published var lastName = ""
     @Published var phoneNumber = ""
     @Published var memberSince = ""
     @Published var errorMessage: String?
     
+    
     @Published var email = ""
     @Published var currentUser: User? // Firebase User object
     private var authStateHandle: AuthStateDidChangeListenerHandle?
     
-    @Published var favorites: [MediaItem] = []
-    private let defaults = UserDefaults.standard
-
+    private let sessionRepo: SessionRepositoryProtocol
+    
     // INITIALIZER & DEINTIALIZER
-    init() {
+    init(sessionRepo: SessionRepositoryProtocol) {
+        self.sessionRepo = sessionRepo
         // Observe authentication state changes
         authStateHandle = Auth.auth().addStateDidChangeListener { [weak self] auth, user in
             self?.currentUser = user
             if let user = user {
                 print("User is signed in: \(user.uid)")
-                // Optionally fetch their full profile data here if needed on app launch
                 self?.fetchUserProfile(uid: user.uid)
-                self?.favorites = FavoritesManager.shared.loadFavorites(for: user.uid)
             } else {
                 print("User is signed out.")
-                self?.favorites = []
             }
         }
     }
-
+    
     deinit {
         // Remove the listener when no longer needed to prevent memory leaks
         if let handle = authStateHandle {
@@ -69,11 +69,9 @@ class AuthenticationViewModel: ObservableObject {
                 "firstName": firstName,
                 "lastName": lastName,
                 "phoneNumber": phoneNumber,
-                "email": email,
-                "memberSince": memberSinceDateString
+                "email": profileEmail,
+                "memberSince": memberSinceDateString,
             ])
-            
-            print("User data successfully written!")
         } catch {
             print("Error signing up: \(error.localizedDescription)")
             self.errorMessage = error.localizedDescription
@@ -84,15 +82,13 @@ class AuthenticationViewModel: ObservableObject {
         errorMessage = nil
         do {
             let result = try await Auth.auth().signIn(withEmail: email, password: password)
-            // User is successfully signed in.
-            // Optionally fetch profile data from Firestore here if needed immediately.
             print("User signed in: \(result.user.email ?? "N/A")")
         } catch {
             print("Error signing in: \(error.localizedDescription)")
             self.errorMessage = "Sign-in failed: \(error.localizedDescription)"
         }
     }
-
+    
     func signOut() {
         do {
             try Auth.auth().signOut()
@@ -102,8 +98,8 @@ class AuthenticationViewModel: ObservableObject {
             self.errorMessage = "Sign out failed: \(error.localizedDescription)"
         }
     }
-
-
+    
+    
     // FETCH USER PROFILE FROM FIRESTORE
     func fetchUserProfile(uid: String) {
         let db = Firestore.firestore()
@@ -122,9 +118,8 @@ class AuthenticationViewModel: ObservableObject {
         }
     }
     
-    
     // UPDATE USER PASSWORD
-    func updateUserPassword(currentPassword: String, newPassword: String, confirmNewPassword: String) async {
+    func updateUserPassword() async {
         errorMessage = nil
         guard let user = Auth.auth().currentUser else {
             errorMessage = "No authenticated user found."
@@ -147,7 +142,7 @@ class AuthenticationViewModel: ObservableObject {
                 errorMessage = "User email not found for re-authentication."
                 return
             }
-            let credential = EmailAuthProvider.credential(withEmail: email, password: currentPassword)
+            let credential = EmailAuthProvider.credential(withEmail: email, password: password)
             
             try await user.reauthenticate(with: credential)
             print("User re-authenticated successfully.")
@@ -155,32 +150,31 @@ class AuthenticationViewModel: ObservableObject {
             // Update password
             try await user.updatePassword(to: newPassword)
             print("Password updated successfully for \(user.email ?? "user").")
-//            errorMessage = "Password updated successfully!"
             
             self.password = ""
             
         } catch let error as NSError {
             print("Error updating password: \(error.localizedDescription)")
-//            if let errorCode = AuthErrorCode.Code(rawValue: error.code) {
-//                switch errorCode {
-//                case .requiresRecentLogin:
-//                    errorMessage = "Please sign in again to update your password."
-//                case .wrongPassword:
-//                    errorMessage = "The current password you entered is incorrect."
-//                case .weakPassword:
-//                    errorMessage = "The new password is too weak. Please choose a stronger one."
-//                default:
-//                    errorMessage = "Failed to update password: \(error.localizedDescription)"
-//                }
-//            } else {
-//                errorMessage = "Failed to update password: \(error.localizedDescription)"
-//            }
+            if let errorCode = AuthErrorCode(rawValue: error.code) {
+                switch errorCode {
+                case .requiresRecentLogin:
+                    errorMessage = "Please sign in again to update your password."
+                case .wrongPassword:
+                    errorMessage = "The current password you entered is incorrect."
+                case .weakPassword:
+                    errorMessage = "The new password is too weak. Please choose a stronger one."
+                default:
+                    errorMessage = "Failed to update password: \(error.localizedDescription)"
+                }
+            } else {
+                errorMessage = "Failed to update password: \(error.localizedDescription)"
+            }
         }
     }
-
+    
     
     // UPDATE USER DATA
-    func updateUserProfileData(newFirstName: String, newLastName: String, newPhoneNumber: String, newEmail: String) async {
+    func updateUserProfileData() async {
         errorMessage = nil
         guard let uid = Auth.auth().currentUser?.uid else {
             errorMessage = "No authenticated user to update profile for."
@@ -191,25 +185,26 @@ class AuthenticationViewModel: ObservableObject {
         let userDocRef = db.collection("users").document(uid)
         
         let updates: [String: Any] = [
-            "firstName": newFirstName,
-            "lastName": newLastName,
-            "phoneNumber": newPhoneNumber,
-            "email": newEmail // This updates the email in Firestore, not Auth
+            "firstName": self.firstName,
+            "lastName": self.lastName,
+            "phoneNumber": self.phoneNumber,
+            "email": self.profileEmail // This updates the email in Firestore, not Auth
         ]
         
         do {
             try await userDocRef.updateData(updates)
             print("User profile data updated successfully in Firestore.")
-//            errorMessage = "Profile updated successfully!"
-            
-            self.firstName = newFirstName
-            self.lastName = newLastName
-            self.phoneNumber = newPhoneNumber
-            self.profileEmail = newEmail
         } catch {
             print("Error updating user profile data in Firestore: \(error.localizedDescription)")
             errorMessage = "Failed to update profile: \(error.localizedDescription)"
         }
+    }
+    
+    func checkConfirmPassword() -> Bool {
+        return password == confirmPassword
+    }
+    func checkConfirmNewPassword() -> Bool {
+        return newPassword == confirmNewPassword
     }
     
     
@@ -228,6 +223,6 @@ class AuthenticationViewModel: ObservableObject {
 
     func isFavorite(_ mediaItem: MediaItem) -> Bool {
         return self.favorites.contains { $0.id == mediaItem.id }
-    }
+    
 }
 

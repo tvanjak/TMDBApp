@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct FooterView: View {
-    @Binding var selectedSection: AppLayout.Section
+    let router: Router
     
     var body: some View {
         HStack {
             Spacer()
-            Button(action: {selectedSection = .home}) {
+            Button(action: {router.navigateTo(.home)}) {
                 VStack {
                     Image(systemName: "house")
                     Text("Home")
@@ -22,7 +22,7 @@ struct FooterView: View {
                 }
             }
             Spacer()
-            Button(action: {selectedSection = .favorites}) {
+            Button(action: {router.navigateTo(.favorites)}) {
                 VStack {
                     Image(systemName: "heart")
                     Text("Favorites")
@@ -31,7 +31,7 @@ struct FooterView: View {
                 }
             }
             Spacer()
-            Button(action: {selectedSection = .profile}) {
+            Button(action: {router.navigateTo(.profile)}) {
                 VStack {
                     Image(systemName: "person")
                     Text("Profile")
@@ -47,6 +47,5 @@ struct FooterView: View {
 }
 
 #Preview {
-    @Previewable @State var section: AppLayout.Section = .home
-    FooterView(selectedSection: $section)
+    FooterView(router: Router())
 }

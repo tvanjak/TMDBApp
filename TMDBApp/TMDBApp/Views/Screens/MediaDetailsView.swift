@@ -42,6 +42,7 @@ struct RatingRing: View {
 }
 
 
+//MOVE THIS TO VIEWMODEL -------------------
 extension String {
     func releaseYear() -> String {
         let formatter = DateFormatter()
@@ -64,15 +65,18 @@ extension String {
         return "N/A"
     }
 }
+// -----------------------------------------
 
 struct MoviePoster: View {
     var id: Int
     var posterPath: String?
+    var fullPosterPath: String?
     var voteAverage: Double
     var releaseDate: String
     var title: String
-    var genres: [Genre]
-    var runtime: Int?
+    var genres: String
+    var runtime: String?
+    @ObservedObject var movieViewModel: MovieViewModel
     
     var movie: MediaItem {
         MediaItem(
@@ -81,14 +85,11 @@ struct MoviePoster: View {
         )
     }
     
-    @EnvironmentObject var authVM: AuthenticationViewModel
-    
     var body: some View {
         ZStack (alignment: .bottomLeading) {
-            if let posterPath = posterPath {
-                let fullURLString = "https://image.tmdb.org/t/p/w500\(posterPath)"
+            if let fullURLString = fullPosterPath {
                 if let url = URL(string: fullURLString) {
-                    AsyncImage(url: url, scale: 2) { image in
+                    AsyncImage(url: url) { image in
                         image
                             .resizable()
                             .scaledToFill()
@@ -96,7 +97,7 @@ struct MoviePoster: View {
                             .clipped()
                     } placeholder: {
                         ProgressView()
-                            .frame(height: 360)
+                            .frame(width: UIScreen.main.bounds.width, height: 360)
                     }
                 }
             } else {
@@ -125,41 +126,31 @@ struct MoviePoster: View {
                 + Text(" (\(releaseDate.releaseYear()))")
                     .font(AppTheme.Typography.largeTitle)
                     .foregroundStyle(.white)
-                VStack(alignment: .leading) {
-                    Text(releaseDate.invertedDate())
-                        .font(AppTheme.Typography.body)
-                        .foregroundStyle(.white)
-                    
-                    let genresString = genres.map { $0.name }.joined(separator: ", ")
-                    Text(genresString)
-                        .font(AppTheme.Typography.body)
+                Text(releaseDate.invertedDate())
+                    .font(.title3)
+                    .foregroundStyle(.white)
+                
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(genres)
+                        .font(.title3)
                         .foregroundStyle(.white)
                         .fixedSize(horizontal: false, vertical: true)
-                    
-                    if let minutes = runtime {
-                        let hours = minutes / 60
-                        let actualMinutes = minutes % 60
-                        
-                        Text(hours > 0
-                             ? "\(hours)h \(actualMinutes > 0 ? "\(actualMinutes)m" : "")"
-                             : "\(actualMinutes)m")
-                        .font(AppTheme.Typography.body)
-                        .foregroundStyle(.white)
-                        .bold()
+                    if let unwrappedRuntime = runtime {
+                        Text(unwrappedRuntime)
+                            .font(.title3)
+                            .foregroundStyle(.white)
+                            .bold()
+                            .padding(.top, 2)
                     }
                 }
                 
                 HStack {
                     Button(action: {
-                        if authVM.isFavorite(movie) {
-                            authVM.removeFavorite(movie)
-                        } else {
-                            authVM.addFavorite(movie)
-                        }
+                        movieViewModel.toggleFavorite(movie)
                     }) {
-                        Image(systemName: authVM.isFavorite(movie) ? "heart.fill" : "heart")
-                            .foregroundColor(authVM.isFavorite(movie) ? .red : .white)
-                            .padding(AppTheme.Spacing.small)
+                        Image(systemName: movieViewModel.getFavoriteIcon(movie))
+                            .foregroundColor(movieViewModel.getFavoriteColor(movie))
+                            .padding(8)
                             .background(Color.black.opacity(0.5))
                             .clipShape(Circle())
                     }
@@ -185,29 +176,9 @@ struct CrewView: View {
     var body: some View {
         VStack {
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .top, spacing: AppTheme.Spacing.medium) {
+                LazyHStack(alignment: .top, spacing: 15) {
                     ForEach(Array(stride(from: 0, to: crew.count, by: 2)), id: \.self) { index in
-                        VStack (alignment: .leading, spacing: AppTheme.Spacing.medium) {
-                            VStack(alignment: .leading, spacing: AppTheme.Spacing.small) {
-                                Text(crew[index].name)
-                                    .font(AppTheme.Typography.body)
-                                    .fontWeight(.bold)
-                                Text(crew[index].job)
-                                    .font(AppTheme.Typography.body)
-                                    .font(.subheadline)
-                            }
-                            VStack(alignment: .leading, spacing: AppTheme.Spacing.small) {
-                                // rendering second item in this column
-                                if index + 1 < crew.count {
-                                    Text(crew[index + 1].name)
-                                        .font(AppTheme.Typography.body)
-                                        .fontWeight(.bold)
-                                    Text(crew[index + 1].job)
-                                        .font(AppTheme.Typography.body)
-                                }
-                            }
-                        }
-                        .frame(width: 150)
+                        CrewMemberCard(crew: crew, index: index)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -228,43 +199,9 @@ struct CastView: View {
                 .font(.title)
                 .fontWeight(.bold)
             ScrollView (.horizontal, showsIndicators: false) {
-                HStack (spacing: AppTheme.Spacing.medium) {
+                LazyHStack (spacing: 20) {
                     ForEach(cast) {castMember in
-                        VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
-                            if let profilePath = castMember.profilePath {
-                                let fullURLString = "https://image.tmdb.org/t/p/w200\(profilePath)"
-                                if let url = URL(string: fullURLString) {
-                                    AsyncImage(url: url) { image in
-                                        image
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(width: 150, height: 150)
-                                            .clipped()
-                                    } placeholder: {
-                                        ProgressView()
-                                    }
-                                }
-                            } else {
-                                Image(systemName: "person.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .foregroundColor(.gray)
-                            }
-                            Text(castMember.name)
-                                .font(AppTheme.Typography.body)
-                                .fontWeight(.bold)
-                                .padding(.horizontal, AppTheme.Spacing.small)
-                            Text(castMember.character)
-                                .font(AppTheme.Typography.body)
-                                .foregroundStyle(AppTheme.Colors.textSecondary)
-                                .padding(.horizontal, AppTheme.Spacing.small)
-                            Spacer()
-                        }
-                        .frame(width: 150, height: 250)
-                        .background(Color.white) 
-                        .cornerRadius(AppTheme.Radius.medium)
-                        .shadow(color: Color.black.opacity(0.1), radius: AppTheme.Radius.small)
-                        .padding(.vertical)
+                        CastMemberCard(castMember: castMember)
                     }
                 }
             }
@@ -274,12 +211,11 @@ struct CastView: View {
 }
 
 
-struct MediaDetailsView: View {
+struct MovieView: View {
+    var movieId: Int
     let media: MediaType
+    @ObservedObject var movieViewModel: MovieViewModel
 
-    @StateObject private var mediaViewModel = MediaViewModel()
-    @EnvironmentObject var authVM: AuthenticationViewModel
-    
     var body: some View {
         ScrollView {
             if let mediaDetail = mediaViewModel.mediaDetail {
@@ -287,16 +223,15 @@ struct MediaDetailsView: View {
                 VStack (spacing: AppTheme.Spacing.medium) {
                     
                     // POSTER AND GENERAL INFO
-                    MoviePoster(
-                        id: mediaDetail.id,
-                        posterPath: mediaDetail.posterPath,
-                        voteAverage: mediaDetail.voteAverage,
-                        releaseDate: mediaDetail.releaseDate,
-                        title: mediaDetail.displayTitle,
-                        genres: mediaDetail.genres,
-                        runtime: mediaDetail.runtime
-                    )
-                        .environmentObject(authVM)
+                    MoviePoster(id: movieDetail.id,
+                                posterPath: movieDetail.posterPath,
+                                fullPosterPath: movieDetail.fullPosterPath,
+                                voteAverage: movieDetail.voteAverage,
+                                releaseDate: movieDetail.releaseDate,
+                                title: movieDetail.title,
+                                genres: movieDetail.formattedGenres,
+                                runtime: movieDetail.formattedRuntime,
+                                movieViewModel: movieViewModel)
                     
                     // OVERVIEW
                     VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
@@ -331,6 +266,9 @@ struct MediaDetailsView: View {
 }
 
 #Preview {
-    MediaDetailsView(media: MediaType.movie(id: 6))
-        .environmentObject(AuthenticationViewModel())
+    MovieView(media: MediaType.movie(id: 6), movieId: 2, movieViewModel: MovieViewModel(
+            favoritesRepo: FavoritesRepository(),
+            sessionRepo: SessionRepository(),
+            navigationService: Router(),
+        ))
 }
