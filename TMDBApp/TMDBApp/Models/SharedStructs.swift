@@ -23,9 +23,10 @@ struct CastMember: Codable, Identifiable {
     let character: String
     let profilePath: String?
     
-//    var fullProfilePath {
-//        
-//    }
+    var fullProfilePath: String? {
+        guard let path = profilePath else { return nil }
+        return "https://image.tmdb.org/t/p/w200\(path)"
+    }
     
     enum CodingKeys: String, CodingKey {
         case id

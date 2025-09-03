@@ -206,23 +206,5 @@ final class AuthenticationViewModel: ObservableObject {
     func checkConfirmNewPassword() -> Bool {
         return newPassword == confirmNewPassword
     }
-    
-    
-    // FAVORITES FUNCTIONS
-    func addFavorite(_ mediaItem: MediaItem) {
-        guard let uid = currentUser?.uid else { return }
-        favorites.append(mediaItem)
-        FavoritesManager.shared.saveFavorites(favorites, for: uid)
-    }
-
-    func removeFavorite(_ mediaItem: MediaItem) {
-        guard let uid = currentUser?.uid else { return }
-        self.favorites.removeAll { $0.id == mediaItem.id }
-        FavoritesManager.shared.saveFavorites(favorites, for: uid)
-    }
-
-    func isFavorite(_ mediaItem: MediaItem) -> Bool {
-        return self.favorites.contains { $0.id == mediaItem.id }
-    
 }
 

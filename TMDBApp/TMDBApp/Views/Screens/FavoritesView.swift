@@ -12,7 +12,7 @@ struct FavoriteCardView: View {
     var media: MediaItem
     
     var body: some View {
-        Button(action: { mediaViewModel.navigateToMovie(media.id) }) {
+//        Button(action: { mediaViewModel.navigateToMedia(media) }) {
             ZStack(alignment: .topLeading) {
                 if let fullURLString = media.fullPosterPath {
                     if let url = URL(string: fullURLString) {
@@ -47,7 +47,7 @@ struct FavoriteCardView: View {
                 }
                 .padding(8)
             }
-        }
+//        }
     }
 }
 

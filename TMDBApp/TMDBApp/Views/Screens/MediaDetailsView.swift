@@ -255,10 +255,8 @@ struct MediaDetailsView: View {
             }
         }
         .onAppear {
-            if mediaViewModel.mediaDetail == nil {
-                Task {
-                    await mediaViewModel.loadDetails(media: media)
-                }
+            Task {
+                await mediaViewModel.loadDetails(media: media)
             }
         }
     }
