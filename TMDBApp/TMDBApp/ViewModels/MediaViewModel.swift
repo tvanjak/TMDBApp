@@ -2,19 +2,19 @@
 import SwiftUI
 
 @MainActor
-final class MovieViewModel: ObservableObject {
-    @Published var popularMovies: [Movie] = []
-    @Published var trendingMovies: [Movie] = []
-    @Published var upcomingMovies: [Movie] = []
-    @Published var nowPlayingMovies: [Movie] = []
+final class MediaViewModel: ObservableObject {
+    @Published var popularMovies: [MediaItem] = []
+    @Published var trendingMovies: [MediaItem] = []
+    @Published var upcomingMovies: [MediaItem] = []
+    @Published var nowPlayingMovies: [MediaItem] = []
     
-    @Published var popularTVShows: [TVShow] = []
-    @Published var topRatedTVShows: [TVShow] = []
+    @Published var popularTVShows: [MediaItem] = []
+    @Published var topRatedTVShows: [MediaItem] = []
     
     @Published var errorMessage: String?
-    @Published var movieDetail: MovieDetails? = nil
-    
-    @Published var favorites: [Movie] = []
+    @Published var mediaDetail: (any MediaItemDetails)?
+
+    @Published var favorites: [MediaItem] = []
     
     private let favoritesRepo: FavoritesRepositoryProtocol
     private let sessionRepo: SessionRepositoryProtocol
@@ -37,35 +37,35 @@ final class MovieViewModel: ObservableObject {
         favorites = favoritesRepo.loadFavorites(for: uid)
     }
     
-    func toggleFavorite(_ movie: Movie) {
-        if isFavorite(movie) {
-            removeFavorite(movie)
+    func toggleFavorite(_ media: MediaItem) {
+        if isFavorite(media) {
+            removeFavorite(media)
         } else {
-            addFavorite(movie)
+            addFavorite(media)
         }
     }
     
-    func isFavorite(_ movie: Movie) -> Bool {
-        favorites.contains { $0.id == movie.id }
+    func isFavorite(_ media: MediaItem) -> Bool {
+        favorites.contains { $0.id == media.id }
     }
     
-    func getFavoriteIcon(_ movie: Movie) -> String {
-        return isFavorite(movie) ? "heart.fill" : "heart"
+    func getFavoriteIcon(_ media: MediaItem) -> String {
+        return isFavorite(media) ? "heart.fill" : "heart"
     }
     
-    func getFavoriteColor(_ movie: Movie) -> Color {
-        return isFavorite(movie) ? .red : .white
+    func getFavoriteColor(_ media: MediaItem) -> Color {
+        return isFavorite(media) ? .red : .white
     }
     
-    private func addFavorite(_ movie: Movie) {
+    private func addFavorite(_ media: MediaItem) {
         guard let uid = sessionRepo.currentUserId else { return }
-        favorites.append(movie)
+        favorites.append(media)
         favoritesRepo.saveFavorites(favorites, for: uid)
     }
     
-    private func removeFavorite(_ movie: Movie) {
+    private func removeFavorite(_ media: MediaItem) {
         guard let uid = sessionRepo.currentUserId else { return }
-        favorites.removeAll { $0.id == movie.id }
+        favorites.removeAll { $0.id == media.id }
         favoritesRepo.saveFavorites(favorites, for: uid)
     }
     // ------------------------------------------------------------
@@ -104,10 +104,10 @@ final class MovieViewModel: ObservableObject {
         }
     }
     
-    func loadMovieDetails(movieId: Int) async {
+    func loadMovieDetails(media: MediaItem) async {
         do {
-            movieDetail = nil
-            movieDetail = try await TMDBService.shared.fetchMovieDetails(movieId: movieId)
+            mediaDetail = nil
+            mediaDetail = try await TMDBService.shared.fetchMovieDetails(movieId: movieId)
         } catch {
             errorMessage = error.localizedDescription
         }

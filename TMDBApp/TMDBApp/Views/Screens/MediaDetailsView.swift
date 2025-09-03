@@ -76,7 +76,7 @@ struct MoviePoster: View {
     var title: String
     var genres: String
     var runtime: String?
-    @ObservedObject var movieViewModel: MovieViewModel
+    @ObservedObject var mediaViewModel: MediaViewModel
     
     var movie: MediaItem {
         MediaItem(
@@ -146,10 +146,10 @@ struct MoviePoster: View {
                 
                 HStack {
                     Button(action: {
-                        movieViewModel.toggleFavorite(movie)
+                        mediaViewModel.toggleFavorite(movie)
                     }) {
-                        Image(systemName: movieViewModel.getFavoriteIcon(movie))
-                            .foregroundColor(movieViewModel.getFavoriteColor(movie))
+                        Image(systemName: mediaViewModel.getFavoriteIcon(movie))
+                            .foregroundColor(mediaViewModel.getFavoriteColor(movie))
                             .padding(8)
                             .background(Color.black.opacity(0.5))
                             .clipShape(Circle())
@@ -212,9 +212,8 @@ struct CastView: View {
 
 
 struct MovieView: View {
-    var movieId: Int
     let media: MediaType
-    @ObservedObject var movieViewModel: MovieViewModel
+    @ObservedObject var mediaViewModel: MediaViewModel
 
     var body: some View {
         ScrollView {
@@ -223,15 +222,15 @@ struct MovieView: View {
                 VStack (spacing: AppTheme.Spacing.medium) {
                     
                     // POSTER AND GENERAL INFO
-                    MoviePoster(id: movieDetail.id,
-                                posterPath: movieDetail.posterPath,
-                                fullPosterPath: movieDetail.fullPosterPath,
-                                voteAverage: movieDetail.voteAverage,
-                                releaseDate: movieDetail.releaseDate,
-                                title: movieDetail.title,
-                                genres: movieDetail.formattedGenres,
-                                runtime: movieDetail.formattedRuntime,
-                                movieViewModel: movieViewModel)
+                    MoviePoster(id: mediaDetail.id,
+                                posterPath: mediaDetail.posterPath,
+                                fullPosterPath: mediaDetail.fullPosterPath,
+                                voteAverage: mediaDetail.voteAverage,
+                                releaseDate: mediaDetail.releaseDate,
+                                title: mediaDetail.title,
+                                genres: mediaDetail.formattedGenres,
+                                runtime: mediaDetail.formattedRuntime,
+                                movieViewModel: mediaViewModel)
                     
                     // OVERVIEW
                     VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
@@ -266,7 +265,7 @@ struct MovieView: View {
 }
 
 #Preview {
-    MovieView(media: MediaType.movie(id: 6), movieId: 2, movieViewModel: MovieViewModel(
+    MovieView(media: MediaType.movie(id: 6), mediaViewModel: MediaViewModel(
             favoritesRepo: FavoritesRepository(),
             sessionRepo: SessionRepository(),
             navigationService: Router(),

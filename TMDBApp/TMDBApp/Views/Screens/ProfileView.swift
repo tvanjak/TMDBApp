@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ProfileHeader: View {
     @ObservedObject var authViewModel: AuthenticationViewModel
-    @Binding var selectedSection: ProfileView.sections
+    @Binding var selectedSection: ProfileView.ProfileSections
     @Binding var editMode: Bool
     
     var body: some View {
@@ -140,12 +140,12 @@ struct PasswordSection: View {
 struct ProfileView: View {
     @ObservedObject var authViewModel: AuthenticationViewModel
     
-    enum sections {
+    enum ProfileSections: CaseIterable, Hashable {
         case details
         case reviews
         case password
     }
-    @State private var selectedSection: sections = .details
+    @State private var selectedSection: ProfileSections = .details
     
     // variables that track user actions
     @State private var addPhoneNumber: Bool = false
@@ -164,7 +164,13 @@ struct ProfileView: View {
                 VStack (spacing: 20) {
                     ProfileHeader(authViewModel: authViewModel, selectedSection: $selectedSection, editMode: $editMode)
                     
-                    SectionsBar(selectedSection: $selectedSection)
+                    SectionsBar(selectedSection: $selectedSection) { section in
+                        switch section {
+                        case .details: "Details"
+                        case .reviews: "Reviews"
+                        case .password: "Password"
+                        }
+                    }
                     
                     switch selectedSection {
                     case .details:
@@ -179,7 +185,7 @@ struct ProfileView: View {
             }
             
             if editMode {
-                SaveUserDataButton(authViewModel: authViewModel, saveAlertMessage: $saveAlertMessage, showSaveAlert: $showSaveAlert)
+                SaveUserDataButton(authViewModel: authViewModel, editMode: $editMode, saveAlertMessage: $saveAlertMessage, showSaveAlert: $showSaveAlert)
             }
             if selectedSection == .password {
                 UpdatePasswordButton(authViewModel: authViewModel, updateAlertMessage: $updateAlertMessage, showUpdateAlert: $showUpdateAlert, selectedSection: $selectedSection)

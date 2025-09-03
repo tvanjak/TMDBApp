@@ -8,60 +8,6 @@
 import SwiftUI
 
 // DETAILS SECTION ----------------------------------
-struct SectionsBar: View {
-    @Binding var selectedSection: ProfileView.sections
-    
-    var body: some View {
-        HStack (alignment: .top, spacing: 20) {
-            VStack (alignment: .center) {
-                Button() {
-                    selectedSection = .details
-                } label: {
-                    Text("Details")
-                        .font(.title3)
-                        .foregroundStyle(.black)
-                        .fontWeight(selectedSection == ProfileView.sections.details ? .bold : .thin)
-                }
-                if selectedSection == .details {
-                    Rectangle()
-                        .frame(width: 70, height: 4)
-                }
-            }
-            VStack (alignment: .center) {
-                Button() {
-                    selectedSection = .reviews
-                } label: {
-                    Text("Reviews")
-                        .font(.title3)
-                        .foregroundStyle(.black)
-                        .fontWeight(selectedSection == ProfileView.sections.reviews ? .bold : .thin)
-                }
-                if selectedSection == .reviews {
-                    Rectangle()
-                        .frame(width: 90, height: 4)
-                }
-            }
-            VStack (alignment: .center) {
-                Button() {
-                    selectedSection = .password
-                } label: {
-                    Text("Password")
-                        .font(.title3)
-                        .foregroundStyle(.black)
-                        .fontWeight(selectedSection == ProfileView.sections.password ? .bold : .thin)
-                }
-                if selectedSection == .password {
-                    Rectangle()
-                        .frame(width: 110, height: 4)
-                }
-            }
-            
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.vertical)
-    }
-}
-
 struct FirstNameInput: View {
     @ObservedObject var authViewModel: AuthenticationViewModel
     
@@ -285,7 +231,7 @@ struct UpdatePasswordButton: View {
     @ObservedObject var authViewModel: AuthenticationViewModel
     @Binding var updateAlertMessage: String
     @Binding var showUpdateAlert: Bool
-    @Binding var selectedSection: ProfileView.sections
+    @Binding var selectedSection: ProfileView.ProfileSections
     
     var body: some View {
         Button(action: {
@@ -316,6 +262,7 @@ struct UpdatePasswordButton: View {
 
 struct SaveUserDataButton: View {
     @ObservedObject var authViewModel: AuthenticationViewModel
+    @Binding var editMode: Bool
     @Binding var saveAlertMessage: String
     @Binding var showSaveAlert: Bool
     

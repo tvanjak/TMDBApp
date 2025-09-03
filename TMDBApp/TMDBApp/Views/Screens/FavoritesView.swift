@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct FavoriteCardView: View {
-    @ObservedObject var movieViewModel: MovieViewModel
-    var movie: Movie
+    @ObservedObject var mediaViewModel: MediaViewModel
+    var media: MediaItem
     
     var body: some View {
-        Button(action: { movieViewModel.navigateToMovie(movie.id) }) {
+        Button(action: { mediaViewModel.navigateToMovie(media.id) }) {
             ZStack(alignment: .topLeading) {
-                if let fullURLString = movie.fullPosterPath {
+                if let fullURLString = media.fullPosterPath {
                     if let url = URL(string: fullURLString) {
                         AsyncImage(url: url, scale: 4) { image in
                             image
@@ -37,10 +37,10 @@ struct FavoriteCardView: View {
                 }
                 
                 Button(action: {
-                    movieViewModel.toggleFavorite(movie)
+                    mediaViewModel.toggleFavorite(media)
                 }) {
-                    Image(systemName: movieViewModel.getFavoriteIcon(movie))
-                        .foregroundColor(movieViewModel.getFavoriteColor(movie))
+                    Image(systemName: mediaViewModel.getFavoriteIcon(media))
+                        .foregroundColor(mediaViewModel.getFavoriteColor(media))
                         .padding(8)
                         .background(Color.black.opacity(0.5))
                         .clipShape(Circle())
@@ -52,14 +52,14 @@ struct FavoriteCardView: View {
 }
 
 struct FavoritesList: View {
-    @ObservedObject var movieViewModel: MovieViewModel
+    @ObservedObject var mediaViewModel: MediaViewModel
     let columns = [GridItem(.adaptive(minimum: 115), spacing: 10)]
 
     var body: some View {
         ScrollView {
             LazyVGrid (columns: columns) {
-                ForEach(movieViewModel.favorites) { movie in
-                    FavoriteCardView(movieViewModel: movieViewModel, movie: movie)
+                ForEach(mediaViewModel.favorites) { media in
+                    FavoriteCardView(mediaViewModel: mediaViewModel, media: media)
                 }
             }
         }
@@ -68,7 +68,7 @@ struct FavoritesList: View {
 
 
 struct FavoritesView: View {
-    @ObservedObject var movieViewModel: MovieViewModel
+    @ObservedObject var mediaViewModel: MediaViewModel
 
     var body: some View {
         VStack (alignment: .leading, spacing: 10) {
@@ -76,13 +76,13 @@ struct FavoritesView: View {
                 .font(.title)
                 .fontWeight(.bold)
                 .padding(.vertical)
-            if movieViewModel.favorites.isEmpty {
+            if mediaViewModel.favorites.isEmpty {
                 Text("Your favorites list is currently empty")
                     .font(.subheadline)
                     .fontWeight(.thin)
                 Spacer()
             } else {
-                FavoritesList(movieViewModel: movieViewModel)
+                FavoritesList(mediaViewModel: mediaViewModel)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -91,7 +91,7 @@ struct FavoritesView: View {
 }
 
 #Preview {
-    FavoritesView(movieViewModel: MovieViewModel(
+    FavoritesView(mediaViewModel: MediaViewModel(
         favoritesRepo: FavoritesRepository(),
         sessionRepo: SessionRepository(),
         navigationService: Router()

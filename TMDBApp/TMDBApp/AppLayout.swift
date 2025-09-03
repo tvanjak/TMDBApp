@@ -10,7 +10,7 @@ import Factory
 
 struct AppLayout: View {
     @StateObject private var router = Container.shared.router()
-    @StateObject private var movieViewModel = Container.shared.movieViewModel()
+    @StateObject private var mediaViewModel = Container.shared.mediaViewModel()
     @StateObject private var authViewModel = Container.shared.authViewModel()
 
     var body: some View {
@@ -18,15 +18,15 @@ struct AppLayout: View {
             VStack(spacing: 0) {
                 HeaderView(canGoBack: router.canGoBack(), onBack: { router.goBack() })
                 NavigationStack(path: $router.path) {
-                    HomeView(movieViewModel: movieViewModel)
+                    HomeView(mediaViewModel: mediaViewModel)
                         .navigationDestination(for: Route.self) { route in
                             switch route {
                             case .home:
-                                HomeView(movieViewModel: movieViewModel)
+                                HomeView(mediaViewModel: mediaViewModel)
                                     .navigationBarBackButtonHidden(true)
                                     .toolbar(.hidden, for: .navigationBar)
                             case .favorites:
-                                FavoritesView(movieViewModel: movieViewModel)
+                                FavoritesView(mediaViewModel: mediaViewModel)
                                     .navigationBarBackButtonHidden(true)
                                     .toolbar(.hidden, for: .navigationBar)
                             case .profile:
@@ -34,7 +34,7 @@ struct AppLayout: View {
                                     .navigationBarBackButtonHidden(true)
                                     .toolbar(.hidden, for: .navigationBar)
                             case .mediaDetail(let id):
-                                MovieView(movieId: id, movieViewModel: movieViewModel)
+                                MovieView(movieId: id, mediaViewModel: mediaViewModel)
                                     .navigationBarBackButtonHidden(true)
                                     .toolbar(.hidden, for: .navigationBar)
                             }

@@ -10,7 +10,7 @@ import SwiftUI
 
 struct MediaItemCard: View {
     let mediaItem: MediaItem
-    @EnvironmentObject var authVM: AuthenticationViewModel
+    @ObservedObject var mediaViewModel: MediaViewModel
     
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -40,14 +40,10 @@ struct MediaItemCard: View {
             
             
             Button(action: {
-                if authVM.isFavorite(mediaItem) {
-                    authVM.removeFavorite(mediaItem)
-                } else {
-                    authVM.addFavorite(mediaItem)
-                }
+                mediaViewModel.toggleFavorite(mediaItem)
             }) {
-                Image(systemName: authVM.isFavorite(mediaItem) ? "heart.fill" : "heart")
-                    .foregroundColor(authVM.isFavorite(mediaItem) ? .red : .white)
+                Image(systemName: mediaViewModel.getFavoriteIcon(mediaItem))
+                    .foregroundColor(mediaViewModel.getFavoriteColor(mediaItem))
                     .padding(AppTheme.Spacing.small)
                     .background(Color.black.opacity(0.5))
                     .clipShape(Circle())
@@ -62,7 +58,6 @@ struct MediaItemCard: View {
 struct HomeView: View {
     @ObservedObject var mediaViewModel: MediaViewModel
     
-    @EnvironmentObject var authVM: AuthenticationViewModel
 
     @State private var searchTerm = ""
         
@@ -86,28 +81,28 @@ struct HomeView: View {
         case .popular: 
             if mediaViewModel.popularMovies.isEmpty {
                 Task { @MainActor in
-                    mediaViewModel.loadPopularMovies()
+                    await mediaViewModel.loadPopularMovies()
                 }
             }
             return mediaViewModel.popularMovies
         case .trending:
             if mediaViewModel.trendingMovies.isEmpty {
                 Task { @MainActor in
-                    mediaViewModel.loadTrendingMovies()
+                    await mediaViewModel.loadTrendingMovies()
                 }
             }
             return mediaViewModel.trendingMovies
         case .upcoming:
             if mediaViewModel.upcomingMovies.isEmpty {
                 Task { @MainActor in
-                    mediaViewModel.loadUpcomingMovies()
+                    await mediaViewModel.loadUpcomingMovies()
                 }
             }
             return mediaViewModel.upcomingMovies
         case .nowPlaying:
             if mediaViewModel.nowPlayingMovies.isEmpty {
                 Task { @MainActor in
-                    mediaViewModel.loadNowPlayingMovies()
+                    await mediaViewModel.loadNowPlayingMovies()
                 }
             }
             return mediaViewModel.nowPlayingMovies
@@ -119,14 +114,14 @@ struct HomeView: View {
         case .popular:
             if mediaViewModel.popularTVShows.isEmpty {
                 Task { @MainActor in
-                    mediaViewModel.loadPopularTVShows()
+                    await mediaViewModel.loadPopularTVShows()
                 }
             }
             return mediaViewModel.popularTVShows
         case .topRated:
             if mediaViewModel.topRatedTVShows.isEmpty {
                 Task { @MainActor in
-                    mediaViewModel.loadTopRatedTVShows()
+                    await mediaViewModel.loadTopRatedTVShows()
                 }
             }
             return mediaViewModel.topRatedTVShows
@@ -168,8 +163,7 @@ struct HomeView: View {
                             ForEach(currentMovies) { movie in
                                 // Button(action: { movieViewModel.navigateToMovie(movie.id) }) {
                                 NavigationLink(value: MediaType.movie(id: movie.id)) {
-                                    MediaItemCard(mediaItem: movie)
-                                        .environmentObject(authVM)
+                                    MediaItemCard(mediaItem: movie, mediaViewModel: mediaViewModel)
                                 }
                             }
                         }
@@ -194,8 +188,7 @@ struct HomeView: View {
                             ForEach(currentTVShows) { tvShow in
                                 // Button(action: { movieViewModel.navigateToMovie(movie.id) }) {
                                 NavigationLink(value: MediaType.tvShow(id: tvShow.id)) {
-                                    MediaItemCard(mediaItem: tvShow)
-                                        .environmentObject(authVM)
+                                    MediaItemCard(mediaItem: tvShow, mediaViewModel: mediaViewModel)
                                 }
                             }
                         }
@@ -208,10 +201,10 @@ struct HomeView: View {
             .onAppear {
                 Task {
                     if mediaViewModel.popularMovies.isEmpty {
-                        await movieViewModel.loadPopularMovies()
+                        await mediaViewModel.loadPopularMovies()
                     }
                     if mediaViewModel.popularTVShows.isEmpty {
-                        await movieViewModel.loadTrendingMovies()
+                        await mediaViewModel.loadTrendingMovies()
                     }
                 }
             }
@@ -221,7 +214,7 @@ struct HomeView: View {
 
 
 #Preview {
-    HomeView(movieViewModel: MovieViewModel(
+    HomeView(mediaViewModel: MediaViewModel(
         favoritesRepo: FavoritesRepository(),
         sessionRepo: SessionRepository(),
         navigationService: Router()

@@ -27,9 +27,9 @@ extension Container {
     }
     
     // ViewModels
-    var movieViewModel: Factory<MovieViewModel> {
+    var mediaViewModel: Factory<MediaViewModel> {
         self { @MainActor in
-            MovieViewModel(
+            MediaViewModel(
                 favoritesRepo: self.favoritesRepository(),
                 sessionRepo: self.sessionRepository(),
                 navigationService: self.router()
