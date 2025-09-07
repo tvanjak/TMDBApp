@@ -207,15 +207,15 @@ struct ConfirmNewPasswordInput: View {
     @ObservedObject var authViewModel: AuthenticationViewModel
     
     var body: some View {
-        VStack (alignment: .leading, spacing: 10) {
+        VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
             Text("Confirm new password")
                 .font(AppTheme.Typography.body)
                 .foregroundStyle(.secondary)
                 .fontWeight(.regular)
-            TextField("", text: $authViewModel.confirmNewPassword)
+            SecureField("", text: $authViewModel.confirmNewPassword)
                 .font(AppTheme.Typography.subtitle)
-                .frame(maxWidth: .infinity)
                 .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .overlay(
                     RoundedRectangle(cornerRadius: AppTheme.Radius.small)
                         .stroke(AppTheme.Colors.lightBlue, lineWidth: 2)

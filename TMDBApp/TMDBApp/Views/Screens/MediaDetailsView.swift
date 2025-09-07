@@ -6,43 +6,9 @@
 //
 
 import SwiftUI
- 
-
-struct RatingRing: View {
-    var rating: Double
-    
-    var body: some View {
-        ZStack {
-            Circle()
-                .stroke(Color.gray.opacity(0.3), lineWidth: 6)
-            
-            Circle()
-                .trim(from: 0, to: rating)
-                .stroke(
-                    ratingColor,
-                    style: StrokeStyle(lineWidth: 6, lineCap: .round)
-                )
-                .rotationEffect(.degrees(-90))
-            
-            Text("\(Int(rating * 100))%")
-                .font(AppTheme.Typography.body)
-                .fontWeight(.semibold)
-                .foregroundColor(ratingColor)
-        }
-        .frame(width: 60, height: 60)
-    }
-    
-    private var ratingColor: Color {
-        switch rating {
-        case 0.75...: return .green
-        case 0.5..<0.75: return .orange
-        default: return .red
-        }
-    }
-}
 
 
-//MOVE THIS TO VIEWMODEL -------------------
+//MOVE THIS TO VIEWMODEL? -------------------
 extension String {
     func releaseYear() -> String {
         let formatter = DateFormatter()
@@ -108,61 +74,10 @@ struct MediaPoster: View {
                     .clipped()
                     .foregroundColor(.black)
             }
-            
             VStack (alignment: .leading) {
-                HStack {
-                    RatingRing(rating: voteAverage/10)
-                        .padding(.trailing, AppTheme.Spacing.small)
-                    Text("User score")
-                        .font(AppTheme.Typography.body)
-                        .foregroundStyle(.white)
-                        .fontWeight(.semibold)
-                }
-                Text(title)
-                    .font(AppTheme.Typography.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.white)
-                + Text(" (\(releaseDate.releaseYear()))")
-                    .font(AppTheme.Typography.largeTitle)
-                    .foregroundStyle(.white)
-                Text(releaseDate.invertedDate())
-                    .font(AppTheme.Typography.body)
-                    .foregroundStyle(.white)
-                
-                VStack(alignment: .leading, spacing: AppTheme.Spacing.small) {
-                    Text(genres)
-                        .font(AppTheme.Typography.body)
-                        .foregroundStyle(.white)
-                        .fixedSize(horizontal: false, vertical: true)
-                    if let unwrappedRuntime = runtime {
-                        Text(unwrappedRuntime)
-                            .font(AppTheme.Typography.body)
-                            .foregroundStyle(.white)
-                            .bold()
-                    }
-                }
-                
-                HStack {
-                    Button(action: {
-                        mediaViewModel.toggleFavorite(movie)
-                    }) {
-                        Image(systemName: mediaViewModel.getFavoriteIcon(movie))
-                            .foregroundColor(mediaViewModel.getFavoriteColor(movie))
-                            .padding(AppTheme.Spacing.small)
-                            .background(Color.black.opacity(0.5))
-                            .clipShape(Circle())
-                    }
-                    Spacer()
-                    Text("Leave a review")
-                        .font(AppTheme.Typography.body)
-                        .fontWeight(.bold)
-                        .frame(width: 180, height: 40)
-                        .background(Color.gray)
-                        .cornerRadius(AppTheme.Radius.small)
-                        .foregroundStyle(.white)
-                }
+                PosterText(voteAverage: voteAverage, releaseDate: releaseDate, title: title, genres: genres, runtime: runtime)
+                PosterButtons(mediaViewModel: mediaViewModel, movie: movie)
             }
-            .padding()
         }
     }
 }
