@@ -56,7 +56,7 @@ struct MediaItemCard: View {
 
 struct MoviesList: View {
     @ObservedObject var mediaViewModel: MediaViewModel
-    @State var selectedMovieSection: HomeView.MovieSections
+    @Binding var selectedMovieSection: HomeView.MovieSections
     var currentMovies: [MediaItem]
     
     var body: some View {
@@ -91,7 +91,7 @@ struct MoviesList: View {
 
 struct TVShowsList: View {
     @ObservedObject var mediaViewModel: MediaViewModel
-    @State var selectedTVShowSection: HomeView.TVShowSections
+    @Binding var selectedTVShowSection: HomeView.TVShowSections
     var currentTVShows: [MediaItem]
     
     var body: some View {

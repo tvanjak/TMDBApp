@@ -97,9 +97,9 @@ struct HomeView: View {
                 .cornerRadius(AppTheme.Radius.small)
                 .padding(.top)
                 
-                MoviesList(mediaViewModel: mediaViewModel, selectedMovieSection: selectedMovieSection, currentMovies: currentMovies)
+                MoviesList(mediaViewModel: mediaViewModel, selectedMovieSection: $selectedMovieSection, currentMovies: currentMovies)
                 
-                TVShowsList(mediaViewModel: mediaViewModel, selectedTVShowSection: selectedTVShowSection, currentTVShows: currentTVShows)
+                TVShowsList(mediaViewModel: mediaViewModel, selectedTVShowSection: $selectedTVShowSection, currentTVShows: currentTVShows)
 
             }
             .onAppear {
@@ -119,8 +119,7 @@ struct HomeView: View {
 
 #Preview {
     HomeView(mediaViewModel: MediaViewModel(
-        favoritesRepo: FavoritesRepository(),
-        sessionRepo: SessionRepository(),
+        favoritesManager: FavoritesManager(favoritesRepo: FavoritesRepository(), sessionRepo: SessionRepository()),
         navigationService: Router()
     ))
 }

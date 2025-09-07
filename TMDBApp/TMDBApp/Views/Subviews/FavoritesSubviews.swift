@@ -9,7 +9,7 @@ import SwiftUI
 
 
 struct FavoriteCardView: View {
-    @ObservedObject var mediaViewModel: MediaViewModel
+    @ObservedObject var favoritesViewModel: FavoritesViewModel
     var media: MediaItem
     
     var body: some View {
@@ -38,10 +38,10 @@ struct FavoriteCardView: View {
                 }
                 
                 Button(action: {
-                    mediaViewModel.toggleFavorite(media)
+                    favoritesViewModel.toggleFavorite(media)
                 }) {
-                    Image(systemName: mediaViewModel.getFavoriteIcon(media))
-                        .foregroundColor(mediaViewModel.getFavoriteColor(media))
+                    Image(systemName: favoritesViewModel.getFavoriteIcon(media))
+                        .foregroundColor(favoritesViewModel.getFavoriteColor(media))
                         .padding(AppTheme.Spacing.small)
                         .background(Color.black.opacity(0.5))
                         .clipShape(Circle())
@@ -53,14 +53,14 @@ struct FavoriteCardView: View {
 }
 
 struct FavoritesList: View {
-    @ObservedObject var mediaViewModel: MediaViewModel
+    @ObservedObject var favoritesViewModel: FavoritesViewModel
     let columns = [GridItem(.adaptive(minimum: 115), spacing: AppTheme.Spacing.small)]
 
     var body: some View {
         ScrollView {
             LazyVGrid (columns: columns) {
-                ForEach(mediaViewModel.favorites) { media in
-                    FavoriteCardView(mediaViewModel: mediaViewModel, media: media)
+                ForEach(favoritesViewModel.favorites) { media in
+                    FavoriteCardView(favoritesViewModel: favoritesViewModel, media: media)
                 }
             }
         }

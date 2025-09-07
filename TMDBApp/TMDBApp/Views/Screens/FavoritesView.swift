@@ -9,7 +9,7 @@ import SwiftUI
 
 
 struct FavoritesView: View {
-    @ObservedObject var mediaViewModel: MediaViewModel
+    @ObservedObject var favoritesViewModel: FavoritesViewModel
 
     var body: some View {
         VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
@@ -17,13 +17,13 @@ struct FavoritesView: View {
                 .font(.title)
                 .fontWeight(.bold)
                 .padding(.vertical)
-            if mediaViewModel.favorites.isEmpty {
+            if favoritesViewModel.favorites.isEmpty {
                 Text("Your favorites list is currently empty")
                     .font(.subheadline)
                     .fontWeight(.thin)
                 Spacer()
             } else {
-                FavoritesList(mediaViewModel: mediaViewModel)
+                FavoritesList(favoritesViewModel: favoritesViewModel)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -32,9 +32,8 @@ struct FavoritesView: View {
 }
 
 #Preview {
-    FavoritesView(mediaViewModel: MediaViewModel(
-        favoritesRepo: FavoritesRepository(),
-        sessionRepo: SessionRepository(),
+    FavoritesView(favoritesViewModel: FavoritesViewModel(
+        favoritesManager: FavoritesManager(favoritesRepo: FavoritesRepository(), sessionRepo: SessionRepository()),
         navigationService: Router()
     ))
 }

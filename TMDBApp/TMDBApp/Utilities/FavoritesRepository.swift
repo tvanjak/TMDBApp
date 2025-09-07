@@ -8,17 +8,14 @@
 import SwiftUI
 
 protocol FavoritesRepositoryProtocol {
-//    var favorites: [Movie]? { get set }
-
     func loadFavorites(for userId: String) -> [MediaItem]
-    func saveFavorites(_ movie: [MediaItem], for userId: String)
+    func saveFavorites(_ favorites: [MediaItem], for userId: String)
 }
 
 
 class FavoritesRepository: FavoritesRepositoryProtocol {
     
     private let userDefaults: UserDefaults = .standard
-//    var favorites: [Movie]? = []
     
     func loadFavorites(for userId: String) -> [MediaItem] {
         guard let data = userDefaults.data(forKey: "favorites_\(userId)") else { return [] }

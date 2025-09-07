@@ -20,6 +20,17 @@ extension Container {
             .singleton
     }
     
+    // Managers
+    var favoritesManager: Factory<FavoritesManager> {
+        self { @MainActor in
+            FavoritesManager(
+                favoritesRepo: self.favoritesRepository(),
+                sessionRepo: self.sessionRepository(),
+            )
+        }
+        .singleton
+    }
+    
     // Services
     var router: Factory<Router> {
         self { Router() }
@@ -30,8 +41,7 @@ extension Container {
     var mediaViewModel: Factory<MediaViewModel> {
         self { @MainActor in
             MediaViewModel(
-                favoritesRepo: self.favoritesRepository(),
-                sessionRepo: self.sessionRepository(),
+                favoritesManager: self.favoritesManager(),
                 navigationService: self.router()
             )
         }
@@ -42,6 +52,16 @@ extension Container {
         self { @MainActor in
             AuthenticationViewModel(
                 sessionRepo: self.sessionRepository()
+            )
+        }
+        .singleton
+    }
+    
+    var favoritesViewModel: Factory<FavoritesViewModel> {
+        self { @MainActor in
+            FavoritesViewModel(
+                favoritesManager: self.favoritesManager(),
+                navigationService: self.router()
             )
         }
         .singleton

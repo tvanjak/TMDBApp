@@ -78,6 +78,7 @@ struct MediaPoster: View {
                 PosterText(voteAverage: voteAverage, releaseDate: releaseDate, title: title, genres: genres, runtime: runtime)
                 PosterButtons(mediaViewModel: mediaViewModel, movie: movie)
             }
+            .padding()
         }
     }
 }
@@ -177,8 +178,7 @@ struct MediaDetailsView: View {
 
 #Preview {
     MediaDetailsView(media: MediaType.movie(id: 6), mediaViewModel: MediaViewModel(
-            favoritesRepo: FavoritesRepository(),
-            sessionRepo: SessionRepository(),
+            favoritesManager: FavoritesManager(favoritesRepo: FavoritesRepository(), sessionRepo: SessionRepository()),
             navigationService: Router(),
         ))
 }

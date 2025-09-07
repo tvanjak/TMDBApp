@@ -12,6 +12,7 @@ struct AppLayout: View {
     @StateObject private var router = Container.shared.router()
     @StateObject private var mediaViewModel = Container.shared.mediaViewModel()
     @StateObject private var authViewModel = Container.shared.authViewModel()
+    @StateObject private var favoritesViewModel = Container.shared.favoritesViewModel()
 
     var body: some View {
         if authViewModel.currentUser != nil {
@@ -26,7 +27,7 @@ struct AppLayout: View {
                                     .navigationBarBackButtonHidden(true)
                                     .toolbar(.hidden, for: .navigationBar)
                             case .favorites:
-                                FavoritesView(mediaViewModel: mediaViewModel)
+                                FavoritesView(favoritesViewModel: favoritesViewModel)
                                     .navigationBarBackButtonHidden(true)
                                     .toolbar(.hidden, for: .navigationBar)
                             case .profile:

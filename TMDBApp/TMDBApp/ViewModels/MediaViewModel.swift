@@ -1,5 +1,6 @@
 
 import SwiftUI
+import Combine
 
 @MainActor
 final class MediaViewModel: ObservableObject {
@@ -13,60 +14,38 @@ final class MediaViewModel: ObservableObject {
     
     @Published var errorMessage: String?
     @Published var mediaDetail: (any MediaItemDetails)?
-
     @Published var favorites: [MediaItem] = []
     
-    private let favoritesRepo: FavoritesRepositoryProtocol
-    private let sessionRepo: SessionRepositoryProtocol
+    private let favoritesManager: FavoritesManager
     private let navigationService: NavigationServiceProtocol
     
     init(
-        favoritesRepo: FavoritesRepositoryProtocol,
-        sessionRepo: SessionRepositoryProtocol,
+        favoritesManager: FavoritesManager,
         navigationService: NavigationServiceProtocol
     ) {
-        self.favoritesRepo = favoritesRepo
-        self.sessionRepo = sessionRepo
+        self.favoritesManager = favoritesManager
         self.navigationService = navigationService
-        loadFavorites()
+        
+        // Observe FavoritesManager changes
+        favoritesManager.$favorites
+            .assign(to: &$favorites)
     }
     
     // FAVORITES FUNCTIONS -------------------------------
-    private func loadFavorites() {
-        guard let uid = sessionRepo.currentUserId else { return }
-        favorites = favoritesRepo.loadFavorites(for: uid)
-    }
-    
     func toggleFavorite(_ media: MediaItem) {
-        if isFavorite(media) {
-            removeFavorite(media)
-        } else {
-            addFavorite(media)
-        }
+        favoritesManager.toggleFavorite(media)
     }
     
     func isFavorite(_ media: MediaItem) -> Bool {
-        favorites.contains { $0.id == media.id }
+        return favoritesManager.isFavorite(media)
     }
     
     func getFavoriteIcon(_ media: MediaItem) -> String {
-        return isFavorite(media) ? "heart.fill" : "heart"
+        return favoritesManager.getFavoriteIcon(media)
     }
     
     func getFavoriteColor(_ media: MediaItem) -> Color {
-        return isFavorite(media) ? .red : .white
-    }
-    
-    private func addFavorite(_ media: MediaItem) {
-        guard let uid = sessionRepo.currentUserId else { return }
-        favorites.append(media)
-        favoritesRepo.saveFavorites(favorites, for: uid)
-    }
-    
-    private func removeFavorite(_ media: MediaItem) {
-        guard let uid = sessionRepo.currentUserId else { return }
-        favorites.removeAll { $0.id == media.id }
-        favoritesRepo.saveFavorites(favorites, for: uid)
+        return favoritesManager.getFavoriteColor(media)
     }
     // ------------------------------------------------------------
 
