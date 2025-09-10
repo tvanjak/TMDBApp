@@ -43,38 +43,40 @@ struct RatingRing: View {
 
 
 struct PosterText: View {
-    var voteAverage: Double
-    var releaseDate: String
-    var title: String
-    var genres: String
-    var runtime: String?
+//    var voteAverage: Double
+//    var releaseDate: String
+//    var title: String
+//    var genres: String
+//    var runtime: String?
+    @ObservedObject var mediaViewModel: MediaViewModel
+
     
     var body: some View {
         HStack {
-            RatingRing(rating: voteAverage/10)
+            RatingRing(rating: mediaViewModel.mediaDetail!.voteAverage/10)
                 .padding(.trailing, AppTheme.Spacing.small)
             Text("User score")
                 .font(AppTheme.Typography.body)
                 .foregroundStyle(.white)
                 .fontWeight(.semibold)
         }
-        Text(title)
+        Text(mediaViewModel.mediaDetail!.displayTitle)
             .font(AppTheme.Typography.largeTitle)
             .fontWeight(.bold)
             .foregroundStyle(.white)
-        + Text(" (\(releaseDate.releaseYear()))")
+        + Text(" (\(mediaViewModel.mediaDetail!.releaseDate.releaseYear()))")
             .font(AppTheme.Typography.largeTitle)
             .foregroundStyle(.white)
-        Text(releaseDate.invertedDate())
+        Text(mediaViewModel.mediaDetail!.releaseDate.invertedDate())
             .font(AppTheme.Typography.body)
             .foregroundStyle(.white)
         
         VStack(alignment: .leading, spacing: AppTheme.Spacing.small) {
-            Text(genres)
+            Text(mediaViewModel.mediaDetail!.formattedGenres)
                 .font(AppTheme.Typography.body)
                 .foregroundStyle(.white)
                 .fixedSize(horizontal: false, vertical: true)
-            if let unwrappedRuntime = runtime {
+            if let unwrappedRuntime = mediaViewModel.mediaDetail!.formattedRuntime {
                 Text(unwrappedRuntime)
                     .font(AppTheme.Typography.body)
                     .foregroundStyle(.white)
@@ -86,7 +88,12 @@ struct PosterText: View {
 
 struct PosterButtons: View {
     @ObservedObject var mediaViewModel: MediaViewModel
-    let movie: MediaItem
+    var movie: MediaItem {
+        MediaItem(
+            id: mediaViewModel.mediaDetail!.id,
+            posterPath: mediaViewModel.mediaDetail!.posterPath,
+        )
+    }
     
     var body: some View {
         HStack {

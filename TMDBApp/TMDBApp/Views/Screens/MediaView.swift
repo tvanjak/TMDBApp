@@ -34,26 +34,19 @@ extension String {
 // -----------------------------------------
 
 struct MediaPoster: View {
-    var id: Int
-    var posterPath: String?
-    var fullPosterPath: String?
-    var voteAverage: Double
-    var releaseDate: String
-    var title: String
-    var genres: String
-    var runtime: String?
+//    var id: Int
+//    var posterPath: String?
+//    var fullPosterPath: String?
+//    var voteAverage: Double
+//    var releaseDate: String
+//    var title: String
+//    var genres: String
+//    var runtime: String?
     @ObservedObject var mediaViewModel: MediaViewModel
-    
-    var movie: MediaItem {
-        MediaItem(
-            id: id,
-            posterPath: posterPath,
-        )
-    }
     
     var body: some View {
         ZStack (alignment: .bottomLeading) {
-            if let fullURLString = fullPosterPath {
+            if let fullURLString = mediaViewModel.mediaDetail!.fullPosterPath {
                 if let url = URL(string: fullURLString) {
                     AsyncImage(url: url) { image in
                         image
@@ -75,8 +68,9 @@ struct MediaPoster: View {
                     .foregroundColor(.black)
             }
             VStack (alignment: .leading) {
-                PosterText(voteAverage: voteAverage, releaseDate: releaseDate, title: title, genres: genres, runtime: runtime)
-                PosterButtons(mediaViewModel: mediaViewModel, movie: movie)
+//                PosterText(voteAverage: voteAverage, releaseDate: releaseDate, title: title, genres: genres, runtime: runtime)
+                PosterText(mediaViewModel: mediaViewModel)
+                PosterButtons(mediaViewModel: mediaViewModel)
             }
             .padding()
         }
@@ -136,15 +130,16 @@ struct MediaView: View {
                 VStack (spacing: AppTheme.Spacing.medium) {
                     
                     // POSTER AND GENERAL INFO
-                    MediaPoster(id: mediaDetail.id,
-                                posterPath: mediaDetail.posterPath,
-                                fullPosterPath: mediaDetail.fullPosterPath,
-                                voteAverage: mediaDetail.voteAverage,
-                                releaseDate: mediaDetail.releaseDate,
-                                title: mediaDetail.displayTitle,
-                                genres: mediaDetail.formattedGenres,
-                                runtime: mediaDetail.formattedRuntime,
-                                mediaViewModel: mediaViewModel)
+//                    MediaPoster(id: mediaDetail.id,
+//                                                    posterPath: mediaDetail.posterPath,
+//                                                    fullPosterPath: mediaDetail.fullPosterPath,
+//                                                    voteAverage: mediaDetail.voteAverage,
+//                                                    releaseDate: mediaDetail.releaseDate,
+//                                                    title: mediaDetail.displayTitle,
+//                                                    genres: mediaDetail.formattedGenres,
+//                                                    runtime: mediaDetail.formattedRuntime,
+//                                                    mediaViewModel: mediaViewModel)
+                    MediaPoster(mediaViewModel: mediaViewModel)
                     
                     // OVERVIEW
                     VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
