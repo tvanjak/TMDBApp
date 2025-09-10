@@ -56,8 +56,6 @@ struct MediaItemCard: View {
 
 struct MoviesList: View {
     @ObservedObject var homeViewModel: HomeViewModel
-    @Binding var selectedMovieSection: HomeView.MovieSections
-    var currentMovies: [MediaItem]
     
     var body: some View {
         VStack (alignment: .leading) {
@@ -65,7 +63,7 @@ struct MoviesList: View {
                 Text("Movies")
                     .font(AppTheme.Typography.title)
                     .fontWeight(.bold)
-                SectionsBar(selectedSection: $selectedMovieSection) { section in
+                SectionsBar(selectedSection: $homeViewModel.selectedMovieSection) { section in
                     switch section {
                     case .popular: "Popular"
                     case .trending: "Trending"
@@ -76,7 +74,7 @@ struct MoviesList: View {
             }
             ScrollView (.horizontal) {
                 LazyHStack {
-                    ForEach(currentMovies) { movie in
+                    ForEach(homeViewModel.currentMovies, id: \.id) { movie in
                         Button(action: { homeViewModel.navigateToMedia(MediaType.movie(id: movie.id)) }) {
                             MediaItemCard(mediaItem: movie, homeViewModel: homeViewModel)
                         }
@@ -91,8 +89,6 @@ struct MoviesList: View {
 
 struct TVShowsList: View {
     @ObservedObject var homeViewModel: HomeViewModel
-    @Binding var selectedTVShowSection: HomeView.TVShowSections
-    var currentTVShows: [MediaItem]
     
     var body: some View {
         VStack (alignment: .leading) {
@@ -100,7 +96,7 @@ struct TVShowsList: View {
                 Text("TV Shows")
                     .font(AppTheme.Typography.title)
                     .fontWeight(.bold)
-                SectionsBar(selectedSection: $selectedTVShowSection) { section in
+                SectionsBar(selectedSection: $homeViewModel.selectedTVShowSection) { section in
                     switch section {
                     case .popular: "Popular"
                     case .topRated: "Top Rated"
@@ -109,7 +105,7 @@ struct TVShowsList: View {
             }
             ScrollView (.horizontal) {
                 LazyHStack {
-                    ForEach(currentTVShows) { tvShow in
+                    ForEach(homeViewModel.currentTVShows, id: \.id) { tvShow in
                         Button(action: { homeViewModel.navigateToMedia(MediaType.tvShow(id: tvShow.id)) }) {
                             MediaItemCard(mediaItem: tvShow, homeViewModel: homeViewModel)
                         }

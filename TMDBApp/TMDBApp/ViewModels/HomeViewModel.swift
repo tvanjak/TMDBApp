@@ -11,6 +11,31 @@ final class HomeViewModel: ObservableObject {
     @Published var popularTVShows: [MediaItem] = []
     @Published var topRatedTVShows: [MediaItem] = []
     
+    enum MovieSections: CaseIterable, Hashable {
+        case popular
+        case trending
+        case upcoming
+        case nowPlaying
+    }
+    @Published var selectedMovieSection: MovieSections = .popular {
+        didSet {
+            updateCurrentMovies()
+        }
+    }
+    
+    enum TVShowSections: CaseIterable, Hashable {
+        case popular
+        case topRated
+    }
+    @Published var selectedTVShowSection: TVShowSections = .popular {
+        didSet {
+            updateCurrentTVShows()
+        }
+    }
+    
+    @Published var currentMovies: [MediaItem] = []
+    @Published var currentTVShows: [MediaItem] = []
+    
     @Published var errorMessage: String?
     @Published var favorites: [MediaItem] = []
     
@@ -27,6 +52,12 @@ final class HomeViewModel: ObservableObject {
         // Observe FavoritesManager changes
         favoritesManager.$favorites
             .assign(to: &$favorites)
+        
+        // Initialize current arrays and load data
+        Task { @MainActor in
+            await loadPopularMovies()
+            await loadPopularTVShows()
+        }
     }
     
     // FAVORITES FUNCTIONS -------------------------------
@@ -46,12 +77,69 @@ final class HomeViewModel: ObservableObject {
         return favoritesManager.getFavoriteColor(media)
     }
     // ------------------------------------------------------------
+    
+    // UPDATE CURRENT ARRAYS -------------------------------
+    private func updateCurrentMovies() {
+        switch selectedMovieSection {
+        case .popular:
+            currentMovies = popularMovies
+            if popularMovies.isEmpty {
+                Task { @MainActor in
+                    await loadPopularMovies()
+                }
+            }
+        case .trending:
+            currentMovies = trendingMovies
+            if trendingMovies.isEmpty {
+                Task { @MainActor in
+                    await loadTrendingMovies()
+                }
+            }
+        case .upcoming:
+            currentMovies = upcomingMovies
+            if upcomingMovies.isEmpty {
+                Task { @MainActor in
+                    await loadUpcomingMovies()
+                }
+            }
+        case .nowPlaying:
+            currentMovies = nowPlayingMovies
+            if nowPlayingMovies.isEmpty {
+                Task { @MainActor in
+                    await loadNowPlayingMovies()
+                }
+            }
+        }
+    }
+    
+    private func updateCurrentTVShows() {
+        switch selectedTVShowSection {
+        case .popular:
+            currentTVShows = popularTVShows
+            if popularTVShows.isEmpty {
+                Task { @MainActor in
+                    await loadPopularTVShows()
+                }
+            }
+        case .topRated:
+            currentTVShows = topRatedTVShows
+            if topRatedTVShows.isEmpty {
+                Task { @MainActor in
+                    await loadTopRatedTVShows()
+                }
+            }
+        }
+    }
+    // ------------------------------------------------------------
 
     
     // MOVIE LOADING FUNCTIONS -------------------------------
     func loadPopularMovies() async {
         do {
             popularMovies = try await TMDBService.shared.fetchPopularMovies()
+            if selectedMovieSection == .popular {
+                currentMovies = popularMovies
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -60,6 +148,9 @@ final class HomeViewModel: ObservableObject {
     func loadTrendingMovies() async {
         do {
             trendingMovies = try await TMDBService.shared.fetchTrendingMovies()
+            if selectedMovieSection == .trending {
+                currentMovies = trendingMovies
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -68,6 +159,9 @@ final class HomeViewModel: ObservableObject {
     func loadUpcomingMovies() async {
         do {
             upcomingMovies = try await TMDBService.shared.fetchUpcomingMovies()
+            if selectedMovieSection == .upcoming {
+                currentMovies = upcomingMovies
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -76,6 +170,9 @@ final class HomeViewModel: ObservableObject {
     func loadNowPlayingMovies() async {
         do {
             nowPlayingMovies = try await TMDBService.shared.fetchNowPlayingMovies()
+            if selectedMovieSection == .nowPlaying {
+                currentMovies = nowPlayingMovies
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -102,6 +199,9 @@ final class HomeViewModel: ObservableObject {
     func loadPopularTVShows() async {
         do {
             popularTVShows = try await TMDBService.shared.fetchPopularTVShows()
+            if selectedTVShowSection == .popular {
+                currentTVShows = popularTVShows
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -110,6 +210,9 @@ final class HomeViewModel: ObservableObject {
     func loadTopRatedTVShows() async {
         do {
             topRatedTVShows = try await TMDBService.shared.fetchTopRatedTVShows()
+            if selectedTVShowSection == .topRated {
+                currentTVShows = topRatedTVShows
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
