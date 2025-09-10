@@ -66,6 +66,15 @@ extension Container {
         .singleton
     }
     
+    var profileViewModel: Factory<ProfileViewModel> {
+        self { @MainActor in
+            ProfileViewModel(
+                sessionRepo: self.sessionRepository()
+            )
+        }
+        .singleton
+    }
+    
     var favoritesViewModel: Factory<FavoritesViewModel> {
         self { @MainActor in
             FavoritesViewModel(

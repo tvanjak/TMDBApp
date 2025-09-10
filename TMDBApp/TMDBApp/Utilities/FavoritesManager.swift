@@ -26,7 +26,7 @@ class FavoritesManager: ObservableObject {
     }
     
     func toggleFavorite(_ media: MediaItem) {
-        guard let uid = sessionRepo.currentUserId else { return }
+        guard let _ = sessionRepo.currentUserId else { return }
         if isFavorite(media) {
             removeFavorite(media)
         } else {

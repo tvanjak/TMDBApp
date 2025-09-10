@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ProfileHeader: View {
-    @ObservedObject var authViewModel: AuthenticationViewModel
+    @ObservedObject var profileViewModel: ProfileViewModel
     @Binding var selectedSection: ProfileView.ProfileSections
     @Binding var editMode: Bool
     
@@ -41,7 +41,7 @@ struct ProfileHeader: View {
                 }
             }
             
-            Text("Hi, \(authViewModel.firstName) \(authViewModel.lastName)")
+            Text("Hi, \(profileViewModel.firstName) \(profileViewModel.lastName)")
                 .font(AppTheme.Typography.title)
                 .fontWeight(.bold)
             
@@ -61,7 +61,7 @@ struct ProfileHeader: View {
 
 
 struct DetailsSection: View {
-    @ObservedObject var authViewModel: AuthenticationViewModel
+    @ObservedObject var profileViewModel: ProfileViewModel
     
     @Binding var editMode: Bool
     @Binding var addPhoneNumber: Bool
@@ -71,27 +71,27 @@ struct DetailsSection: View {
         VStack (spacing: AppTheme.Spacing.large){
             if editMode {
                 VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
-                    FirstNameInput(authViewModel: authViewModel)
-                    LastNameInput(authViewModel: authViewModel)
+                    FirstNameInput(profileViewModel: profileViewModel)
+                    LastNameInput(profileViewModel: profileViewModel)
                 }
             }
             
             
             VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
-                MemberSince(authViewModel: authViewModel)
+                MemberSince(profileViewModel: profileViewModel)
                 
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             
             
             VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
-                EmailInput(authViewModel: authViewModel, editMode: $editMode)
+                EmailInput(profileViewModel: profileViewModel, editMode: $editMode)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             
             
             VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
-                PhoneNumberInput(authViewModel: authViewModel, editMode: $editMode, addPhoneNumber: $addPhoneNumber)
+                PhoneNumberInput(profileViewModel: profileViewModel, editMode: $editMode, addPhoneNumber: $addPhoneNumber)
             }
             
             Spacer()
@@ -118,7 +118,7 @@ struct ReviewsSection: View {
 
 
 struct PasswordSection: View {
-    @ObservedObject var authViewModel: AuthenticationViewModel
+    @ObservedObject var profileViewModel: ProfileViewModel
     
     var body: some View {
         VStack (spacing: AppTheme.Spacing.large) {
@@ -126,11 +126,11 @@ struct PasswordSection: View {
                 .bold()
                 .frame(maxWidth: .infinity, alignment: .leading)
             
-            CurrentPasswordInput(authViewModel: authViewModel)
+            CurrentPasswordInput(profileViewModel: profileViewModel)
             
-            NewPasswordInput(authViewModel: authViewModel)
+            NewPasswordInput(profileViewModel: profileViewModel)
             
-            ConfirmNewPasswordInput(authViewModel: authViewModel)
+            ConfirmNewPasswordInput(profileViewModel: profileViewModel)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -138,7 +138,7 @@ struct PasswordSection: View {
 
 
 struct ProfileView: View {
-    @ObservedObject var authViewModel: AuthenticationViewModel
+    @ObservedObject var profileViewModel: ProfileViewModel
     
     enum ProfileSections: CaseIterable, Hashable {
         case details
@@ -162,7 +162,7 @@ struct ProfileView: View {
         VStack {
             ScrollView {
                 VStack (spacing: AppTheme.Spacing.medium) {
-                    ProfileHeader(authViewModel: authViewModel, selectedSection: $selectedSection, editMode: $editMode)
+                    ProfileHeader(profileViewModel: profileViewModel, selectedSection: $selectedSection, editMode: $editMode)
                     
                     SectionsBar(selectedSection: $selectedSection) { section in
                         switch section {
@@ -174,21 +174,21 @@ struct ProfileView: View {
                     
                     switch selectedSection {
                     case .details:
-                        DetailsSection(authViewModel: authViewModel, editMode: $editMode, addPhoneNumber: $addPhoneNumber, wantToLogOut: $wantToLogOut)
+                        DetailsSection(profileViewModel: profileViewModel, editMode: $editMode, addPhoneNumber: $addPhoneNumber, wantToLogOut: $wantToLogOut)
                     case .reviews:
                         ReviewsSection()
                     case .password:
-                        PasswordSection(authViewModel: authViewModel)
+                        PasswordSection(profileViewModel: profileViewModel)
                     }
                 }
                 .padding(AppTheme.Spacing.large)
             }
             
             if editMode {
-                SaveUserDataButton(authViewModel: authViewModel, editMode: $editMode, saveAlertMessage: $saveAlertMessage, showSaveAlert: $showSaveAlert)
+                SaveUserDataButton(profileViewModel: profileViewModel, editMode: $editMode, saveAlertMessage: $saveAlertMessage, showSaveAlert: $showSaveAlert)
             }
             if selectedSection == .password {
-                UpdatePasswordButton(authViewModel: authViewModel, updateAlertMessage: $updateAlertMessage, showUpdateAlert: $showUpdateAlert, selectedSection: $selectedSection)
+                UpdatePasswordButton(profileViewModel: profileViewModel, updateAlertMessage: $updateAlertMessage, showUpdateAlert: $showUpdateAlert, selectedSection: $selectedSection)
             }
         }
         .alert("Log out?", isPresented: $wantToLogOut) {
@@ -196,7 +196,7 @@ struct ProfileView: View {
                 wantToLogOut = false
             }
             Button("OK") {
-                authViewModel.signOut()
+                profileViewModel.signOut()
             }
         } message: {
             Text("Are you sure you want to log out")
@@ -217,12 +217,12 @@ struct ProfileView: View {
 
 
 #Preview {
-    let authViewModel = AuthenticationViewModel(sessionRepo: SessionRepository())
-    authViewModel.firstName = "John"
-    authViewModel.lastName = "Doe"
-    authViewModel.profileEmail = "john.doe@example.com"
-    authViewModel.phoneNumber = "+1234567890"
-    authViewModel.memberSince = "24/04/2022"
+    let profileViewModel = ProfileViewModel(sessionRepo: SessionRepository())
+    profileViewModel.firstName = "John"
+    profileViewModel.lastName = "Doe"
+    profileViewModel.profileEmail = "john.doe@example.com"
+    profileViewModel.phoneNumber = "+1234567890"
+    profileViewModel.memberSince = "24/04/2022"
     
-    return ProfileView(authViewModel: authViewModel)
+    return ProfileView(profileViewModel: profileViewModel)
 }

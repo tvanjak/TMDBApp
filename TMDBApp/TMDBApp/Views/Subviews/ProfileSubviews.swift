@@ -9,14 +9,14 @@ import SwiftUI
 
 // DETAILS SECTION ----------------------------------
 struct FirstNameInput: View {
-    @ObservedObject var authViewModel: AuthenticationViewModel
+    @ObservedObject var profileViewModel: ProfileViewModel
     
     var body: some View {
         Text("First name")
             .font(AppTheme.Typography.body)
             .foregroundStyle(.secondary)
             .fontWeight(.regular)
-        TextField("", text: $authViewModel.firstName)
+        TextField("", text: $profileViewModel.firstName)
             .font(AppTheme.Typography.subtitle)
             .frame(maxWidth: .infinity)
             .padding()
@@ -29,14 +29,14 @@ struct FirstNameInput: View {
 }
 
 struct LastNameInput: View {
-    @ObservedObject var authViewModel: AuthenticationViewModel
+    @ObservedObject var profileViewModel: ProfileViewModel
     
     var body: some View {
         Text("Last name")
             .font(AppTheme.Typography.body)
             .foregroundStyle(.secondary)
             .fontWeight(.regular)
-        TextField("", text: $authViewModel.lastName)
+        TextField("", text: $profileViewModel.lastName)
             .font(AppTheme.Typography.subtitle)
             .frame(maxWidth: .infinity)
             .padding()
@@ -49,20 +49,20 @@ struct LastNameInput: View {
 }
 
 struct MemberSince: View {
-    @ObservedObject var authViewModel: AuthenticationViewModel
+    @ObservedObject var profileViewModel: ProfileViewModel
     
     var body: some View {
         Text("Member since")
             .font(AppTheme.Typography.body)
             .foregroundStyle(.secondary)
             .fontWeight(.regular)
-        Text(authViewModel.memberSince)
+        Text(profileViewModel.memberSince)
             .font(AppTheme.Typography.subtitle)
     }
 }
 
 struct EmailInput: View {
-    @ObservedObject var authViewModel: AuthenticationViewModel
+    @ObservedObject var profileViewModel: ProfileViewModel
     @Binding var editMode: Bool
     
     var body: some View {
@@ -71,7 +71,7 @@ struct EmailInput: View {
             .foregroundStyle(.secondary)
             .fontWeight(.regular)
         if editMode {
-            TextField("", text: $authViewModel.profileEmail)
+            TextField("", text: $profileViewModel.profileEmail)
                 .font(AppTheme.Typography.subtitle)
                 .frame(maxWidth: .infinity)
                 .padding()
@@ -81,7 +81,7 @@ struct EmailInput: View {
                         .shadow(radius: AppTheme.Radius.small)
                 )
         } else {
-            Text(authViewModel.profileEmail)
+            Text(profileViewModel.profileEmail)
                 .font(AppTheme.Typography.subtitle)
                 .foregroundStyle(.black)
                 .padding()
@@ -97,7 +97,7 @@ struct EmailInput: View {
 }
 
 struct PhoneNumberInput: View {
-    @ObservedObject var authViewModel: AuthenticationViewModel
+    @ObservedObject var profileViewModel: ProfileViewModel
     @Binding var editMode: Bool
     @Binding var addPhoneNumber: Bool
 
@@ -107,7 +107,7 @@ struct PhoneNumberInput: View {
             .foregroundStyle(.secondary)
             .fontWeight(.regular)
         if editMode || addPhoneNumber {
-            TextField("", text: $authViewModel.phoneNumber)
+            TextField("", text: $profileViewModel.phoneNumber)
                 .font(AppTheme.Typography.subtitle)
                 .frame(maxWidth: .infinity)
                 .padding()
@@ -118,7 +118,7 @@ struct PhoneNumberInput: View {
                 )
         }
         else {
-            if authViewModel.phoneNumber == "" {
+            if profileViewModel.phoneNumber == "" {
                 Button(action: {addPhoneNumber = true}) {
                     Text("Add phone number")
                         .font(AppTheme.Typography.subtitle)
@@ -136,7 +136,7 @@ struct PhoneNumberInput: View {
                     .buttonStyle(.plain)
             }
             else {
-                Text(authViewModel.phoneNumber)
+                Text(profileViewModel.phoneNumber)
                     .font(AppTheme.Typography.subtitle)
                     .foregroundStyle(.black)
                     .padding()
@@ -155,7 +155,7 @@ struct PhoneNumberInput: View {
 
 // PASSWORD SECTION ----------------------------------
 struct CurrentPasswordInput: View {
-    @ObservedObject var authViewModel: AuthenticationViewModel
+    @ObservedObject var profileViewModel: ProfileViewModel
     
     var body: some View {
         VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
@@ -163,7 +163,7 @@ struct CurrentPasswordInput: View {
                 .font(AppTheme.Typography.body)
                 .foregroundStyle(.secondary)
                 .fontWeight(.regular)
-            SecureField("", text: $authViewModel.password)
+            SecureField("", text: $profileViewModel.currentPassword)
                 .font(AppTheme.Typography.subtitle)
                 .foregroundStyle(.black)
                 .padding()
@@ -179,7 +179,7 @@ struct CurrentPasswordInput: View {
 }
 
 struct NewPasswordInput: View {
-    @ObservedObject var authViewModel: AuthenticationViewModel
+    @ObservedObject var profileViewModel: ProfileViewModel
     
     var body: some View {
         VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
@@ -187,7 +187,7 @@ struct NewPasswordInput: View {
                 .font(AppTheme.Typography.body)
                 .foregroundStyle(.secondary)
                 .fontWeight(.regular)
-            SecureField("Enter new password", text: $authViewModel.newPassword)
+            SecureField("Enter new password", text: $profileViewModel.newPassword)
                 .font(AppTheme.Typography.subtitle)
                 .foregroundStyle(.secondary)
                 .padding()
@@ -204,7 +204,7 @@ struct NewPasswordInput: View {
 }
 
 struct ConfirmNewPasswordInput: View {
-    @ObservedObject var authViewModel: AuthenticationViewModel
+    @ObservedObject var profileViewModel: ProfileViewModel
     
     var body: some View {
         VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
@@ -212,7 +212,7 @@ struct ConfirmNewPasswordInput: View {
                 .font(AppTheme.Typography.body)
                 .foregroundStyle(.secondary)
                 .fontWeight(.regular)
-            SecureField("", text: $authViewModel.confirmNewPassword)
+            SecureField("", text: $profileViewModel.confirmNewPassword)
                 .font(AppTheme.Typography.subtitle)
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -228,7 +228,7 @@ struct ConfirmNewPasswordInput: View {
 
 // BUTTONS ----------------------------------
 struct UpdatePasswordButton: View {
-    @ObservedObject var authViewModel: AuthenticationViewModel
+    @ObservedObject var profileViewModel: ProfileViewModel
     @Binding var updateAlertMessage: String
     @Binding var showUpdateAlert: Bool
     @Binding var selectedSection: ProfileView.ProfileSections
@@ -236,8 +236,8 @@ struct UpdatePasswordButton: View {
     var body: some View {
         Button(action: {
             Task {
-                await authViewModel.updateUserPassword()
-                if let error = authViewModel.errorMessage {
+                await profileViewModel.updateUserPassword()
+                if let error = profileViewModel.errorMessage {
                     updateAlertMessage = error
                     showUpdateAlert = true
                 } else {
@@ -261,7 +261,7 @@ struct UpdatePasswordButton: View {
 
 
 struct SaveUserDataButton: View {
-    @ObservedObject var authViewModel: AuthenticationViewModel
+    @ObservedObject var profileViewModel: ProfileViewModel
     @Binding var editMode: Bool
     @Binding var saveAlertMessage: String
     @Binding var showSaveAlert: Bool
@@ -269,8 +269,8 @@ struct SaveUserDataButton: View {
     var body: some View {
         Button(action: {
             Task {
-                await authViewModel.updateUserProfileData()
-                if let error = authViewModel.errorMessage {
+                await profileViewModel.updateUserProfileData()
+                if let error = profileViewModel.errorMessage {
                     saveAlertMessage = error
                     showSaveAlert = true
                 } else {

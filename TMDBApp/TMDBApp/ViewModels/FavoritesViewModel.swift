@@ -6,8 +6,6 @@
 //
 
 import SwiftUI
-import Combine
-
 
 @MainActor
 final class FavoritesViewModel: ObservableObject {

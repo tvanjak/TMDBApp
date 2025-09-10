@@ -11,6 +11,7 @@ import SwiftUI
 final class MediaViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var mediaDetail: (any MediaItemDetails)?
+    @Published var favorites: [MediaItem] = []
     
     private let favoritesManager: FavoritesManager
     
@@ -18,6 +19,10 @@ final class MediaViewModel: ObservableObject {
         favoritesManager: FavoritesManager,
     ) {
         self.favoritesManager = favoritesManager
+        
+        // Observe FavoritesManager changes
+        favoritesManager.$favorites
+            .assign(to: &$favorites)
     }
     
     // FAVORITES FUNCTIONS -------------------------------

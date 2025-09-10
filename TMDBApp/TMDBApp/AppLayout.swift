@@ -14,6 +14,7 @@ struct AppLayout: View {
     @StateObject private var mediaViewModel = Container.shared.mediaViewModel()
     @StateObject private var authViewModel = Container.shared.authViewModel()
     @StateObject private var favoritesViewModel = Container.shared.favoritesViewModel()
+    @StateObject private var profileViewModel = Container.shared.profileViewModel()
 
     var body: some View {
         if authViewModel.currentUser != nil {
@@ -32,7 +33,7 @@ struct AppLayout: View {
                                     .navigationBarBackButtonHidden(true)
                                     .toolbar(.hidden, for: .navigationBar)
                             case .profile:
-                                ProfileView(authViewModel: authViewModel)
+                                ProfileView(profileViewModel: profileViewModel)
                                     .navigationBarBackButtonHidden(true)
                                     .toolbar(.hidden, for: .navigationBar)
                             case .mediaDetail(let media):
