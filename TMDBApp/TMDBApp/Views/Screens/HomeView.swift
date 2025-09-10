@@ -9,8 +9,7 @@ import SwiftUI
 
 
 struct HomeView: View {
-    @ObservedObject var mediaViewModel: MediaViewModel
-    
+    @ObservedObject var homeViewModel: HomeViewModel
 
     @State private var searchTerm = ""
         
@@ -32,52 +31,52 @@ struct HomeView: View {
     var currentMovies: [MediaItem] {
         switch selectedMovieSection {
         case .popular: 
-            if mediaViewModel.popularMovies.isEmpty {
+            if homeViewModel.popularMovies.isEmpty {
                 Task { @MainActor in
-                    await mediaViewModel.loadPopularMovies()
+                    await homeViewModel.loadPopularMovies()
                 }
             }
-            return mediaViewModel.popularMovies
+            return homeViewModel.popularMovies
         case .trending:
-            if mediaViewModel.trendingMovies.isEmpty {
+            if homeViewModel.trendingMovies.isEmpty {
                 Task { @MainActor in
-                    await mediaViewModel.loadTrendingMovies()
+                    await homeViewModel.loadTrendingMovies()
                 }
             }
-            return mediaViewModel.trendingMovies
+            return homeViewModel.trendingMovies
         case .upcoming:
-            if mediaViewModel.upcomingMovies.isEmpty {
+            if homeViewModel.upcomingMovies.isEmpty {
                 Task { @MainActor in
-                    await mediaViewModel.loadUpcomingMovies()
+                    await homeViewModel.loadUpcomingMovies()
                 }
             }
-            return mediaViewModel.upcomingMovies
+            return homeViewModel.upcomingMovies
         case .nowPlaying:
-            if mediaViewModel.nowPlayingMovies.isEmpty {
+            if homeViewModel.nowPlayingMovies.isEmpty {
                 Task { @MainActor in
-                    await mediaViewModel.loadNowPlayingMovies()
+                    await homeViewModel.loadNowPlayingMovies()
                 }
             }
-            return mediaViewModel.nowPlayingMovies
+            return homeViewModel.nowPlayingMovies
         }
     }
 
     var currentTVShows: [MediaItem] {
         switch selectedTVShowSection {
         case .popular:
-            if mediaViewModel.popularTVShows.isEmpty {
+            if homeViewModel.popularTVShows.isEmpty {
                 Task { @MainActor in
-                    await mediaViewModel.loadPopularTVShows()
+                    await homeViewModel.loadPopularTVShows()
                 }
             }
-            return mediaViewModel.popularTVShows
+            return homeViewModel.popularTVShows
         case .topRated:
-            if mediaViewModel.topRatedTVShows.isEmpty {
+            if homeViewModel.topRatedTVShows.isEmpty {
                 Task { @MainActor in
-                    await mediaViewModel.loadTopRatedTVShows()
+                    await homeViewModel.loadTopRatedTVShows()
                 }
             }
-            return mediaViewModel.topRatedTVShows
+            return homeViewModel.topRatedTVShows
         }
     }
     
@@ -97,18 +96,18 @@ struct HomeView: View {
                 .cornerRadius(AppTheme.Radius.small)
                 .padding(.top)
                 
-                MoviesList(mediaViewModel: mediaViewModel, selectedMovieSection: $selectedMovieSection, currentMovies: currentMovies)
+                MoviesList(homeViewModel: homeViewModel, selectedMovieSection: $selectedMovieSection, currentMovies: currentMovies)
                 
-                TVShowsList(mediaViewModel: mediaViewModel, selectedTVShowSection: $selectedTVShowSection, currentTVShows: currentTVShows)
+                TVShowsList(homeViewModel: homeViewModel, selectedTVShowSection: $selectedTVShowSection, currentTVShows: currentTVShows)
 
             }
             .onAppear {
                 Task {
-                    if mediaViewModel.popularMovies.isEmpty {
-                        await mediaViewModel.loadPopularMovies()
+                    if homeViewModel.popularMovies.isEmpty {
+                        await homeViewModel.loadPopularMovies()
                     }
-                    if mediaViewModel.popularTVShows.isEmpty {
-                        await mediaViewModel.loadTrendingMovies()
+                    if homeViewModel.popularTVShows.isEmpty {
+                        await homeViewModel.loadTrendingMovies()
                     }
                 }
             }
@@ -118,7 +117,7 @@ struct HomeView: View {
 
 
 #Preview {
-    HomeView(mediaViewModel: MediaViewModel(
+    HomeView(homeViewModel: HomeViewModel(
         favoritesManager: FavoritesManager(favoritesRepo: FavoritesRepository(), sessionRepo: SessionRepository()),
         navigationService: Router()
     ))

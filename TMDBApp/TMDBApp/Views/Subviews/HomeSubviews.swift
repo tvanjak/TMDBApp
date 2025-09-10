@@ -10,7 +10,7 @@ import SwiftUI
 
 struct MediaItemCard: View {
     let mediaItem: MediaItem
-    @ObservedObject var mediaViewModel: MediaViewModel
+    @ObservedObject var homeViewModel: HomeViewModel
     
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -40,10 +40,10 @@ struct MediaItemCard: View {
             
             
             Button(action: {
-                mediaViewModel.toggleFavorite(mediaItem)
+                homeViewModel.toggleFavorite(mediaItem)
             }) {
-                Image(systemName: mediaViewModel.getFavoriteIcon(mediaItem))
-                    .foregroundColor(mediaViewModel.getFavoriteColor(mediaItem))
+                Image(systemName: homeViewModel.getFavoriteIcon(mediaItem))
+                    .foregroundColor(homeViewModel.getFavoriteColor(mediaItem))
                     .padding(AppTheme.Spacing.small)
                     .background(Color.black.opacity(0.5))
                     .clipShape(Circle())
@@ -55,7 +55,7 @@ struct MediaItemCard: View {
 
 
 struct MoviesList: View {
-    @ObservedObject var mediaViewModel: MediaViewModel
+    @ObservedObject var homeViewModel: HomeViewModel
     @Binding var selectedMovieSection: HomeView.MovieSections
     var currentMovies: [MediaItem]
     
@@ -77,8 +77,8 @@ struct MoviesList: View {
             ScrollView (.horizontal) {
                 LazyHStack {
                     ForEach(currentMovies) { movie in
-                        Button(action: { mediaViewModel.navigateToMedia(MediaType.movie(id: movie.id)) }) {
-                            MediaItemCard(mediaItem: movie, mediaViewModel: mediaViewModel)
+                        Button(action: { homeViewModel.navigateToMedia(MediaType.movie(id: movie.id)) }) {
+                            MediaItemCard(mediaItem: movie, homeViewModel: homeViewModel)
                         }
                     }
                 }
@@ -90,7 +90,7 @@ struct MoviesList: View {
 
 
 struct TVShowsList: View {
-    @ObservedObject var mediaViewModel: MediaViewModel
+    @ObservedObject var homeViewModel: HomeViewModel
     @Binding var selectedTVShowSection: HomeView.TVShowSections
     var currentTVShows: [MediaItem]
     
@@ -110,8 +110,8 @@ struct TVShowsList: View {
             ScrollView (.horizontal) {
                 LazyHStack {
                     ForEach(currentTVShows) { tvShow in
-                        Button(action: { mediaViewModel.navigateToMedia(MediaType.tvShow(id: tvShow.id)) }) {
-                            MediaItemCard(mediaItem: tvShow, mediaViewModel: mediaViewModel)
+                        Button(action: { homeViewModel.navigateToMedia(MediaType.tvShow(id: tvShow.id)) }) {
+                            MediaItemCard(mediaItem: tvShow, homeViewModel: homeViewModel)
                         }
                     }
                 }

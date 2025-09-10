@@ -1,34 +1,23 @@
+//
+//  MediaDetailsViewModel.swift
+//  TMDBApp
+//
+//  Created by Toni Vanjak on 10.09.2025..
+//
 
 import SwiftUI
-import Combine
 
 @MainActor
 final class MediaViewModel: ObservableObject {
-    @Published var popularMovies: [MediaItem] = []
-    @Published var trendingMovies: [MediaItem] = []
-    @Published var upcomingMovies: [MediaItem] = []
-    @Published var nowPlayingMovies: [MediaItem] = []
-    
-    @Published var popularTVShows: [MediaItem] = []
-    @Published var topRatedTVShows: [MediaItem] = []
-    
     @Published var errorMessage: String?
     @Published var mediaDetail: (any MediaItemDetails)?
-    @Published var favorites: [MediaItem] = []
     
     private let favoritesManager: FavoritesManager
-    private let navigationService: NavigationServiceProtocol
     
     init(
         favoritesManager: FavoritesManager,
-        navigationService: NavigationServiceProtocol
     ) {
         self.favoritesManager = favoritesManager
-        self.navigationService = navigationService
-        
-        // Observe FavoritesManager changes
-        favoritesManager.$favorites
-            .assign(to: &$favorites)
     }
     
     // FAVORITES FUNCTIONS -------------------------------
@@ -50,48 +39,7 @@ final class MediaViewModel: ObservableObject {
     // ------------------------------------------------------------
 
     
-    // MOVIE LOADING FUNCTIONS -------------------------------
-    func loadPopularMovies() async {
-        do {
-            popularMovies = try await TMDBService.shared.fetchPopularMovies()
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
-    
-    func loadTrendingMovies() async {
-        do {
-            trendingMovies = try await TMDBService.shared.fetchTrendingMovies()
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
-    
-    func loadUpcomingMovies() async {
-        do {
-            upcomingMovies = try await TMDBService.shared.fetchUpcomingMovies()
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
-    
-    func loadNowPlayingMovies() async {
-        do {
-            nowPlayingMovies = try await TMDBService.shared.fetchNowPlayingMovies()
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
-    
-//    func loadMovieDetails(media: MediaItem) async {
-//        do {
-//            mediaDetail = nil
-//            mediaDetail = try await TMDBService.shared.fetchDetails(media: media)
-//        } catch {
-//            errorMessage = error.localizedDescription
-//        }
-//    }
-    
+    // MOVIE DETAILS
     func loadDetails(media: MediaType) async {
         do {
             switch media {
@@ -105,40 +53,6 @@ final class MediaViewModel: ObservableObject {
             }
         } catch {
             self.errorMessage = error.localizedDescription
-        }
-    }
-    // ------------------------------------------------------------
-
-    
-    // ROUTER FUNCTIONS
-    func navigateToMedia(_ media: MediaType) {
-        navigationService.navigateToMedia(media)
-    }
-    
-    func goBack() {
-        navigationService.goBack()
-    }
-    
-    func canGoBack() -> Bool {
-        return navigationService.canGoBack()
-    }
-    // ------------------------------------------------------------
-    
-    
-    // TVShow FUNCTIONS
-    func loadPopularTVShows() async {
-        do {
-            popularTVShows = try await TMDBService.shared.fetchPopularTVShows()
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
-    
-    func loadTopRatedTVShows() async {
-        do {
-            topRatedTVShows = try await TMDBService.shared.fetchTopRatedTVShows()
-        } catch {
-            errorMessage = error.localizedDescription
         }
     }
     // ------------------------------------------------------------

@@ -38,11 +38,20 @@ extension Container {
     }
     
     // ViewModels
+    var homeViewModel: Factory<HomeViewModel> {
+        self { @MainActor in
+            HomeViewModel(
+                favoritesManager: self.favoritesManager(),
+                navigationService: self.router()
+            )
+        }
+        .singleton
+    }
+    
     var mediaViewModel: Factory<MediaViewModel> {
         self { @MainActor in
             MediaViewModel(
                 favoritesManager: self.favoritesManager(),
-                navigationService: self.router()
             )
         }
         .singleton

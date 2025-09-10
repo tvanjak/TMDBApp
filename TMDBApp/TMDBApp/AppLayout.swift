@@ -10,6 +10,7 @@ import Factory
 
 struct AppLayout: View {
     @StateObject private var router = Container.shared.router()
+    @StateObject private var homeViewModel = Container.shared.homeViewModel()
     @StateObject private var mediaViewModel = Container.shared.mediaViewModel()
     @StateObject private var authViewModel = Container.shared.authViewModel()
     @StateObject private var favoritesViewModel = Container.shared.favoritesViewModel()
@@ -19,11 +20,11 @@ struct AppLayout: View {
             VStack(spacing: 0) {
                 HeaderView(canGoBack: router.canGoBack(), onBack: { router.goBack() })
                 NavigationStack(path: $router.path) {
-                    HomeView(mediaViewModel: mediaViewModel)
+                    HomeView(homeViewModel: homeViewModel)
                         .navigationDestination(for: Route.self) { route in
                             switch route {
                             case .home:
-                                HomeView(mediaViewModel: mediaViewModel)
+                                HomeView(homeViewModel: homeViewModel)
                                     .navigationBarBackButtonHidden(true)
                                     .toolbar(.hidden, for: .navigationBar)
                             case .favorites:
@@ -35,7 +36,7 @@ struct AppLayout: View {
                                     .navigationBarBackButtonHidden(true)
                                     .toolbar(.hidden, for: .navigationBar)
                             case .mediaDetail(let media):
-                                MediaDetailsView(media: media, mediaViewModel: mediaViewModel)
+                                MediaView(media: media, mediaViewModel: mediaViewModel)
                                     .navigationBarBackButtonHidden(true)
                                     .toolbar(.hidden, for: .navigationBar)
                             }

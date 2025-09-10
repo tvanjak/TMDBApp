@@ -125,7 +125,7 @@ struct CastView: View {
 }
 
 
-struct MediaDetailsView: View {
+struct MediaView: View {
     let media: MediaType
     @ObservedObject var mediaViewModel: MediaViewModel
 
@@ -177,8 +177,7 @@ struct MediaDetailsView: View {
 }
 
 #Preview {
-    MediaDetailsView(media: MediaType.movie(id: 6), mediaViewModel: MediaViewModel(
+    MediaView(media: MediaType.movie(id: 6), mediaViewModel: MediaViewModel(
             favoritesManager: FavoritesManager(favoritesRepo: FavoritesRepository(), sessionRepo: SessionRepository()),
-            navigationService: Router(),
         ))
 }
