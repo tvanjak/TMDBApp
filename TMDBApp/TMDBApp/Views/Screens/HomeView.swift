@@ -10,8 +10,7 @@ import SwiftUI
 
 struct HomeView: View {
     @ObservedObject var homeViewModel: HomeViewModel
-
-    @State private var searchTerm = ""
+    @FocusState var searchFocused: Bool
     
     var body: some View {
         ScrollView {
@@ -20,8 +19,24 @@ struct HomeView: View {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.black)
                     
-                    TextField("Search", text: $searchTerm)
+                    TextField("Search", text: $homeViewModel.searchTerm)
                         .textFieldStyle(PlainTextFieldStyle())
+                        .focused($searchFocused)
+                        .onSubmit {
+                            Task { await homeViewModel.search() }
+                        }
+                    
+                    if searchFocused {
+                        Button {
+                            homeViewModel.searchTerm = ""
+                            homeViewModel.searchedMovies = []
+                            homeViewModel.searchedTVShows = []
+                            searchFocused = false
+                        } label: {
+                            Image(systemName: "xmark")
+                                .foregroundColor(.black)
+                        }
+                    }
                 }
                 .padding(AppTheme.Spacing.small)
                 .frame(width: 360, height: 40)
@@ -29,10 +44,16 @@ struct HomeView: View {
                 .cornerRadius(AppTheme.Radius.small)
                 .padding(.top)
                 
-                MoviesList(homeViewModel: homeViewModel)
+                if searchFocused && homeViewModel.searchedMovies.isEmpty {
+                    EmptyView()
+                } else if !homeViewModel.searchedMovies.isEmpty {
+                    SearchMoviesList(homeViewModel: homeViewModel)
+//                    SearchTVShowsList(homeViewModel: homeViewModel)
+                } else {
+                    MoviesList(homeViewModel: homeViewModel)
+                    TVShowsList(homeViewModel: homeViewModel)
+                }
                 
-                TVShowsList(homeViewModel: homeViewModel)
-
             }
             .onAppear {
                 // Data loading is now handled in ViewModel initialization

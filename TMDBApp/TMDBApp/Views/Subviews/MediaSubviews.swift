@@ -88,7 +88,7 @@ struct PosterText: View {
 
 struct PosterButtons: View {
     @ObservedObject var mediaViewModel: MediaViewModel
-    var movie: MediaItem {
+    var media: MediaItem {
         MediaItem(
             id: mediaViewModel.mediaDetail!.id,
             posterPath: mediaViewModel.mediaDetail!.posterPath,
@@ -98,10 +98,10 @@ struct PosterButtons: View {
     var body: some View {
         HStack {
             Button(action: {
-                mediaViewModel.toggleFavorite(movie)
+                mediaViewModel.toggleFavorite(media)
             }) {
-                Image(systemName: mediaViewModel.getFavoriteIcon(movie))
-                    .foregroundColor(mediaViewModel.getFavoriteColor(movie))
+                Image(systemName: mediaViewModel.getFavoriteIcon(media))
+                    .foregroundColor(mediaViewModel.getFavoriteColor(media))
                     .padding(AppTheme.Spacing.small)
                     .background(Color.black.opacity(0.5))
                     .clipShape(Circle())

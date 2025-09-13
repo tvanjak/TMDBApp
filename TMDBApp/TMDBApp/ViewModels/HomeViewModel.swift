@@ -10,6 +10,11 @@ final class HomeViewModel: ObservableObject {
     
     @Published var popularTVShows: [MediaItem] = []
     @Published var topRatedTVShows: [MediaItem] = []
+
+    @Published var searchedMovies: [MediaItem] = []
+    @Published var searchedTVShows: [MediaItem] = []
+
+    @Published var searchTerm = ""
     
     enum MovieSections: CaseIterable, Hashable {
         case popular
@@ -219,4 +224,13 @@ final class HomeViewModel: ObservableObject {
     }
     // ------------------------------------------------------------
 
+    // SEARCH FUNCTION
+    func search() async {
+        do {
+            searchedMovies = try await TMDBService.shared.fetchSearchedMovies(query: searchTerm)
+            searchedTVShows = try await TMDBService.shared.fetchSearchedTVShows(query: searchTerm)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
 }
