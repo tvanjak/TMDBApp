@@ -46,9 +46,9 @@ struct HomeView: View {
                 
                 if searchFocused && homeViewModel.searchedMovies.isEmpty {
                     EmptyView()
-                } else if !homeViewModel.searchedMovies.isEmpty {
+                } else if !homeViewModel.searchedMovies.isEmpty || !homeViewModel.searchedTVShows.isEmpty {
                     SearchMoviesList(homeViewModel: homeViewModel)
-//                    SearchTVShowsList(homeViewModel: homeViewModel)
+                    SearchTVShowsList(homeViewModel: homeViewModel)
                 } else {
                     MoviesList(homeViewModel: homeViewModel)
                     TVShowsList(homeViewModel: homeViewModel)

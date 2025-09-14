@@ -102,19 +102,21 @@ struct CastView: View {
     var cast: [CastMember]
     
     var body: some View {
-        VStack (alignment: .leading) {
-            Text("Top Billed Cast")
-                .font(.title)
-                .fontWeight(.bold)
-            ScrollView (.horizontal, showsIndicators: false) {
-                LazyHStack (spacing: AppTheme.Spacing.medium) {
-                    ForEach(cast) {castMember in
-                        CastMemberCard(castMember: castMember)
+        if !cast.isEmpty {
+            VStack (alignment: .leading) {
+                Text("Top Billed Cast")
+                    .font(.title)
+                    .fontWeight(.bold)
+                ScrollView (.horizontal, showsIndicators: false) {
+                    LazyHStack (spacing: AppTheme.Spacing.medium) {
+                        ForEach(cast) {castMember in
+                            CastMemberCard(castMember: castMember)
+                        }
                     }
                 }
             }
+            .padding(.horizontal)
         }
-        .padding(.horizontal)
     }
 }
 
