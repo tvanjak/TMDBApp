@@ -51,11 +51,20 @@ struct RememberMe: View {
 
 struct SignInButton: View {
     @ObservedObject var authViewModel: AuthenticationViewModel
+    @Binding var alertMessage: String
+    @Binding var showAlert: Bool
     
     var body: some View {
         Button {
             Task {
                 await authViewModel.signIn()
+                if let error = authViewModel.errorMessage {
+                    alertMessage = error
+                    showAlert = true
+                } else {
+                    alertMessage = "Signed in succsesfully!"
+                    showAlert = true
+                }
             }
         } label: {
             Text("Sign in")
@@ -70,6 +79,7 @@ struct SignInButton: View {
         .padding(.horizontal, AppTheme.Spacing.large)
     }
 }
+
 
 struct SignUpLink: View {
     @ObservedObject var authViewModel: AuthenticationViewModel

@@ -26,12 +26,33 @@ final class ProfileViewModel: ObservableObject {
     @Published var errorMessage: String?
     
     private let sessionRepo: SessionRepositoryProtocol
+    private var authStateHandle: AuthStateDidChangeListenerHandle?
     
     init(sessionRepo: SessionRepositoryProtocol) {
         self.sessionRepo = sessionRepo
-
+        // Initial fetch if already signed in
         if let uid = sessionRepo.currentUserId {
             fetchUserProfile(uid: uid)
+        }
+        // Listen for auth changes to fetch after sign-in
+        authStateHandle = Auth.auth().addStateDidChangeListener { [weak self] _, user in
+            guard let self = self else { return }
+            if let user = user {
+                self.fetchUserProfile(uid: user.uid)
+            } else {
+                // Clear fields on sign-out
+                self.firstName = ""
+                self.lastName = ""
+                self.phoneNumber = ""
+                self.profileEmail = ""
+                self.memberSince = ""
+            }
+        }
+    }
+    
+    deinit {
+        if let handle = authStateHandle {
+            Auth.auth().removeStateDidChangeListener(handle)
         }
     }
     
@@ -84,56 +105,76 @@ final class ProfileViewModel: ObservableObject {
     // UPDATE USER PASSWORD
     func updateUserPassword() async {
         errorMessage = nil
+        print("[Profile] updateUserPassword() called newLen=\(newPassword.count) confirmLen=\(confirmNewPassword.count) currentLen=\(currentPassword.count)")
         
         guard let user = Auth.auth().currentUser else {
             errorMessage = "No authenticated user found."
+            print("[Profile][Error] No currentUser")
+            return
+        }
+        
+        guard !currentPassword.isEmpty else {
+            errorMessage = "Enter your current password to re-authenticate."
+            print("[Profile][Error] currentPassword empty")
             return
         }
         
         if newPassword != confirmNewPassword {
             errorMessage = "New passwords do not match."
+            print("[Profile][Error] new!=confirm")
             return
         }
         
         if newPassword.count < 6 {
             errorMessage = "Password should be at least 6 characters."
+            print("[Profile][Error] new too short")
             return
         }
         
+        // Ensure we have freshest auth state and reauthenticate first
         do {
-            // Re-authenticate using current password
+            try await user.reload()
             guard let email = user.email else {
                 errorMessage = "User email not found for re-authentication."
+                print("[Profile][Error] user.email nil")
                 return
             }
-            
+            print("[Profile] Reauth with email=\(email), currentLen=\(currentPassword.count)")
             let credential = EmailAuthProvider.credential(withEmail: email, password: currentPassword)
             try await user.reauthenticate(with: credential)
-            print("User re-authenticated successfully.")
-            
-            // Update password
+            print("[Profile] Re-authenticated ok")
+        } catch let error as NSError {
+            let code = AuthErrorCode(rawValue: error.code)
+            print("[Profile][Error] reauthenticate failed code=\(code?.rawValue ?? error.code) (\(String(describing: code))) message=\(error.localizedDescription)")
+            switch code {
+            case .wrongPassword, .invalidCredential:
+                errorMessage = "Incorrect credentials."
+            case .requiresRecentLogin:
+                errorMessage = "Please sign in again to update your password."
+            case .tooManyRequests:
+                errorMessage = "Too many attempts. Please try again later."
+            default:
+                errorMessage = "Re-authentication failed: \(error.localizedDescription)"
+            }
+            return
+        }
+
+        // Then attempt to update the password
+        do {
             try await user.updatePassword(to: newPassword)
-            print("Password updated successfully for \(user.email ?? "user").")
-            
-            // Clear sensitive fields
+            print("[Profile] Password updated ok for \(user.email ?? "user")")
             self.currentPassword = ""
             self.newPassword = ""
             self.confirmNewPassword = ""
-            
         } catch let error as NSError {
-            print("Error updating password: \(error.localizedDescription)")
-            if let errorCode = AuthErrorCode(rawValue: error.code) {
-                switch errorCode {
-                case .requiresRecentLogin:
-                    errorMessage = "Please sign in again to update your password."
-                case .wrongPassword:
-                    errorMessage = "The current password you entered is incorrect."
-                case .weakPassword:
-                    errorMessage = "The new password is too weak. Please choose a stronger one."
-                default:
-                    errorMessage = "Failed to update password: \(error.localizedDescription)"
-                }
-            } else {
+            let code = AuthErrorCode(rawValue: error.code)
+            print("[Profile][Error] updatePassword failed code=\(code?.rawValue ?? error.code) (\(String(describing: code))) message=\(error.localizedDescription)")
+            switch code {
+            case .weakPassword:
+                errorMessage = "The new password is too weak. Please choose a stronger one."
+            case .requiresRecentLogin:
+                errorMessage = "Please sign in again to update your password."
+            default:
                 errorMessage = "Failed to update password: \(error.localizedDescription)"
             }
         }

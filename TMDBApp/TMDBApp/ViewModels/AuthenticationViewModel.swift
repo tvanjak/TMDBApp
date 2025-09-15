@@ -77,12 +77,35 @@ final class AuthenticationViewModel: ObservableObject {
     
     func signIn() async {
         errorMessage = nil
+        let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        let passwordLength = password.count
+        print("[Auth] signIn() called with email=\(trimmedEmail), passwordLength=\(passwordLength)")
+        guard !trimmedEmail.isEmpty, !password.isEmpty else {
+            errorMessage = "Email and password are required."
+            print("[Auth][Error] Missing credentials: emailEmpty=\(trimmedEmail.isEmpty), passwordEmpty=\(password.isEmpty)")
+            return
+        }
         do {
-            let result = try await Auth.auth().signIn(withEmail: email, password: password)
-            print("User signed in: \(result.user.email ?? "N/A")")
+            let result = try await Auth.auth().signIn(withEmail: trimmedEmail, password: password)
+            print("[Auth] User signed in: \(result.user.email ?? "N/A") (uid=\(result.user.uid))")
         } catch {
-            print("Error signing in: \(error.localizedDescription)")
-            self.errorMessage = "Sign-in failed: \(error.localizedDescription)"
+            let ns = error as NSError
+            let code = AuthErrorCode(rawValue: ns.code)
+            print("[Auth][Error] signIn failed code=\(code?.rawValue ?? ns.code) (\(String(describing: code))) message=\(ns.localizedDescription)")
+            switch code {
+            case .wrongPassword, .invalidCredential:
+                errorMessage = "Incorrect credentials."
+            case .userDisabled:
+                errorMessage = "This account has been disabled."
+            case .userNotFound:
+                errorMessage = "No user found for this email."
+            case .tooManyRequests:
+                errorMessage = "Too many attempts. Please try again later."
+            case .invalidEmail:
+                errorMessage = "Invalid email format."
+            default:
+                errorMessage = "Sign-in failed: \(ns.localizedDescription)"
+            }
         }
     }
     

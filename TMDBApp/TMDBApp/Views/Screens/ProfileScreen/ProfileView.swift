@@ -71,8 +71,8 @@ struct DetailsSection: View {
         VStack (spacing: AppTheme.Spacing.large){
             if editMode {
                 VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
-                    FirstNameInput(profileViewModel: profileViewModel)
-                    LastNameInput(profileViewModel: profileViewModel)
+                    ProfileTextField(subtitle: "First Name", input: $profileViewModel.firstName)
+                    ProfileTextField(subtitle: "Last Name", input: $profileViewModel.lastName)
                 }
             }
             
@@ -83,15 +83,28 @@ struct DetailsSection: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             
-            
             VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
-                EmailInput(profileViewModel: profileViewModel, editMode: $editMode)
+                if editMode {
+                    ProfileTextField(subtitle: "Email address", input: $profileViewModel.profileEmail)
+                } else {
+                    ProfileText(subtitle: "Email address", text: profileViewModel.profileEmail)
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             
             
             VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
-                PhoneNumberInput(profileViewModel: profileViewModel, editMode: $editMode, addPhoneNumber: $addPhoneNumber)
+                if editMode || addPhoneNumber {
+                    ProfileTextField(subtitle: "Phone number", input: $profileViewModel.phoneNumber)
+                }
+                else {
+                    if profileViewModel.phoneNumber == "" {
+                        AddPhoneNumberButton(addPhoneNumber: $addPhoneNumber)
+                    }
+                    else {
+                        ProfileText(subtitle: "Phone number", text: profileViewModel.phoneNumber)
+                    }
+                }
             }
             
             Spacer()

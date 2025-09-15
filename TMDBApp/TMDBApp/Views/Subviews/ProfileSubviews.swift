@@ -7,16 +7,16 @@
 
 import SwiftUI
 
-// DETAILS SECTION ----------------------------------
-struct FirstNameInput: View {
-    @ObservedObject var profileViewModel: ProfileViewModel
+struct ProfileTextField: View {
+    var subtitle: String
+    @Binding var input: String
     
     var body: some View {
-        Text("First name")
+        Text(subtitle)
             .font(AppTheme.Typography.body)
             .foregroundStyle(.secondary)
             .fontWeight(.regular)
-        TextField("", text: $profileViewModel.firstName)
+        TextField("", text: $input)
             .font(AppTheme.Typography.subtitle)
             .frame(maxWidth: .infinity)
             .padding()
@@ -28,25 +28,55 @@ struct FirstNameInput: View {
     }
 }
 
-struct LastNameInput: View {
-    @ObservedObject var profileViewModel: ProfileViewModel
+struct ProfileText: View {
+    var subtitle: String
+    var text: String
     
     var body: some View {
-        Text("Last name")
+        Text(subtitle)
             .font(AppTheme.Typography.body)
             .foregroundStyle(.secondary)
             .fontWeight(.regular)
-        TextField("", text: $profileViewModel.lastName)
+        Text(text)
             .font(AppTheme.Typography.subtitle)
-            .frame(maxWidth: .infinity)
+            .foregroundStyle(.black)
             .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(.white)
             .overlay(
                 RoundedRectangle(cornerRadius: AppTheme.Radius.small)
-                    .stroke(AppTheme.Colors.lightBlue, lineWidth: 2)
+                    .stroke(Color.gray.opacity(0.2), lineWidth: 2)
                     .shadow(radius: AppTheme.Radius.small)
             )
     }
 }
+
+struct AddPhoneNumberButton: View {
+    @Binding var addPhoneNumber: Bool
+    
+    var body: some View {
+        Text("Phone number")
+            .font(AppTheme.Typography.body)
+            .foregroundStyle(.secondary)
+            .fontWeight(.regular)
+        Button(action: {addPhoneNumber = true}) {
+            Text("Add phone number")
+                .font(AppTheme.Typography.subtitle)
+                .foregroundStyle(.secondary)
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(.gray.opacity(0.2))
+                .cornerRadius(AppTheme.Radius.small)
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppTheme.Radius.small)
+                        .stroke(Color.gray.opacity(0.2), lineWidth: 2)
+                        .shadow(radius: AppTheme.Radius.small)
+                )
+        } .frame(maxWidth: .infinity, alignment: .leading)
+            .buttonStyle(.plain)
+    }
+}
+
 
 struct MemberSince: View {
     @ObservedObject var profileViewModel: ProfileViewModel
@@ -61,96 +91,6 @@ struct MemberSince: View {
     }
 }
 
-struct EmailInput: View {
-    @ObservedObject var profileViewModel: ProfileViewModel
-    @Binding var editMode: Bool
-    
-    var body: some View {
-        Text("Email address")
-            .font(AppTheme.Typography.body)
-            .foregroundStyle(.secondary)
-            .fontWeight(.regular)
-        if editMode {
-            TextField("", text: $profileViewModel.profileEmail)
-                .font(AppTheme.Typography.subtitle)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppTheme.Radius.small)
-                        .stroke(AppTheme.Colors.lightBlue, lineWidth: 2)
-                        .shadow(radius: AppTheme.Radius.small)
-                )
-        } else {
-            Text(profileViewModel.profileEmail)
-                .font(AppTheme.Typography.subtitle)
-                .foregroundStyle(.black)
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(.white)
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppTheme.Radius.small)
-                        .stroke(Color.gray.opacity(0.2), lineWidth: 2)
-                        .shadow(radius: AppTheme.Radius.small)
-                )
-        }
-    }
-}
-
-struct PhoneNumberInput: View {
-    @ObservedObject var profileViewModel: ProfileViewModel
-    @Binding var editMode: Bool
-    @Binding var addPhoneNumber: Bool
-
-    var body: some View {
-        Text("Phone number")
-            .font(AppTheme.Typography.body)
-            .foregroundStyle(.secondary)
-            .fontWeight(.regular)
-        if editMode || addPhoneNumber {
-            TextField("", text: $profileViewModel.phoneNumber)
-                .font(AppTheme.Typography.subtitle)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppTheme.Radius.small)
-                        .stroke(AppTheme.Colors.lightBlue, lineWidth: 2)
-                        .shadow(radius: AppTheme.Radius.small)
-                )
-        }
-        else {
-            if profileViewModel.phoneNumber == "" {
-                Button(action: {addPhoneNumber = true}) {
-                    Text("Add phone number")
-                        .font(AppTheme.Typography.subtitle)
-                        .foregroundStyle(.secondary)
-                        .padding()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(.gray.opacity(0.2))
-                        .cornerRadius(AppTheme.Radius.small)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: AppTheme.Radius.small)
-                                .stroke(Color.gray.opacity(0.2), lineWidth: 2)
-                                .shadow(radius: AppTheme.Radius.small)
-                        )
-                } .frame(maxWidth: .infinity, alignment: .leading)
-                    .buttonStyle(.plain)
-            }
-            else {
-                Text(profileViewModel.phoneNumber)
-                    .font(AppTheme.Typography.subtitle)
-                    .foregroundStyle(.black)
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(.white)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: AppTheme.Radius.small)
-                            .stroke(Color.gray.opacity(0.2), lineWidth: 2)
-                            .shadow(radius: AppTheme.Radius.small)
-                    )
-            }
-        }
-    }
-}
 
 
 // PASSWORD SECTION ----------------------------------
@@ -214,8 +154,10 @@ struct ConfirmNewPasswordInput: View {
                 .fontWeight(.regular)
             SecureField("", text: $profileViewModel.confirmNewPassword)
                 .font(AppTheme.Typography.subtitle)
+                .foregroundStyle(.black) // unnecessary
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .background(.white) // unnecessary
                 .overlay(
                     RoundedRectangle(cornerRadius: AppTheme.Radius.small)
                         .stroke(AppTheme.Colors.lightBlue, lineWidth: 2)
@@ -227,6 +169,38 @@ struct ConfirmNewPasswordInput: View {
 
 
 // BUTTONS ----------------------------------
+//struct ProfileButton: View {
+//    @Binding var errorMessage: String?
+//    @Binding var alertMessage: String
+//    @Binding var showAlert: Bool
+//    var userAction: () async -> Void
+//    
+//    var body: some View {
+//        Button(action: {
+//            Task {
+//                await userAction()
+//                if let error = errorMessage {
+//                    alertMessage = error
+//                    showAlert = true
+//                } else {
+//                    alertMessage = "Password updated successfully!"
+//                    showAlert = true
+//                }
+//            }
+////            selectedSection = .details
+//        }) {
+//            Text("Update")
+//                .font(AppTheme.Typography.body)
+//                .frame(maxWidth: .infinity)
+//                .padding()
+//                .background(AppTheme.Colors.lightBlue)
+//                .foregroundColor(.white)
+//                .cornerRadius(AppTheme.Radius.medium)
+//                .padding()
+//        }
+//    }
+//}
+
 struct UpdatePasswordButton: View {
     @ObservedObject var profileViewModel: ProfileViewModel
     @Binding var updateAlertMessage: String

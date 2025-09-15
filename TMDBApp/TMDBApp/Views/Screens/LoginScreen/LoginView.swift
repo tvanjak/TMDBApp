@@ -9,9 +9,12 @@ import SwiftUI
 
 
 struct LoginView: View {
-    
     @ObservedObject var authViewModel: AuthenticationViewModel
     @State private var rememberMe: Bool = false
+    
+    
+    @State private var showAlert = false
+    @State private var alertMessage = ""
     
     var body: some View {
         ZStack {
@@ -31,13 +34,18 @@ struct LoginView: View {
                             
                             CustomDivider()
                             
-                            SignInButton(authViewModel: authViewModel)
+                            SignInButton(authViewModel: authViewModel, alertMessage: $alertMessage, showAlert: $showAlert)
                             
                             SignUpLink(authViewModel: authViewModel)
                         }
                     }
                 }
                 .background(AppTheme.Colors.background)
+                .alert("Sign in", isPresented: $showAlert) {
+                    Button("OK") { }
+                } message: {
+                    Text(alertMessage)
+                }
             }
         }
     }

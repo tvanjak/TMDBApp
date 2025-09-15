@@ -107,9 +107,6 @@ struct SearchMediaCard: View {
                 RoundedRectangle(cornerRadius: AppTheme.Radius.large)
             )
             .padding(AppTheme.Spacing.small)
-//            .background(Color.white)
-//            .cornerRadius(AppTheme.Radius.medium)
-//            .shadow(color: Color.black.opacity(0.2), radius: AppTheme.Radius.small)
         }
     }
 }
