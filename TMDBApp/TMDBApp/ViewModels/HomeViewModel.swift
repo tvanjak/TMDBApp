@@ -15,6 +15,7 @@ final class HomeViewModel: ObservableObject {
     @Published var searchedTVShows: [MediaItem] = []
 
     @Published var searchTerm = ""
+    @FocusState var searchFocused: Bool
     
     enum MovieSections: CaseIterable, Hashable {
         case popular
@@ -45,11 +46,11 @@ final class HomeViewModel: ObservableObject {
     @Published var favorites: [MediaItem] = []
     
     private let favoritesManager: FavoritesManager
-    private let navigationService: NavigationServiceProtocol
+    private let navigationService: NavigationViewModelProtocol
     
     init(
         favoritesManager: FavoritesManager,
-        navigationService: NavigationServiceProtocol
+        navigationService: NavigationViewModelProtocol
     ) {
         self.favoritesManager = favoritesManager
         self.navigationService = navigationService

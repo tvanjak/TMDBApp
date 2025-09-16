@@ -10,6 +10,7 @@ import SwiftUI
 
 struct SignUpView: View {
     @ObservedObject var authViewModel: AuthenticationViewModel
+    
     @State private var localErrorMessage: String?
     
     var body: some View {

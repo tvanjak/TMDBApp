@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FooterView: View {
-    let router: Router
+    let router: NavigationProtocol
     
     var body: some View {
         HStack {

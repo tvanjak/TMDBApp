@@ -10,41 +10,13 @@ import SwiftUI
 
 struct HomeView: View {
     @ObservedObject var homeViewModel: HomeViewModel
-    @FocusState var searchFocused: Bool
     
     var body: some View {
         ScrollView {
             VStack {
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundColor(.black)
-                    
-                    TextField("Search", text: $homeViewModel.searchTerm)
-                        .textFieldStyle(PlainTextFieldStyle())
-                        .focused($searchFocused)
-                        .onSubmit {
-                            Task { await homeViewModel.search() }
-                        }
-                    
-                    if searchFocused {
-                        Button {
-                            homeViewModel.searchTerm = ""
-                            homeViewModel.searchedMovies = []
-                            homeViewModel.searchedTVShows = []
-                            searchFocused = false
-                        } label: {
-                            Image(systemName: "xmark")
-                                .foregroundColor(.black)
-                        }
-                    }
-                }
-                .padding(AppTheme.Spacing.small)
-                .frame(width: 360, height: 40)
-                .background(Color(.systemGray6))
-                .cornerRadius(AppTheme.Radius.small)
-                .padding(.top)
+                SearchBar(homeViewModel: homeViewModel)
                 
-                if searchFocused && homeViewModel.searchedMovies.isEmpty {
+                if homeViewModel.searchFocused && homeViewModel.searchedMovies.isEmpty {
                     EmptyView()
                 } else if !homeViewModel.searchedMovies.isEmpty || !homeViewModel.searchedTVShows.isEmpty {
                     SearchMoviesList(homeViewModel: homeViewModel)

@@ -27,9 +27,9 @@ struct LoginInputTextFields: View {
     @ObservedObject var authViewModel: AuthenticationViewModel
     
     var body: some View {
-        CustomTextField(text: $authViewModel.email, subtitle: "Email address", placeholder: "ex. Matt", secure: false)
+        AuthenticationTextField(text: $authViewModel.email, subtitle: "Email address", placeholder: "ex. Matt", secure: false)
         
-        CustomTextField(text: $authViewModel.password, subtitle: "Password", placeholder: "Enter your password", secure: true, forgotPasswordAction: {})
+        AuthenticationTextField(text: $authViewModel.password, subtitle: "Password", placeholder: "Enter your password", secure: true, forgotPasswordAction: {})
         
     }
 }

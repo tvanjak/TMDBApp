@@ -8,14 +8,14 @@
 import SwiftUI
 
 // Protocol for ViewModels
-protocol NavigationServiceProtocol {
+protocol NavigationViewModelProtocol {
     func navigateToMedia(_ media: MediaType)
     func goBack()
     func canGoBack() -> Bool
 }
 
 // Protocol for Views 
-protocol NavigationManagerProtocol {
+protocol NavigationProtocol {
     var path: NavigationPath { get set }
     
     func goBack()
@@ -23,7 +23,9 @@ protocol NavigationManagerProtocol {
     func navigateTo(_ route: Route)
 }
 
-class Router: NavigationManagerProtocol, NavigationServiceProtocol, ObservableObject {
+
+// Router class
+class Router: NavigationProtocol, NavigationViewModelProtocol, ObservableObject {
     @Published var path = NavigationPath()
     
     func goBack() {

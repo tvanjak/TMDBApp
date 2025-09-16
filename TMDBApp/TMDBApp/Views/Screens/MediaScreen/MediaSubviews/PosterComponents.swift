@@ -1,11 +1,56 @@
 //
-//  MovieSubviews.swift
+//  CastComponent.swift
 //  TMDBApp
 //
-//  Created by Toni Vanjak on 02.09.2025..
+//  Created by Toni Vanjak on 16.09.2025..
 //
 
 import SwiftUI
+
+
+struct MediaPoster: View {
+//    var id: Int
+//    var posterPath: String?
+//    var fullPosterPath: String?
+//    var voteAverage: Double
+//    var releaseDate: String
+//    var title: String
+//    var genres: String
+//    var runtime: String?
+    @ObservedObject var mediaViewModel: MediaViewModel
+    
+    var body: some View {
+        ZStack (alignment: .bottomLeading) {
+            if let fullURLString = mediaViewModel.mediaDetail!.fullPosterPath {
+                if let url = URL(string: fullURLString) {
+                    AsyncImage(url: url) { image in
+                        image
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: UIScreen.main.bounds.width, height: 360)
+                            .clipped()
+                    } placeholder: {
+                        ProgressView()
+                            .frame(width: UIScreen.main.bounds.width, height: 360)
+                    }
+                }
+            } else {
+                Image(systemName: "photo")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: UIScreen.main.bounds.width, height: 360)
+                    .clipped()
+                    .foregroundColor(.black)
+            }
+            VStack (alignment: .leading) {
+//                PosterText(voteAverage: voteAverage, releaseDate: releaseDate, title: title, genres: genres, runtime: runtime)
+                PosterText(mediaViewModel: mediaViewModel)
+                PosterButtons(mediaViewModel: mediaViewModel)
+            }
+            .padding()
+        }
+    }
+}
 
 
 struct RatingRing: View {
@@ -115,75 +160,5 @@ struct PosterButtons: View {
                 .cornerRadius(AppTheme.Radius.small)
                 .foregroundStyle(.white)
         }
-    }
-}
-
-
-struct CrewMemberCard: View {
-    var crew: [CrewMember]
-    var index: Int
-    
-    var body: some View {
-        VStack (alignment: .leading, spacing: AppTheme.Spacing.medium) {
-            VStack(alignment: .leading, spacing: AppTheme.Spacing.small) {
-                Text(crew[index].name)
-                    .font(AppTheme.Typography.body)
-                    .fontWeight(.bold)
-                Text(crew[index].job)
-                    .font(AppTheme.Typography.body)
-            }
-            VStack(alignment: .leading, spacing: AppTheme.Spacing.small) {
-                // rendering second item in this column
-                if index + 1 < crew.count {
-                    Text(crew[index + 1].name)
-                        .font(AppTheme.Typography.body)
-                        .fontWeight(.bold)
-                    Text(crew[index + 1].job)
-                        .font(AppTheme.Typography.body)
-                }
-            }
-        }
-        .frame(width: 150)
-    }
-}
-
-
-struct CastMemberCard: View {
-    var castMember: CastMember
-    
-    var body: some View {
-        VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
-            if let fullURLString = castMember.fullProfilePath {
-                if let url = URL(string: fullURLString) {
-                    AsyncImage(url: url) { image in
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 150, height: 150)
-                            .clipped()
-                    } placeholder: {
-                        ProgressView()
-                    }
-                }
-            } else {
-                Image(systemName: "person.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .foregroundColor(.gray)
-            }
-            Text(castMember.name)
-                .font(.title3)
-                .fontWeight(.semibold)
-                .padding(.horizontal, AppTheme.Spacing.small)
-            Text(castMember.character)
-                .foregroundStyle(.gray)
-                .padding(.horizontal, AppTheme.Spacing.small)
-            Spacer()
-        }
-        .frame(width: 150, height: 250)
-        .background(Color.white)
-        .cornerRadius(AppTheme.Radius.medium)
-        .shadow(color: Color.black.opacity(0.2), radius: AppTheme.Radius.small)
-        .padding(.vertical)
     }
 }

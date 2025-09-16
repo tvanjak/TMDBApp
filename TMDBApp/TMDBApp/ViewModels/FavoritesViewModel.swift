@@ -14,11 +14,11 @@ final class FavoritesViewModel: ObservableObject {
     @Published var favorites: [MediaItem] = []
     
     private let favoritesManager: FavoritesManager
-    private let navigationService: NavigationServiceProtocol
+    private let navigationService: NavigationViewModelProtocol
     
     init(
         favoritesManager: FavoritesManager,
-        navigationService: NavigationServiceProtocol
+        navigationService: NavigationViewModelProtocol
     ) {
         self.favoritesManager = favoritesManager
         self.navigationService = navigationService

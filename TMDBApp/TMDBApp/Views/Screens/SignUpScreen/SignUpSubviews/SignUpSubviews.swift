@@ -24,18 +24,18 @@ struct SignUpInputTextfields: View {
     
     var body: some View {
         HStack {
-            CustomTextField(text: $authViewModel.firstName, subtitle: "First name", placeholder: "ex. Matt", secure: false)
+            AuthenticationTextField(text: $authViewModel.firstName, subtitle: "First name", placeholder: "ex. Matt", secure: false)
             
-            CustomTextField(text: $authViewModel.lastName,subtitle: "Last name", placeholder: "ex. Smith", secure: false)
+            AuthenticationTextField(text: $authViewModel.lastName,subtitle: "Last name", placeholder: "ex. Smith", secure: false)
         }
         
-        CustomTextField(text: $authViewModel.email, subtitle: "Email address", placeholder: "email@example.com", secure: false)
+        AuthenticationTextField(text: $authViewModel.email, subtitle: "Email address", placeholder: "email@example.com", secure: false)
         
-        CustomTextField(text: $authViewModel.phoneNumber, subtitle: "Phone number", placeholder: "Enter your phone number", secure: false)
+        AuthenticationTextField(text: $authViewModel.phoneNumber, subtitle: "Phone number", placeholder: "Enter your phone number", secure: false)
         
-        CustomTextField(text: $authViewModel.password, subtitle: "Password", placeholder: "Enter your password", secure: true)
+        AuthenticationTextField(text: $authViewModel.password, subtitle: "Password", placeholder: "Enter your password", secure: true)
         
-        CustomTextField(text: $authViewModel.confirmPassword, subtitle: "Confirm password", placeholder: "Repeat your password", secure: true)
+        AuthenticationTextField(text: $authViewModel.confirmPassword, subtitle: "Confirm password", placeholder: "Repeat your password", secure: true)
         
     }
 }
