@@ -13,8 +13,30 @@ struct MediaItem: Codable, Identifiable {
         title ?? name ?? "Untitled"
     }
     
-    var releaseYear: String? { // NEED TO FINISH
-        releaseDate ?? firstAirDate ?? ""
+    var releaseYear: String {
+        if let movieDate = self.releaseDate {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd"
+            if let date = formatter.date(from: movieDate) {
+                let yearFormatter = DateFormatter()
+                yearFormatter.dateFormat = "yyyy"
+                return yearFormatter.string(from: date)
+            }
+            return "N/A"
+        }
+        else if let tvShowDate = self.firstAirDate {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd"
+            if let date = formatter.date(from: tvShowDate) {
+                let yearFormatter = DateFormatter()
+                yearFormatter.dateFormat = "yyyy"
+                return yearFormatter.string(from: date)
+            }
+            return "N/A"
+        }
+        else {
+            return "N/A"
+        }
     }
     
     var fullPosterPath: String? {
@@ -51,4 +73,3 @@ enum MediaType: Hashable {
     case movie(id: Int)
     case tvShow(id: Int)
 }
-

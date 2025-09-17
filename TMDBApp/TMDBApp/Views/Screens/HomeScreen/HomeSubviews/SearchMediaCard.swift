@@ -39,13 +39,19 @@ struct SearchMediaCard: View {
                         .foregroundColor(.gray)
                 }
                 
-                VStack(alignment: .leading/*, spacing: AppTheme.Spacing.small*/) {
-                    Text(media.displayTitle)
-                        .font(AppTheme.Typography.subtitle)
-                        .foregroundStyle(.black)
-                        .bold()
-                        .multilineTextAlignment(.leading)
-                    
+                VStack(alignment: .leading) {
+                    HStack {
+                        Text(media.displayTitle)
+                            .font(AppTheme.Typography.subtitle)
+                            .foregroundStyle(.black)
+                            .bold()
+                            .multilineTextAlignment(.leading)
+                        Text("(" + media.releaseYear + ")")
+                            .font(AppTheme.Typography.subtitle)
+                            .foregroundStyle(.black)
+                            .bold()
+                            .multilineTextAlignment(.leading)
+                    }
                     Text(media.overview ?? "No overview")
                         .font(AppTheme.Typography.body)
                         .foregroundStyle(.black)

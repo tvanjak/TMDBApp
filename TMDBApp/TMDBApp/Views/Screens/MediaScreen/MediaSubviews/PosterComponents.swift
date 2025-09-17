@@ -109,10 +109,10 @@ struct PosterText: View {
             .font(AppTheme.Typography.largeTitle)
             .fontWeight(.bold)
             .foregroundStyle(.white)
-        + Text(" (\(mediaViewModel.mediaDetail!.releaseDate.releaseYear()))")
+        + Text(" (\(mediaViewModel.mediaDetail!.releaseYear)")
             .font(AppTheme.Typography.largeTitle)
             .foregroundStyle(.white)
-        Text(mediaViewModel.mediaDetail!.releaseDate.invertedDate())
+        Text(mediaViewModel.mediaDetail!.invertedDate)
             .font(AppTheme.Typography.body)
             .foregroundStyle(.white)
         

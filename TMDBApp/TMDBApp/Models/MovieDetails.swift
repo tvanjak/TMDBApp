@@ -47,6 +47,27 @@ struct MovieDetails: Codable, Identifiable, MediaItemDetails {
         return "https://image.tmdb.org/t/p/w500\(path)"
     }
     
+    var releaseYear: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        if let date = formatter.date(from: self.releaseDate) {
+            let yearFormatter = DateFormatter()
+            yearFormatter.dateFormat = "yyyy"
+            return yearFormatter.string(from: date)
+        }
+        return "N/A"
+    }
+    
+    var invertedDate: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        if let date = formatter.date(from: self.releaseDate) {
+            formatter.dateFormat = "dd/MM/yyyy"
+            return formatter.string(from: date)
+        }
+        return "N/A"
+    }
+    
     enum CodingKeys: String, CodingKey {
         case id
         case title
