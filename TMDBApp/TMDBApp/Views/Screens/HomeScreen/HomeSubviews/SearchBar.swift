@@ -6,10 +6,10 @@
 //
 
 import SwiftUI
-
 struct SearchBar: View {
     @ObservedObject var homeViewModel: HomeViewModel
-    
+    @Binding var searchFocused: Bool
+
     var body: some View {
         HStack {
             Image(systemName: "magnifyingglass")
@@ -17,17 +17,16 @@ struct SearchBar: View {
             
             TextField("Search", text: $homeViewModel.searchTerm)
                 .textFieldStyle(PlainTextFieldStyle())
-                .focused(homeViewModel.$searchFocused)
                 .onSubmit {
                     Task { await homeViewModel.search() }
                 }
             
-            if homeViewModel.searchFocused {
+            if searchFocused {
                 Button {
                     homeViewModel.searchTerm = ""
                     homeViewModel.searchedMovies = []
                     homeViewModel.searchedTVShows = []
-                    homeViewModel.searchFocused = false
+                    searchFocused = false
                 } label: {
                     Image(systemName: "xmark")
                         .foregroundColor(.black)

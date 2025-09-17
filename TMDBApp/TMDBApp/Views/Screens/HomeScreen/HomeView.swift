@@ -10,13 +10,19 @@ import SwiftUI
 
 struct HomeView: View {
     @ObservedObject var homeViewModel: HomeViewModel
-    
+    @FocusState var searchFocused: Bool
+
     var body: some View {
         ScrollView {
             VStack {
-                SearchBar(homeViewModel: homeViewModel)
+                SearchBar(homeViewModel: homeViewModel,
+                          searchFocused: Binding(
+                            get: { searchFocused },
+                            set: { searchFocused = $0 }
+                          ))
+                    .focused($searchFocused)
                 
-                if homeViewModel.searchFocused && homeViewModel.searchedMovies.isEmpty {
+                if searchFocused && homeViewModel.searchedMovies.isEmpty {
                     EmptyView()
                 } else if !homeViewModel.searchedMovies.isEmpty || !homeViewModel.searchedTVShows.isEmpty {
                     SearchMoviesList(homeViewModel: homeViewModel)

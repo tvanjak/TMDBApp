@@ -21,30 +21,7 @@ protocol MediaItemDetails: Identifiable {
     var formattedGenres: String { get }
     var formattedRuntime: String? { get }
     var fullPosterPath: String? { get }
+    var releaseYear: String { get }
+    var invertedDate: String { get }
 }
-
-//MOVE THIS TO VIEWMODEL? -------------------
-extension String {
-    func releaseYear() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        if let date = formatter.date(from: self) {
-            let yearFormatter = DateFormatter()
-            yearFormatter.dateFormat = "yyyy"
-            return yearFormatter.string(from: date)
-        }
-        return "N/A"
-    }
-    
-    func invertedDate() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        if let date = formatter.date(from: self) {
-            formatter.dateFormat = "dd/MM/yyyy"
-            return formatter.string(from: date)
-        }
-        return "N/A"
-    }
-}
-// -----------------------------------------
 

@@ -27,6 +27,7 @@ struct AppTheme {
 //        static let title4 = Font.system(size: 14, weight: .bold, design: .default)
         static let subtitle = Font.system(size: 22, weight: .regular, design: .default)
         static let body = Font.system(size: 18, weight: .regular, design: .default)
+        static let body2 = Font.system(size: 14, weight: .regular, design: .default)
 //        static let caption = Font.system(size: 12, weight: .light)
     }
     

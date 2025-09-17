@@ -17,7 +17,7 @@ struct SearchMediaCard: View {
                 .shadow(color: Color.black.opacity(0.15), radius: AppTheme.Radius.small)
                 .frame(width: 330, height: 180)
             
-            HStack(spacing: 0) {
+            HStack() {
                 if let fullURLString = media.fullPosterPath {
                     if let url = URL(string: fullURLString) {
                         AsyncImage(url: url) { image in
@@ -39,22 +39,30 @@ struct SearchMediaCard: View {
                         .foregroundColor(.gray)
                 }
                 
-                VStack(alignment: .leading/*, spacing: AppTheme.Spacing.small*/) {
-                    Text(media.displayTitle)
-                        .font(AppTheme.Typography.subtitle)
-                        .foregroundStyle(.black)
-                        .bold()
-                        .multilineTextAlignment(.leading)
-                    
+                VStack(alignment: .leading) {
+                    HStack {
+                        Text(media.displayTitle)
+                            .font(AppTheme.Typography.subtitle)
+                            .foregroundStyle(.black)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                            .bold()
+                            .multilineTextAlignment(.leading)
+                        Text("(" + media.releaseYear + ")")
+                            .font(AppTheme.Typography.subtitle)
+                            .foregroundStyle(.black)
+                            .bold()
+                            .multilineTextAlignment(.leading)
+                    }
                     Text(media.overview ?? "No overview")
-                        .font(AppTheme.Typography.body)
+                        .font(AppTheme.Typography.body2)
                         .foregroundStyle(.black)
                         .lineLimit(5)
                         .truncationMode(.tail)
                         .multilineTextAlignment(.leading)
                 }
-                .frame(width: 210, height: 180)
                 .padding(AppTheme.Spacing.medium)
+                .frame(width: 210, height: 180)
             }
             .frame(height: 180)
             .clipShape(
