@@ -9,8 +9,6 @@ import SwiftUI
 
 @MainActor
 final class FavoritesViewModel: ObservableObject {
-    @Published var errorMessage: String?
-    @Published var mediaDetail: (any MediaItemDetails)?
     @Published var favorites: [MediaItem] = []
     
     private let favoritesManager: FavoritesManager

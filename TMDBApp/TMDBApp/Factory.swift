@@ -20,6 +20,16 @@ extension Container {
             .singleton
     }
     
+    var authRepository: Factory<AuthRepositoryProtocol> {
+        self { AuthRepository() }
+            .singleton
+    }
+    
+    var userRepository: Factory<UserRepositoryProtocol> {
+        self { UserRepository() }
+            .singleton
+    }
+    
     // Managers
     var favoritesManager: Factory<FavoritesManager> {
         self { @MainActor in
@@ -30,6 +40,16 @@ extension Container {
         }
         .singleton
     }
+    
+    var sessionManager: Factory<SessionManager> {
+        self { @MainActor in
+            SessionManager(
+                sessionRepo: self.sessionRepository(),
+            )
+        }
+        .singleton
+    }
+
     
     // Services
     var router: Factory<Router> {
@@ -60,7 +80,9 @@ extension Container {
     var authViewModel: Factory<AuthenticationViewModel> {
         self { @MainActor in
             AuthenticationViewModel(
-                sessionRepo: self.sessionRepository()
+//                authRepo: self.authRepository(),
+//                userRepo: self.userRepository()
+                sessionManager: self.sessionManager()
             )
         }
         .singleton
@@ -69,7 +91,9 @@ extension Container {
     var profileViewModel: Factory<ProfileViewModel> {
         self { @MainActor in
             ProfileViewModel(
-                sessionRepo: self.sessionRepository()
+//                authRepo: self.authRepository(),
+//                userRepo: self.userRepository(),
+                sessionManager: self.sessionManager()
             )
         }
         .singleton

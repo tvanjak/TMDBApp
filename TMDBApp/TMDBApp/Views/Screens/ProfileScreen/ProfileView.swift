@@ -230,7 +230,7 @@ struct ProfileView: View {
 
 
 #Preview {
-    let profileViewModel = ProfileViewModel(sessionRepo: SessionRepository())
+    let profileViewModel = ProfileViewModel(sessionManager: SessionManager(sessionRepo: SessionRepository()))
     profileViewModel.firstName = "John"
     profileViewModel.lastName = "Doe"
     profileViewModel.profileEmail = "john.doe@example.com"
