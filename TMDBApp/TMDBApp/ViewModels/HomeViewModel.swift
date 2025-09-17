@@ -15,7 +15,6 @@ final class HomeViewModel: ObservableObject {
     @Published var searchedTVShows: [MediaItem] = []
 
     @Published var searchTerm = ""
-    @FocusState var searchFocused: Bool
     
     enum MovieSections: CaseIterable, Hashable {
         case popular

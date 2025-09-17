@@ -56,7 +56,7 @@ struct TVShowDetails: Codable, Identifiable, MediaItemDetails {
         return "https://image.tmdb.org/t/p/w500\(path)"
     }
     
-    var releaseYear: String? {
+    var releaseYear: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         if let date = formatter.date(from: self.firstAirDate) {
@@ -64,19 +64,17 @@ struct TVShowDetails: Codable, Identifiable, MediaItemDetails {
             yearFormatter.dateFormat = "yyyy"
             return yearFormatter.string(from: date)
         }
-//        return "N/A"
-        return nil
+        return "N/A"
     }
     
-    var invertedDate: String? {
+    var invertedDate: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         if let date = formatter.date(from: self.firstAirDate) {
             formatter.dateFormat = "dd/MM/yyyy"
             return formatter.string(from: date)
         }
-//        return "N/A"
-        return nil
+        return "N/A"
     }
     
     enum CodingKeys: String, CodingKey {
