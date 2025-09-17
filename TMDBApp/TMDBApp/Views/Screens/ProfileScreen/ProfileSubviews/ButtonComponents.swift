@@ -54,7 +54,7 @@ struct UpdatePasswordButton: View {
         Button(action: {
             Task {
                 await profileViewModel.updateUserPassword()
-                if let error = profileViewModel.errorMessage {
+                if let error = profileViewModel.errorMessage.wrappedValue {
                     updateAlertMessage = error
                     showUpdateAlert = true
                 } else {
@@ -87,7 +87,7 @@ struct SaveUserDataButton: View {
         Button(action: {
             Task {
                 await profileViewModel.updateUserProfileData()
-                if let error = profileViewModel.errorMessage {
+                if let error = profileViewModel.errorMessage.wrappedValue {
                     saveAlertMessage = error
                     showSaveAlert = true
                 } else {

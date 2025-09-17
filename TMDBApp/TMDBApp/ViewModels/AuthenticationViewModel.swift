@@ -11,46 +11,67 @@ import FirebaseFirestore
 
 @MainActor
 final class AuthenticationViewModel: ObservableObject {
-    @Published var errorMessage: String?
-
     @ObservedObject private var sessionManager: SessionManager
-
+    @Published private(set) var currentUser: User?
+    
     init(sessionManager: SessionManager) {
         self.sessionManager = sessionManager
+        self.currentUser = sessionManager.currentUser
+        
+        // Keep currentUser in sync
+        sessionManager.$currentUser
+            .assign(to: &$currentUser)
     }
-
-    // Forward computed bindings
-    var email: String {
-        get { sessionManager.email }
-        set { sessionManager.email = newValue }
+    
+    var email: Binding<String> {
+        Binding(
+            get: { self.sessionManager.email },
+            set: { self.sessionManager.email = $0 }
+        )
     }
-
-    var password: String {
-        get { sessionManager.password }
-        set { sessionManager.password = newValue }
+    
+    var firstName: Binding<String> {
+        Binding(
+            get: { self.sessionManager.firstName },
+            set: { self.sessionManager.firstName = $0 }
+        )
     }
-
-    var confirmPassword: String {
-        get { sessionManager.confirmPassword }
-        set { sessionManager.confirmPassword = newValue }
+    
+    var lastName: Binding<String> {
+        Binding(
+            get: { self.sessionManager.lastName },
+            set: { self.sessionManager.lastName = $0 }
+        )
     }
-
-    var firstName: String {
-        get { sessionManager.firstName }
-        set { sessionManager.firstName = newValue }
+    
+    var phoneNumber: Binding<String> {
+        Binding(
+            get: { self.sessionManager.phoneNumber },
+            set: { self.sessionManager.phoneNumber = $0 }
+        )
     }
-
-    var lastName: String {
-        get { sessionManager.lastName }
-        set { sessionManager.lastName = newValue }
+    
+    var password: Binding<String> {
+        Binding(
+            get: { self.sessionManager.password },
+            set: { self.sessionManager.password = $0 }
+        )
     }
-
-    var phoneNumber: String {
-        get { sessionManager.phoneNumber }
-        set { sessionManager.phoneNumber = newValue }
+    
+    var confirmPassword: Binding<String> {
+        Binding(
+            get: { self.sessionManager.confirmPassword },
+            set: { self.sessionManager.confirmPassword = $0 }
+        )
     }
-
-    var currentUser: User? { sessionManager.currentUser }
+    
+    var errorMessage: Binding<String?> {
+        Binding(
+            get: { self.sessionManager.errorMessage },
+            set: { self.sessionManager.errorMessage = $0 }
+        )
+    }
+    
 
     // Actions
     func signUp() async {

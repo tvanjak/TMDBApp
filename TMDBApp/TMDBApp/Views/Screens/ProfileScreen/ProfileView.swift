@@ -7,149 +7,6 @@
 
 import SwiftUI
 
-struct ProfileHeader: View {
-    @ObservedObject var profileViewModel: ProfileViewModel
-    @Binding var selectedSection: ProfileView.ProfileSections
-    @Binding var editMode: Bool
-    
-    var body: some View {
-        HStack {
-            ZStack (alignment: .bottomTrailing) {
-                ZStack {
-                    Circle()
-                        .fill(Color.gray.opacity(0.2))
-                        .frame(width: 100, height: 100)
-                    
-                    Image(systemName: "person")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 30, height: 30)
-                        .foregroundColor(.gray)
-                }
-                Button(action: {print("Edit image")}) {
-                    ZStack {
-                        Circle()
-                            .fill(AppTheme.Colors.lightBlue)
-                            .frame(width: 30, height: 30)
-                        
-                        Image(systemName: "pencil")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 15, height: 15)
-                            .foregroundColor(.white)
-                    }
-                }
-            }
-            
-            Text("Hi, \(profileViewModel.firstName) \(profileViewModel.lastName)")
-                .font(AppTheme.Typography.title)
-                .fontWeight(.bold)
-            
-            Spacer()
-            
-            Button("Edit") {
-                selectedSection = .details
-                editMode = true
-            }
-            .buttonStyle(.plain)
-            .font(AppTheme.Typography.body)
-            .foregroundStyle(.secondary)
-            .padding()
-        }
-    }
-}
-
-
-struct DetailsSection: View {
-    @ObservedObject var profileViewModel: ProfileViewModel
-    
-    @Binding var editMode: Bool
-    @Binding var addPhoneNumber: Bool
-    @Binding var wantToLogOut: Bool
-    
-    var body: some View {
-        VStack (spacing: AppTheme.Spacing.large){
-            if editMode {
-                VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
-                    ProfileTextField(subtitle: "First Name", input: $profileViewModel.firstName)
-                    ProfileTextField(subtitle: "Last Name", input: $profileViewModel.lastName)
-                }
-            }
-            
-            
-            VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
-                MemberSince(profileViewModel: profileViewModel)
-                
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            
-            VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
-                if editMode {
-                    ProfileTextField(subtitle: "Email address", input: $profileViewModel.profileEmail)
-                } else {
-                    ProfileText(subtitle: "Email address", text: profileViewModel.profileEmail)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            
-            
-            VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {
-                if editMode || addPhoneNumber {
-                    ProfileTextField(subtitle: "Phone number", input: $profileViewModel.phoneNumber)
-                }
-                else {
-                    if profileViewModel.phoneNumber == "" {
-                        AddPhoneNumberButton(addPhoneNumber: $addPhoneNumber)
-                    }
-                    else {
-                        ProfileText(subtitle: "Phone number", text: profileViewModel.phoneNumber)
-                    }
-                }
-            }
-            
-            Spacer()
-            
-            Button("Log out") {
-                wantToLogOut = true
-            }
-            .buttonStyle(.plain)
-            .font(AppTheme.Typography.subtitle)
-            .foregroundStyle(.secondary)
-            .padding()
-        }
-    }
-}
-
-
-struct ReviewsSection: View {
-    var body: some View {
-        Text("You have no reviews so far.")
-            .font(AppTheme.Typography.body)
-            .foregroundStyle(.secondary)
-    }
-}
-
-
-struct PasswordSection: View {
-    @ObservedObject var profileViewModel: ProfileViewModel
-    
-    var body: some View {
-        VStack (spacing: AppTheme.Spacing.large) {
-            Text("Please enter your current password to change your password.")
-                .bold()
-                .frame(maxWidth: .infinity, alignment: .leading)
-            
-            CurrentPasswordInput(profileViewModel: profileViewModel)
-            
-            NewPasswordInput(profileViewModel: profileViewModel)
-            
-            ConfirmNewPasswordInput(profileViewModel: profileViewModel)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-}
-
-
 struct ProfileView: View {
     @ObservedObject var profileViewModel: ProfileViewModel
     
@@ -231,11 +88,11 @@ struct ProfileView: View {
 
 #Preview {
     let profileViewModel = ProfileViewModel(sessionManager: SessionManager(sessionRepo: SessionRepository()))
-    profileViewModel.firstName = "John"
-    profileViewModel.lastName = "Doe"
-    profileViewModel.profileEmail = "john.doe@example.com"
-    profileViewModel.phoneNumber = "+1234567890"
-    profileViewModel.memberSince = "24/04/2022"
+//    profileViewModel.firstName = "John"
+//    profileViewModel.lastName = "Doe"
+//    profileViewModel.profileEmail = "john.doe@example.com"
+//    profileViewModel.phoneNumber = "+1234567890"
+//    profileViewModel.memberSince = "24/04/2022"
     
     return ProfileView(profileViewModel: profileViewModel)
 }

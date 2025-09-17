@@ -13,6 +13,9 @@ struct SignUpView: View {
     
     @State private var localErrorMessage: String?
     
+    @State private var showAlert = false
+    @State private var alertMessage = ""
+    
     var body: some View {
         ZStack {
             AppTheme.Colors.background
@@ -31,7 +34,7 @@ struct SignUpView: View {
                             
                             CustomDivider()
                             
-                            SignUpButton(authViewModel: authViewModel, localErrorMessage: $localErrorMessage)
+                            SignUpButton(authViewModel: authViewModel, localErrorMessage: $localErrorMessage, alertMessage: $alertMessage, showAlert: $showAlert)
                             
                             
                             LoginLink(authViewModel: authViewModel)

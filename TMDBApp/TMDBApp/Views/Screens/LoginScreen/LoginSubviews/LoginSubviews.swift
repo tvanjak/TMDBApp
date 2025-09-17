@@ -27,9 +27,9 @@ struct LoginInputTextFields: View {
     @ObservedObject var authViewModel: AuthenticationViewModel
     
     var body: some View {
-        AuthenticationTextField(text: $authViewModel.email, subtitle: "Email address", placeholder: "ex. Matt", secure: false)
+        AuthenticationTextField(text: authViewModel.email, subtitle: "Email address", placeholder: "ex. Matt", secure: false)
         
-        AuthenticationTextField(text: $authViewModel.password, subtitle: "Password", placeholder: "Enter your password", secure: true, forgotPasswordAction: {})
+        AuthenticationTextField(text: authViewModel.password, subtitle: "Password", placeholder: "Enter your password", secure: true, forgotPasswordAction: {})
         
     }
 }
@@ -58,7 +58,7 @@ struct SignInButton: View {
         Button {
             Task {
                 await authViewModel.signIn()
-                if let error = authViewModel.errorMessage {
+                if let error = authViewModel.errorMessage.wrappedValue {
                     alertMessage = error
                     showAlert = true
                 } else {
@@ -90,11 +90,9 @@ struct SignUpLink: View {
                 .foregroundStyle(.white)
                 .font(AppTheme.Typography.body)
                 .fontWeight(.regular)
-            NavigationLink(destination:
-                            SignUpView(authViewModel: authViewModel)
-            ) {
+            NavigationLink(destination: SignUpView(authViewModel: authViewModel)) {
                 Text("Create one here")
-                    .foregroundColor(.blue)
+                    .foregroundColor(AppTheme.Colors.lightBlue)
                     .font(AppTheme.Typography.body)
             }
         }

@@ -9,40 +9,40 @@ import SwiftUI
 import FirebaseAuth
 import FirebaseFirestore
 
+//@MainActor
+//protocol SessionManagerProtocol: ObservableObject {
+//    // Auth/Login/Signup
+//    var email: String { get set }
+//    var password: String { get set }
+//    var confirmPassword: String { get set }
+//    var currentUser: User? { get }
+//    var errorMessage: String? { get set }
+//    func signUp() async
+//    func signIn() async
+//    func signOut()
+//    func checkConfirmPassword() -> Bool
+//
+//    // Shared profile fields
+//    var firstName: String { get set }
+//    var lastName: String { get set }
+//    var phoneNumber: String { get set }
+//
+//    // Profile-only fields
+//    var profileEmail: String { get set }
+//    var memberSince: String { get }
+//    func fetchUserProfile(uid: String)
+//    func updateUserProfileData() async
+//
+//    // Password change
+//    var currentPassword: String { get set }
+//    var newPassword: String { get set }
+//    var confirmNewPassword: String { get set }
+//    func updateUserPassword() async
+//    func checkConfirmNewPassword() -> Bool
+//}
+
 @MainActor
-protocol SessionManagerProtocol: ObservableObject {
-    // Auth/Login/Signup
-    var email: String { get set }
-    var password: String { get set }
-    var confirmPassword: String { get set }
-    var currentUser: User? { get }
-    var errorMessage: String? { get set }
-    func signUp() async
-    func signIn() async
-    func signOut()
-    func checkConfirmPassword() -> Bool
-
-    // Shared profile fields
-    var firstName: String { get set }
-    var lastName: String { get set }
-    var phoneNumber: String { get set }
-
-    // Profile-only fields
-    var profileEmail: String { get set }
-    var memberSince: String { get }
-    func fetchUserProfile(uid: String)
-    func updateUserProfileData() async
-
-    // Password change
-    var currentPassword: String { get set }
-    var newPassword: String { get set }
-    var confirmNewPassword: String { get set }
-    func updateUserPassword() async
-    func checkConfirmNewPassword() -> Bool
-}
-
-@MainActor
-final class SessionManager: SessionManagerProtocol {
+final class SessionManager: ObservableObject/*, SessionManagerProtocol*/ {
     // Exclusive to login/signup
     @Published var password = ""
     @Published var confirmPassword = ""
@@ -64,7 +64,7 @@ final class SessionManager: SessionManagerProtocol {
     @Published var errorMessage: String?
     
     @Published var email = ""
-    @Published var currentUser: User? // Firebase User object
+    @Published public var currentUser: User? // Firebase User object
     private var authStateHandle: AuthStateDidChangeListenerHandle?
     
     private let sessionRepo: SessionRepositoryProtocol
@@ -137,6 +137,7 @@ final class SessionManager: SessionManagerProtocol {
         }
         do {
             let result = try await Auth.auth().signIn(withEmail: trimmedEmail, password: password)
+            currentUser = result.user // REFRESH VIEW -- CHANGE HERE
             print("[Auth] User signed in: \(result.user.email ?? "N/A") (uid=\(result.user.uid))")
         } catch {
             let ns = error as NSError
@@ -162,6 +163,7 @@ final class SessionManager: SessionManagerProtocol {
     func signOut() {
         do {
             try Auth.auth().signOut()
+            currentUser = nil // REFRESH VIEW -- CHANGE HERE
             print("User signed out successfully.")
         } catch {
             print("Error signing out: \(error.localizedDescription)")

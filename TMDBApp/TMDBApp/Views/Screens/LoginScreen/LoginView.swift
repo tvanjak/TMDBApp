@@ -10,7 +10,8 @@ import SwiftUI
 
 struct LoginView: View {
     @ObservedObject var authViewModel: AuthenticationViewModel
-    
+    @State private var localError: String?
+
     @State private var rememberMe: Bool = false
     
     @State private var showAlert = false
