@@ -100,7 +100,7 @@ final class SessionManager: ObservableObject, SessionManagerProtocol {
         }
     }
     
-    // SIGNUP, SIGNIN & SIGNOUT
+    // AUTHENTICATION VM FUNCTIONS
     func signUp() async {
         errorMessage = nil
         do {
@@ -141,7 +141,6 @@ final class SessionManager: ObservableObject, SessionManagerProtocol {
             handleSignInError(error as NSError)
         }
     }
-
     
     func signOut() {
         do {
@@ -153,15 +152,10 @@ final class SessionManager: ObservableObject, SessionManagerProtocol {
             self.errorMessage = "Sign out failed: \(error.localizedDescription)"
         }
     }
+    // ------------------------------------------------------------------
     
     
-    // CONFIRM PASSWORD
-    func checkConfirmPassword() -> Bool {
-        return password == confirmPassword
-    }
-    
-    
-    // FETCH USER PROFILE FROM FIRESTORE
+    // AUTHENTICATION VM FUNCTIONS
     func fetchUserProfile(uid: String, completion: (() -> Void)? = nil) {
         let db = Firestore.firestore()
         db.collection("users").document(uid).getDocument { [weak self] (document, error) in
@@ -181,7 +175,6 @@ final class SessionManager: ObservableObject, SessionManagerProtocol {
         }
     }
     
-    // UPDATE USER DATA
     func updateUserProfileData() async {
         errorMessage = nil
         guard let uid = sessionRepo.currentUserId else {
@@ -208,7 +201,6 @@ final class SessionManager: ObservableObject, SessionManagerProtocol {
         }
     }
     
-    // UPDATE USER PASSWORD
     func updateUserPassword() async {
         errorMessage = nil
         
@@ -225,14 +217,11 @@ final class SessionManager: ObservableObject, SessionManagerProtocol {
         do {
             // Always refresh state
             try await user.reload()
-            
             // Re-authenticate
             let credential = EmailAuthProvider.credential(withEmail: email, password: currentPassword)
             try await user.reauthenticate(with: credential)
-            
             // Update password
             try await user.updatePassword(to: newPassword)
-            
             // Reset fields
             currentPassword = ""
             newPassword = ""
@@ -243,8 +232,14 @@ final class SessionManager: ObservableObject, SessionManagerProtocol {
             handlePasswordError(error as NSError)
         }
     }
+    // ------------------------------------------------------------------
 
     
+    // CONFIRM PASSWORD
+    func checkConfirmPassword() -> Bool {
+        return password == confirmPassword
+    }
+    // CONFIRM NEW PASSWORD
     func checkConfirmNewPassword() -> Bool {
         return newPassword == confirmNewPassword
     }
@@ -277,6 +272,7 @@ final class SessionManager: ObservableObject, SessionManagerProtocol {
         }
         print("[Auth][Error] \(errorMessage ?? "unknown")")
     }
+    // ------------------------------------------------------------------
 
     
     // CHANGE PASSWORD HELPER FUNCTIONS
@@ -312,5 +308,5 @@ final class SessionManager: ObservableObject, SessionManagerProtocol {
         }
         print("[Profile][Error] \(errorMessage ?? "unknown")")
     }
-
+    // ------------------------------------------------------------------
 }
