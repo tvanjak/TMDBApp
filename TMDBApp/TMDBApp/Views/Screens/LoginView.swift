@@ -7,12 +7,93 @@
 
 import SwiftUI
 
+struct LoginHeader: View {
+    var body: some View {
+        Text("Sign in to your ")
+            .font(.title)
+            .foregroundStyle(.white)
+        + Text("TMDB")
+            .font(.title)
+            .bold()
+            .foregroundStyle(.white)
+        + Text(" account to continue.")
+            .foregroundStyle(.white)
+            .font(.title)
+    }
+}
+
+struct LoginInputTextFields: View {
+    @ObservedObject var authViewModel: AuthenticationViewModel
+    
+    var body: some View {
+        CustomTextField(text: $authViewModel.email, subtitle: "Email address", placeholder: "ex. Matt", secure: false)
+        
+        CustomPasswordTextField(text: $authViewModel.password, subtitle: "Password", placeholder: "Enter your password", secure: true, forgotPasswordAction: {})
+        
+    }
+}
+
+struct RememberMe: View {
+    @Binding var rememberMe: Bool
+    
+    var body: some View {
+        HStack {
+            Toggle("Remember me", isOn: $rememberMe)
+                .toggleStyle(CheckboxToggleStyle())
+                .foregroundColor(.white)
+            Spacer()
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal)
+    }
+}
+
+struct SignInButton: View {
+    @ObservedObject var authViewModel: AuthenticationViewModel
+    
+    var body: some View {
+        Button {
+            Task {
+                await authViewModel.signIn()
+            }
+        } label: {
+            Text("Sign in")
+                .bold()
+                .font(.title3)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity, maxHeight: 20)
+                .padding()
+                .background(Color(red: 76/255, green: 178/255, blue: 223/255))
+                .cornerRadius(12)
+        }
+        .padding(.horizontal,30)
+    }
+}
+
+struct SignUpLink: View {
+    @ObservedObject var authViewModel: AuthenticationViewModel
+    
+    var body: some View {
+        HStack {
+            Text("Don't have a TMDB account?")
+                .foregroundStyle(.white)
+                .font(.headline)
+                .fontWeight(.regular)
+            NavigationLink(destination:
+                            SignUpView(authViewModel: authViewModel)
+                ) {
+                Text("Create one here")
+                    .foregroundColor(.blue)
+                    .font(.headline)
+            }
+        }
+    }
+}
+
 struct LoginView: View {
     
     @ObservedObject var authViewModel: AuthenticationViewModel
     @State private var rememberMe: Bool = false
-    @State private var email: String = ""
-    @State private var password: String = ""
     
     var body: some View {
         ZStack {
@@ -24,78 +105,21 @@ struct LoginView: View {
                     HeaderView()
                     ScrollView {
                         VStack (spacing: 30) {
+                            LoginHeader()
                             
-                            Text("Sign in to your ")
-                                .font(.title)
-                                .foregroundStyle(.white)
-                            + Text("TMDB")
-                                .font(.title)
-                                .bold()
-                                .foregroundStyle(.white)
-                            + Text(" account to continue.")
-                                .foregroundStyle(.white)
-                                .font(.title)
+                            LoginInputTextFields(authViewModel: authViewModel)
                             
-                            CustomTextField(text: $email, subtitle: "Email address", placeholder: "ex. Matt", secure: false)
+                            RememberMe(rememberMe: $rememberMe)
                             
+                            CustomDivider()
                             
-                            CustomPasswordTextField(text: $password, subtitle: "Password", placeholder: "Enter your password", secure: true, forgotPasswordAction: {})
+                            SignInButton(authViewModel: authViewModel)
                             
-                            HStack {
-                                Toggle("Remember me", isOn: $rememberMe)
-                                    .toggleStyle(CheckboxToggleStyle())
-                                    .foregroundColor(.white)
-                                Spacer()
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.horizontal)
-                            
-                            Rectangle()
-                                .frame(height: 1)
-                                .padding(.horizontal)
-                                .foregroundColor(Color(red: 76/255, green: 178/255, blue: 223/255))
-                            
-                            Button {
-                                Task {
-                                    // Sync local state with authViewModel before signing in
-                                    authViewModel.email = email
-                                    authViewModel.password = password
-                                    await authViewModel.signIn()
-                                }
-                            } label: {
-                                Text("Sign in")
-                                    .bold()
-                                    .font(.title3)
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity, maxHeight: 20)
-                                    .padding()
-                                    .background(Color(red: 76/255, green: 178/255, blue: 223/255))
-                                    .cornerRadius(12)
-                            }
-                            .padding(.horizontal,30)
-                            
-                            HStack {
-                                Text("Don't have a TMDB account?")
-                                    .foregroundStyle(.white)
-                                    .font(.headline)
-                                    .fontWeight(.regular)
-                                NavigationLink(destination:
-                                                SignUpView(authViewModel: authViewModel)
-                                    ) {
-                                    Text("Create one here")
-                                        .foregroundColor(.blue)
-                                        .font(.headline)
-                                }
-                            }
-                            
+                            SignUpLink(authViewModel: authViewModel)
                         }
                     }
                 }
                 .background(Color(red: 11/255, green: 37/255, blue: 63/255))
-                // Optional: For iOS 16+ to make the actual navigation bar transparent if it's still showing white
-                .toolbarBackground(.hidden, for: .navigationBar)
-                // Ensures status bar text (time, battery) is visible on a dark background
-                .toolbarColorScheme(.dark, for: .navigationBar)
             }
         }
     }

@@ -178,24 +178,7 @@ struct CrewView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(alignment: .top, spacing: 15) {
                     ForEach(Array(stride(from: 0, to: crew.count, by: 2)), id: \.self) { index in
-                        VStack (alignment: .leading, spacing: 15) {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(crew[index].name)
-                                    .fontWeight(.bold)
-                                Text(crew[index].job)
-                                    .font(.subheadline)
-                            }
-                            VStack(alignment: .leading, spacing: 5) {
-                                // rendering second item in this column
-                                if index + 1 < crew.count {
-                                    Text(crew[index + 1].name)
-                                        .fontWeight(.bold)
-                                    Text(crew[index + 1].job)
-                                        .font(.subheadline)
-                                }
-                            }
-                        }
-                        .frame(width: 150)
+                        CrewMemberCard(crew: crew, index: index)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -218,39 +201,7 @@ struct CastView: View {
             ScrollView (.horizontal, showsIndicators: false) {
                 LazyHStack (spacing: 20) {
                     ForEach(cast) {castMember in
-                        VStack (alignment: .leading, spacing: 5) {
-                            if let fullURLString = castMember.fullProfilePath {
-                                if let url = URL(string: fullURLString) {
-                                    AsyncImage(url: url) { image in
-                                        image
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(width: 150, height: 150)
-                                            .clipped()
-                                    } placeholder: {
-                                        ProgressView()
-                                    }
-                                }
-                            } else {
-                                Image(systemName: "person.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .foregroundColor(.gray)
-                            }
-                            Text(castMember.name)
-                                .font(.title3)
-                                .fontWeight(.semibold)
-                                .padding(.horizontal, 5)
-                            Text(castMember.character)
-                                .foregroundStyle(.gray)
-                                .padding(.horizontal, 5)
-                            Spacer()
-                        }
-                        .frame(width: 150, height: 250)
-                        .background(Color.white) 
-                        .cornerRadius(20)
-                        .shadow(color: Color.black.opacity(0.2), radius: 5, x: 2, y: 4)
-                        .padding(.vertical)
+                        CastMemberCard(castMember: castMember)
                     }
                 }
             }
