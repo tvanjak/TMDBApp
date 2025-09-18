@@ -94,9 +94,7 @@ final class ProfileViewModel: ObservableObject {
     func fetchUserProfile(uid: String) {
         sessionManager.fetchUserProfile(uid: uid) {
             // This closure runs after data is loaded -- need to fix it
-            DispatchQueue.main.async {
-                self.isProfileLoaded = true
-            }
+            self.isProfileLoaded = true
         }
     }
     
