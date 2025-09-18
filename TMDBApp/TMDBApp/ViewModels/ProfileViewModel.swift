@@ -4,6 +4,7 @@
 //
 //  Created by Assistant on 10.09.2025.
 //
+
 import SwiftUI
 import FirebaseAuth
 
@@ -20,6 +21,8 @@ final class ProfileViewModel: ObservableObject {
         sessionManager.$currentUser
             .assign(to: &$currentUser)
     }
+    
+    @Published var isProfileLoaded = false
     
     // Profile
     var firstName: Binding<String> {
@@ -89,7 +92,12 @@ final class ProfileViewModel: ObservableObject {
     
     // Actions
     func fetchUserProfile(uid: String) {
-        sessionManager.fetchUserProfile(uid: uid)
+        sessionManager.fetchUserProfile(uid: uid) {
+            // This closure runs after data is loaded -- need to fix it
+            DispatchQueue.main.async {
+                self.isProfileLoaded = true
+            }
+        }
     }
     
     func updateUserProfileData() async {

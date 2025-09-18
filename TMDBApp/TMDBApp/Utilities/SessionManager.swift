@@ -9,40 +9,41 @@ import SwiftUI
 import FirebaseAuth
 import FirebaseFirestore
 
-//@MainActor
-//protocol SessionManagerProtocol: ObservableObject {
-//    // Auth/Login/Signup
-//    var email: String { get set }
-//    var password: String { get set }
-//    var confirmPassword: String { get set }
-//    var currentUser: User? { get }
-//    var errorMessage: String? { get set }
-//    func signUp() async
-//    func signIn() async
-//    func signOut()
-//    func checkConfirmPassword() -> Bool
-//
-//    // Shared profile fields
-//    var firstName: String { get set }
-//    var lastName: String { get set }
-//    var phoneNumber: String { get set }
-//
-//    // Profile-only fields
-//    var profileEmail: String { get set }
-//    var memberSince: String { get }
-//    func fetchUserProfile(uid: String)
-//    func updateUserProfileData() async
-//
-//    // Password change
-//    var currentPassword: String { get set }
-//    var newPassword: String { get set }
-//    var confirmNewPassword: String { get set }
-//    func updateUserPassword() async
-//    func checkConfirmNewPassword() -> Bool
-//}
+@MainActor
+protocol SessionManagerProtocol: ObservableObject {
+    // Auth/Login/Signup
+    var email: String { get set }
+    var password: String { get set }
+    var confirmPassword: String { get set }
+    var currentUser: User? { get }
+    var currentUserPublisher: Published<User?>.Publisher { get }
+    var errorMessage: String? { get set }
+    func signUp() async
+    func signIn() async
+    func signOut()
+    func checkConfirmPassword() -> Bool
+
+    // Shared profile fields
+    var firstName: String { get set }
+    var lastName: String { get set }
+    var phoneNumber: String { get set }
+
+    // Profile-only fields
+    var profileEmail: String { get set }
+    var memberSince: String { get }
+    func fetchUserProfile(uid: String, completion: (() -> Void)?)
+    func updateUserProfileData() async
+
+    // Password change
+    var currentPassword: String { get set }
+    var newPassword: String { get set }
+    var confirmNewPassword: String { get set }
+    func updateUserPassword() async
+    func checkConfirmNewPassword() -> Bool
+}
 
 @MainActor
-final class SessionManager: ObservableObject/*, SessionManagerProtocol*/ {
+final class SessionManager: ObservableObject, SessionManagerProtocol {
     // Exclusive to login/signup
     @Published var password = ""
     @Published var confirmPassword = ""
@@ -65,6 +66,8 @@ final class SessionManager: ObservableObject/*, SessionManagerProtocol*/ {
     
     @Published var email = ""
     @Published public var currentUser: User? // Firebase User object
+    var currentUserPublisher: Published<User?>.Publisher { $currentUser }
+    
     private var authStateHandle: AuthStateDidChangeListenerHandle?
     
     private let sessionRepo: SessionRepositoryProtocol
@@ -92,13 +95,12 @@ final class SessionManager: ObservableObject/*, SessionManagerProtocol*/ {
     }
     
     deinit {
-        // Remove the listener when no longer needed to prevent memory leaks
         if let handle = authStateHandle {
             Auth.auth().removeStateDidChangeListener(handle)
         }
     }
     
-    // SIGNUP, SIGNIN & SIGNOUT
+    // AUTHENTICATION VM FUNCTIONS
     func signUp() async {
         errorMessage = nil
         do {
@@ -128,58 +130,33 @@ final class SessionManager: ObservableObject/*, SessionManagerProtocol*/ {
     func signIn() async {
         errorMessage = nil
         let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
-        let passwordLength = password.count
-        print("[Auth] signIn() called with email=\(trimmedEmail), passwordLength=\(passwordLength)")
-        guard !trimmedEmail.isEmpty, !password.isEmpty else {
-            errorMessage = "Email and password are required."
-            print("[Auth][Error] Missing credentials: emailEmpty=\(trimmedEmail.isEmpty), passwordEmpty=\(password.isEmpty)")
-            return
-        }
+        
+        guard validateCredentials(email: trimmedEmail, password: password) else { return }
+        
         do {
             let result = try await Auth.auth().signIn(withEmail: trimmedEmail, password: password)
-            currentUser = result.user // REFRESH VIEW -- CHANGE HERE
-            print("[Auth] User signed in: \(result.user.email ?? "N/A") (uid=\(result.user.uid))")
+            currentUser = result.user
+            print("[Auth] Signed in as \(result.user.email ?? "unknown")")
         } catch {
-            let ns = error as NSError
-            let code = AuthErrorCode(rawValue: ns.code)
-            print("[Auth][Error] signIn failed code=\(code?.rawValue ?? ns.code) (\(String(describing: code))) message=\(ns.localizedDescription)")
-            switch code {
-            case .wrongPassword, .invalidCredential:
-                errorMessage = "Incorrect credentials."
-            case .userDisabled:
-                errorMessage = "This account has been disabled."
-            case .userNotFound:
-                errorMessage = "No user found for this email."
-            case .tooManyRequests:
-                errorMessage = "Too many attempts. Please try again later."
-            case .invalidEmail:
-                errorMessage = "Invalid email format."
-            default:
-                errorMessage = "Sign-in failed: \(ns.localizedDescription)"
-            }
+            handleSignInError(error as NSError)
         }
     }
     
     func signOut() {
         do {
             try Auth.auth().signOut()
-            currentUser = nil // REFRESH VIEW -- CHANGE HERE
+            currentUser = nil // REFRESH VIEW
             print("User signed out successfully.")
         } catch {
             print("Error signing out: \(error.localizedDescription)")
             self.errorMessage = "Sign out failed: \(error.localizedDescription)"
         }
     }
+    // ------------------------------------------------------------------
     
     
-    // CONFIRM PASSWORD
-    func checkConfirmPassword() -> Bool {
-        return password == confirmPassword
-    }
-    
-    
-    // FETCH USER PROFILE FROM FIRESTORE
-    func fetchUserProfile(uid: String) {
+    // AUTHENTICATION VM FUNCTIONS
+    func fetchUserProfile(uid: String, completion: (() -> Void)? = nil) {
         let db = Firestore.firestore()
         db.collection("users").document(uid).getDocument { [weak self] (document, error) in
             guard let self = self else { return }
@@ -194,10 +171,10 @@ final class SessionManager: ObservableObject/*, SessionManagerProtocol*/ {
             } else {
                 print("Document does not exist or error: \(error?.localizedDescription ?? "unknown")")
             }
+            completion?()
         }
     }
     
-    // UPDATE USER DATA
     func updateUserProfileData() async {
         errorMessage = nil
         guard let uid = sessionRepo.currentUserId else {
@@ -224,85 +201,112 @@ final class SessionManager: ObservableObject/*, SessionManagerProtocol*/ {
         }
     }
     
-    // UPDATE USER PASSWORD
     func updateUserPassword() async {
         errorMessage = nil
-        print("[Profile] updateUserPassword() called newLen=\(newPassword.count) confirmLen=\(confirmNewPassword.count) currentLen=\(currentPassword.count)")
         
+        guard validatePasswords() else { return }
         guard let user = Auth.auth().currentUser else {
             errorMessage = "No authenticated user found."
-            print("[Profile][Error] No currentUser")
+            return
+        }
+        guard let email = user.email else {
+            errorMessage = "User email not found."
             return
         }
         
-        guard !currentPassword.isEmpty else {
-            errorMessage = "Enter your current password to re-authenticate."
-            print("[Profile][Error] currentPassword empty")
-            return
-        }
-        
-        if newPassword != confirmNewPassword {
-            errorMessage = "New passwords do not match."
-            print("[Profile][Error] new!=confirm")
-            return
-        }
-        
-        if newPassword.count < 6 {
-            errorMessage = "Password should be at least 6 characters."
-            print("[Profile][Error] new too short")
-            return
-        }
-        
-        // Ensure we have freshest auth state and reauthenticate first
         do {
+            // Always refresh state
             try await user.reload()
-            guard let email = user.email else {
-                errorMessage = "User email not found for re-authentication."
-                print("[Profile][Error] user.email nil")
-                return
-            }
-            print("[Profile] Reauth with email=\(email), currentLen=\(currentPassword.count)")
+            // Re-authenticate
             let credential = EmailAuthProvider.credential(withEmail: email, password: currentPassword)
             try await user.reauthenticate(with: credential)
-            print("[Profile] Re-authenticated ok")
-        } catch let error as NSError {
-            let code = AuthErrorCode(rawValue: error.code)
-            print("[Profile][Error] reauthenticate failed code=\(code?.rawValue ?? error.code) (\(String(describing: code))) message=\(error.localizedDescription)")
-            switch code {
-            case .wrongPassword, .invalidCredential:
-                errorMessage = "Incorrect credentials."
-            case .requiresRecentLogin:
-                errorMessage = "Please sign in again to update your password."
-            case .tooManyRequests:
-                errorMessage = "Too many attempts. Please try again later."
-            default:
-                errorMessage = "Re-authentication failed: \(error.localizedDescription)"
-            }
-            return
-        }
-
-        // Then attempt to update the password
-        do {
+            // Update password
             try await user.updatePassword(to: newPassword)
-            print("[Profile] Password updated ok for \(user.email ?? "user")")
-            self.currentPassword = ""
-            self.newPassword = ""
-            self.confirmNewPassword = ""
-        } catch let error as NSError {
-            let code = AuthErrorCode(rawValue: error.code)
-            print("[Profile][Error] updatePassword failed code=\(code?.rawValue ?? error.code) (\(String(describing: code))) message=\(error.localizedDescription)")
-            switch code {
-            case .weakPassword:
-                errorMessage = "The new password is too weak. Please choose a stronger one."
-            case .requiresRecentLogin:
-                errorMessage = "Please sign in again to update your password."
-            default:
-                errorMessage = "Failed to update password: \(error.localizedDescription)"
-            }
+            // Reset fields
+            currentPassword = ""
+            newPassword = ""
+            confirmNewPassword = ""
+            
+            print("[Profile] Password updated successfully")
+        } catch {
+            handlePasswordError(error as NSError)
         }
     }
+    // ------------------------------------------------------------------
+
     
+    // CONFIRM PASSWORD
+    func checkConfirmPassword() -> Bool {
+        return password == confirmPassword
+    }
+    // CONFIRM NEW PASSWORD
     func checkConfirmNewPassword() -> Bool {
         return newPassword == confirmNewPassword
     }
+    
+    
+    // SIGN IN HELPER FUNCTIONS
+    private func validateCredentials(email: String, password: String) -> Bool {
+        guard !email.isEmpty, !password.isEmpty else {
+            errorMessage = "Email and password are required."
+            return false
+        }
+        return true
+    }
+
+    private func handleSignInError(_ error: NSError) {
+        let code = AuthErrorCode(rawValue: error.code)
+        switch code {
+        case .wrongPassword, .invalidCredential:
+            errorMessage = "Incorrect credentials."
+        case .userDisabled:
+            errorMessage = "This account has been disabled."
+        case .userNotFound:
+            errorMessage = "No user found for this email."
+        case .tooManyRequests:
+            errorMessage = "Too many attempts. Please try again later."
+        case .invalidEmail:
+            errorMessage = "Invalid email format."
+        default:
+            errorMessage = "Sign-in failed: \(error.localizedDescription)"
+        }
+        print("[Auth][Error] \(errorMessage ?? "unknown")")
+    }
+    // ------------------------------------------------------------------
+
+    
+    // CHANGE PASSWORD HELPER FUNCTIONS
+    private func validatePasswords() -> Bool {
+        guard !currentPassword.isEmpty else {
+            errorMessage = "Enter your current password."
+            return false
+        }
+        guard newPassword == confirmNewPassword else {
+            errorMessage = "New passwords do not match."
+            return false
+        }
+        guard newPassword.count >= 6 else {
+            errorMessage = "Password must be at least 6 characters."
+            return false
+        }
+        return true
+    }
+
+    private func handlePasswordError(_ error: NSError) {
+        let code = AuthErrorCode(rawValue: error.code)
+        switch code {
+        case .wrongPassword, .invalidCredential:
+            errorMessage = "Incorrect current password."
+        case .weakPassword:
+            errorMessage = "The new password is too weak."
+        case .requiresRecentLogin:
+            errorMessage = "Please sign in again to update your password."
+        case .tooManyRequests:
+            errorMessage = "Too many attempts. Try again later."
+        default:
+            errorMessage = "Error: \(error.localizedDescription)"
+        }
+        print("[Profile][Error] \(errorMessage ?? "unknown")")
+    }
+    // ------------------------------------------------------------------
 }

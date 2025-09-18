@@ -11,15 +11,15 @@ import FirebaseFirestore
 
 @MainActor
 final class AuthenticationViewModel: ObservableObject {
-    @ObservedObject private var sessionManager: SessionManager
+    private var sessionManager: any SessionManagerProtocol
     @Published private(set) var currentUser: User?
     
-    init(sessionManager: SessionManager) {
+    init(sessionManager: any SessionManagerProtocol) {
         self.sessionManager = sessionManager
         self.currentUser = sessionManager.currentUser
         
         // Keep currentUser in sync
-        sessionManager.$currentUser
+        sessionManager.currentUserPublisher
             .assign(to: &$currentUser)
     }
     

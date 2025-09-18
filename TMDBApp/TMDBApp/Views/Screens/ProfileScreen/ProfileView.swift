@@ -29,6 +29,7 @@ struct ProfileView: View {
     @State private var updateAlertMessage = ""
     
     var body: some View {
+        //        if profileViewModel.isProfileLoaded {
         VStack {
             ScrollView {
                 VStack (spacing: AppTheme.Spacing.medium) {
@@ -81,6 +82,9 @@ struct ProfileView: View {
         } message: {
             Text(updateAlertMessage)
         }
+        //        } else {
+        //            ProgressView("Loading…")
+        //        }
     }
 }
 

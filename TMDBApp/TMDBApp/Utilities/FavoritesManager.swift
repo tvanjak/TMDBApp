@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// ADD PROTOCOL
+
 @MainActor
 final class FavoritesManager: ObservableObject {
     @Published var favorites: [MediaItem] = []
