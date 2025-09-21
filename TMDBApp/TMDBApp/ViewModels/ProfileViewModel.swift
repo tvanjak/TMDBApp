@@ -2,115 +2,87 @@
 //  ProfileViewModel.swift
 //  TMDBApp
 //
-//  Created by Toni Vanjak on 10.09.2025.
+//  Created by Assistant on 10.09.2025.
 //
 
 import SwiftUI
 import FirebaseAuth
+import Combine
 
 @MainActor
 final class ProfileViewModel: ObservableObject {
-    private let sessionManager: SessionManager
+    private let profileRepository: ProfileRepositoryProtocol
+//    private var cancellables = Set<AnyCancellable>()
     @Published private(set) var currentUser: User?
     
-    init(sessionManager: SessionManager) {
-        self.sessionManager = sessionManager
-        self.currentUser = sessionManager.currentUser
-        
-        // Keep currentUser in sync
-        sessionManager.$currentUser
+    @Published var profile: UserProfile = UserProfile()
+
+    @Published var errorMessage: String?
+    @Published var isProfileLoaded = false
+    
+    // Password change form
+    @Published var currentPassword: String = ""
+    @Published var newPassword: String = ""
+    @Published var confirmNewPassword: String = ""
+    
+    init(profileRepository: ProfileRepositoryProtocol) {
+        self.profileRepository = profileRepository
+        profileRepository.currentUserPublisher
             .assign(to: &$currentUser)
     }
     
-    @Published var isProfileLoaded = false
-    
-    // Profile
-    var firstName: Binding<String> {
-        Binding(
-            get: { self.sessionManager.firstName },
-            set: { self.sessionManager.firstName = $0 }
-        )
-    }
-    
-    var lastName: Binding<String> {
-        Binding(
-            get: { self.sessionManager.lastName },
-            set: { self.sessionManager.lastName = $0 }
-        )
-    }
-    
-    var phoneNumber: Binding<String> {
-        Binding(
-            get: { self.sessionManager.phoneNumber },
-            set: { self.sessionManager.phoneNumber = $0 }
-        )
-    }
-    
-    var profileEmail: Binding<String> {
-        Binding(
-            get: { self.sessionManager.profileEmail },
-            set: { self.sessionManager.profileEmail = $0 }
-        )
-    }
-    
-    var memberSince: Binding<String> {
-        Binding(
-            get: { self.sessionManager.memberSince },
-            set: { _ in } // read-only, cannot modify
-        )
-    }
-    
-    // Password Change
-    var currentPassword: Binding<String> {
-        Binding(
-            get: { self.sessionManager.currentPassword },
-            set: { self.sessionManager.currentPassword = $0 }
-        )
-    }
-    
-    var newPassword: Binding<String> {
-        Binding(
-            get: { self.sessionManager.newPassword },
-            set: { self.sessionManager.newPassword = $0 }
-        )
-    }
-    
-    var confirmNewPassword: Binding<String> {
-        Binding(
-            get: { self.sessionManager.confirmNewPassword },
-            set: { self.sessionManager.confirmNewPassword = $0 }
-        )
-    }
-    
-    var errorMessage: Binding<String?> {
-        Binding(
-            get: { self.sessionManager.errorMessage },
-            set: { self.sessionManager.errorMessage = $0 }
-        )
-    }
-    
-    
     // Actions
-    func fetchUserProfile(uid: String) {
-        sessionManager.fetchUserProfile(uid: uid) {
-            // This closure runs after data is loaded -- need to fix it
-            self.isProfileLoaded = true
+    func fetchUserProfileData() async {
+        guard let uid = currentUser?.uid else {
+            errorMessage = "No authenticated user."
+            return
+        }
+        do {
+            let fetched = try await profileRepository.fetchUserProfile(uid: uid)
+            self.profile = fetched
+            isProfileLoaded = true
+        } catch {
+            errorMessage = "Failed to load profile: \(error.localizedDescription)"
         }
     }
     
     func updateUserProfileData() async {
-        await sessionManager.updateUserProfileData()
+//        guard !profile.firstName.isEmpty || !profile.lastName.isEmpty else {
+//            errorMessage = "Profile is incomplete."
+//            return
+//        }
+        do {
+            try await profileRepository.updateUserProfileData(profile: profile)
+        } catch {
+            errorMessage = "Failed to update profile: \(error.localizedDescription)"
+        }
     }
     
     func updateUserPassword() async {
-        await sessionManager.updateUserPassword()
-    }
-    
-    func checkConfirmNewPassword() -> Bool {
-        sessionManager.checkConfirmNewPassword()
+        guard !currentPassword.isEmpty else {
+            errorMessage = "Enter your current password."
+            return
+        }
+        guard newPassword == confirmNewPassword else {
+            errorMessage = "New passwords do not match."
+            return
+        }
+        
+        do {
+            try await profileRepository.updateUserPassword(current: currentPassword, new: newPassword, confirm: confirmNewPassword)
+            currentPassword = ""
+            newPassword = ""
+            confirmNewPassword = ""
+        } catch {
+            errorMessage = "Failed to update password: \(error.localizedDescription)"
+        }
     }
     
     func signOut() {
-        sessionManager.signOut()
+        do {
+            try profileRepository.signOut()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 }
