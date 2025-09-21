@@ -62,6 +62,6 @@ struct MediaView: View {
 
 #Preview {
     MediaView(media: MediaType.movie(id: 6), mediaViewModel: MediaViewModel(
-            favoritesManager: FavoritesManager(favoritesRepo: FavoritesRepository(), sessionRepo: SessionRepository()),
+            favoritesManager: FavoritesManager(favoritesRepo: FavoritesRepository(), authenticationRepo: AuthenticationRepository()),
         ))
 }

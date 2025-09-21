@@ -24,55 +24,33 @@ struct SignUpInputTextfields: View {
     
     var body: some View {
         HStack {
-            AuthenticationTextField(text: authViewModel.firstName, subtitle: "First name", placeholder: "ex. Matt", secure: false)
+            AuthenticationTextField(text: $authViewModel.firstName, subtitle: "First name", placeholder: "ex. Matt", secure: false)
             
-            AuthenticationTextField(text: authViewModel.lastName,subtitle: "Last name", placeholder: "ex. Smith", secure: false)
+            AuthenticationTextField(text: $authViewModel.lastName,subtitle: "Last name", placeholder: "ex. Smith", secure: false)
         }
         
-        AuthenticationTextField(text: authViewModel.email, subtitle: "Email address", placeholder: "email@example.com", secure: false)
+        AuthenticationTextField(text: $authViewModel.email, subtitle: "Email address", placeholder: "email@example.com", secure: false)
         
-        AuthenticationTextField(text: authViewModel.phoneNumber, subtitle: "Phone number", placeholder: "Enter your phone number", secure: false)
+        AuthenticationTextField(text: $authViewModel.phoneNumber, subtitle: "Phone number", placeholder: "Enter your phone number", secure: false)
         
-        AuthenticationTextField(text: authViewModel.password, subtitle: "Password", placeholder: "Enter your password", secure: true)
+        AuthenticationTextField(text: $authViewModel.password, subtitle: "Password", placeholder: "Enter your password", secure: true)
         
-        AuthenticationTextField(text: authViewModel.confirmPassword, subtitle: "Confirm password", placeholder: "Repeat your password", secure: true)
+        AuthenticationTextField(text: $authViewModel.confirmPassword, subtitle: "Confirm password", placeholder: "Repeat your password", secure: true)
         
-    }
-}
-
-struct ErrorMessage: View {
-    @ObservedObject var authViewModel: AuthenticationViewModel
-    @Binding var localErrorMessage: String?
-    
-    var body: some View {
-        if let errorMessage = authViewModel.errorMessage.wrappedValue {
-            Text(errorMessage)
-                .foregroundColor(.red)
-                .padding(.horizontal)
-        } else if let localError = localErrorMessage {
-            Text(localError)
-                .foregroundColor(.red)
-                .padding(.horizontal)
-        }
     }
 }
 
 struct SignUpButton: View {
     @ObservedObject var authViewModel: AuthenticationViewModel
-    @Binding var localErrorMessage: String?
     @Binding var alertMessage: String
     @Binding var showAlert: Bool
 
     var body: some View {
         Button {
-            localErrorMessage = nil
-            if authViewModel.checkConfirmPassword() {
-                localErrorMessage = "Passwords do not match."
-                return
-            }
+            authViewModel.errorMessage = nil
             Task {
                 await authViewModel.signUp()
-                if let error = authViewModel.errorMessage.wrappedValue {
+                if let error = authViewModel.errorMessage {
                     alertMessage = error
                     showAlert = true
                 } else {

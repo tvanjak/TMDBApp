@@ -29,69 +29,75 @@ struct ProfileView: View {
     @State private var updateAlertMessage = ""
     
     var body: some View {
-        //        if profileViewModel.isProfileLoaded {
-        VStack {
-            ScrollView {
-                VStack (spacing: AppTheme.Spacing.medium) {
-                    ProfileHeader(profileViewModel: profileViewModel, selectedSection: $selectedSection, editMode: $editMode)
-                    
-                    SectionsBar(selectedSection: $selectedSection) { section in
-                        switch section {
-                        case .details: "Details"
-                        case .reviews: "Reviews"
-                        case .password: "Password"
+        if profileViewModel.isProfileLoaded {
+            VStack {
+                ScrollView {
+                    VStack (spacing: AppTheme.Spacing.medium) {
+                        ProfileHeader(profileViewModel: profileViewModel, selectedSection: $selectedSection, editMode: $editMode)
+                        
+                        SectionsBar(selectedSection: $selectedSection) { section in
+                            switch section {
+                            case .details: "Details"
+                            case .reviews: "Reviews"
+                            case .password: "Password"
+                            }
+                        }
+                        
+                        switch selectedSection {
+                        case .details:
+                            DetailsSection(profileViewModel: profileViewModel, editMode: $editMode, addPhoneNumber: $addPhoneNumber, wantToLogOut: $wantToLogOut)
+                        case .reviews:
+                            ReviewsSection()
+                        case .password:
+                            PasswordSection(profileViewModel: profileViewModel)
                         }
                     }
-                    
-                    switch selectedSection {
-                    case .details:
-                        DetailsSection(profileViewModel: profileViewModel, editMode: $editMode, addPhoneNumber: $addPhoneNumber, wantToLogOut: $wantToLogOut)
-                    case .reviews:
-                        ReviewsSection()
-                    case .password:
-                        PasswordSection(profileViewModel: profileViewModel)
+                    .padding(AppTheme.Spacing.large)
+                }
+                
+                if editMode {
+                    SaveUserDataButton(profileViewModel: profileViewModel, editMode: $editMode, saveAlertMessage: $saveAlertMessage, showSaveAlert: $showSaveAlert)
+                }
+                if selectedSection == .password {
+                    UpdatePasswordButton(profileViewModel: profileViewModel, updateAlertMessage: $updateAlertMessage, showUpdateAlert: $showUpdateAlert, selectedSection: $selectedSection)
+                }
+            }
+            .alert("Log out?", isPresented: $wantToLogOut) {
+                Button("Cancel") {
+                    wantToLogOut = false
+                }
+                Button("OK") {
+                    profileViewModel.signOut()
+                }
+            } message: {
+                Text("Are you sure you want to log out")
+            }
+            .alert("Profile Update", isPresented: $showSaveAlert) {
+                Button("OK") { }
+            } message: {
+                Text(saveAlertMessage)
+            }
+            .alert("Password Update", isPresented: $showUpdateAlert) {
+                Button("OK") { }
+            } message: {
+                Text(updateAlertMessage)
+            }
+        } else {
+            ProgressView("Loading…")
+                .onAppear {
+                    Task {
+                        await profileViewModel.fetchUserProfileData()
                     }
                 }
-                .padding(AppTheme.Spacing.large)
-            }
+        }
             
-            if editMode {
-                SaveUserDataButton(profileViewModel: profileViewModel, editMode: $editMode, saveAlertMessage: $saveAlertMessage, showSaveAlert: $showSaveAlert)
-            }
-            if selectedSection == .password {
-                UpdatePasswordButton(profileViewModel: profileViewModel, updateAlertMessage: $updateAlertMessage, showUpdateAlert: $showUpdateAlert, selectedSection: $selectedSection)
-            }
-        }
-        .alert("Log out?", isPresented: $wantToLogOut) {
-            Button("Cancel") {
-                wantToLogOut = false
-            }
-            Button("OK") {
-                profileViewModel.signOut()
-            }
-        } message: {
-            Text("Are you sure you want to log out")
-        }
-        .alert("Profile Update", isPresented: $showSaveAlert) {
-            Button("OK") { }
-        } message: {
-            Text(saveAlertMessage)
-        }
-        .alert("Password Update", isPresented: $showUpdateAlert) {
-            Button("OK") { }
-        } message: {
-            Text(updateAlertMessage)
-        }
-        //        } else {
-        //            ProgressView("Loading…")
-        //        }
     }
 }
 
 
 
 #Preview {
-    let profileViewModel = ProfileViewModel(sessionManager: SessionManager(sessionRepo: SessionRepository()))
+    let profileViewModel = ProfileViewModel(profileRepository: ProfileRepository())
 //    profileViewModel.firstName = "John"
 //    profileViewModel.lastName = "Doe"
 //    profileViewModel.profileEmail = "john.doe@example.com"

@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Factory
+import FirebaseFirestore
 
 extension Container {
     // Repositories
@@ -15,9 +16,22 @@ extension Container {
             .singleton  
     }
     
-    var sessionRepository: Factory<SessionRepositoryProtocol> {
-        self { SessionRepository() }
-            .singleton
+    var authenticationRepository: Factory<AuthenticationRepository> {
+        self { @MainActor in
+            AuthenticationRepository(
+                db: Firestore.firestore()
+            )
+        }
+        .singleton
+    }
+    
+    var profileRepository: Factory<ProfileRepository> {
+        self { @MainActor in
+            ProfileRepository(
+                db: Firestore.firestore()
+            )
+        }
+        .singleton
     }
     
     // Managers
@@ -25,16 +39,7 @@ extension Container {
         self { @MainActor in
             FavoritesManager(
                 favoritesRepo: self.favoritesRepository(),
-                sessionRepo: self.sessionRepository(),
-            )
-        }
-        .singleton
-    }
-    
-    var sessionManager: Factory<SessionManager> {
-        self { @MainActor in
-            SessionManager(
-                sessionRepo: self.sessionRepository(),
+                authenticationRepo: self.authenticationRepository()
             )
         }
         .singleton
@@ -70,7 +75,7 @@ extension Container {
     var authViewModel: Factory<AuthenticationViewModel> {
         self { @MainActor in
             AuthenticationViewModel(
-                sessionManager: self.sessionManager()
+                authenticationRepository: self.authenticationRepository()
             )
         }
         .singleton
@@ -79,7 +84,7 @@ extension Container {
     var profileViewModel: Factory<ProfileViewModel> {
         self { @MainActor in
             ProfileViewModel(
-                sessionManager: self.sessionManager()
+                profileRepository: self.profileRepository(),
             )
         }
         .singleton

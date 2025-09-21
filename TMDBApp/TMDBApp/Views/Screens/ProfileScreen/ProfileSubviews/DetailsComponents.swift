@@ -86,7 +86,7 @@ struct MemberSince: View {
             .font(AppTheme.Typography.body)
             .foregroundStyle(.secondary)
             .fontWeight(.regular)
-        Text(profileViewModel.memberSince.wrappedValue)
+        Text(profileViewModel.profile.memberSince)
             .font(AppTheme.Typography.subtitle)
     }
 }

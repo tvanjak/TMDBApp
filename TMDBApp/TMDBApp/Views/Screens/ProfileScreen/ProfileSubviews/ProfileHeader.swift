@@ -42,7 +42,7 @@ struct ProfileHeader: View {
                 }
             }
             
-            Text("Hi, \(profileViewModel.firstName.wrappedValue) \(profileViewModel.lastName.wrappedValue)")
+            Text("Hi, \(profileViewModel.profile.firstName) \(profileViewModel.profile.lastName)")
                 .font(AppTheme.Typography.title)
                 .fontWeight(.bold)
             

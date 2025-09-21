@@ -43,7 +43,7 @@ struct HomeView: View {
 
 #Preview {
     HomeView(homeViewModel: HomeViewModel(
-        favoritesManager: FavoritesManager(favoritesRepo: FavoritesRepository(), sessionRepo: SessionRepository()),
+        favoritesManager: FavoritesManager(favoritesRepo: FavoritesRepository(), authenticationRepo: AuthenticationRepository()),
         navigationService: Router()
     ))
 }

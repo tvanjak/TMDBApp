@@ -14,21 +14,21 @@ final class FavoritesManager: ObservableObject {
     @Published var favorites: [MediaItem] = []
     
     private let favoritesRepo: FavoritesRepositoryProtocol
-    private let sessionRepo: SessionRepositoryProtocol
+    private let authenticationRepo: AuthenticationRepositoryProtocol
     
-    init(favoritesRepo: FavoritesRepositoryProtocol, sessionRepo: SessionRepositoryProtocol) {
+    init(favoritesRepo: FavoritesRepositoryProtocol, authenticationRepo: AuthenticationRepositoryProtocol) {
         self.favoritesRepo = favoritesRepo
-        self.sessionRepo = sessionRepo
+        self.authenticationRepo = authenticationRepo
         loadFavorites()
     }
     
     private func loadFavorites() {
-        guard let uid = sessionRepo.currentUserId else { return }
+        guard let uid = authenticationRepo.currentUserId else { return }
         favorites = favoritesRepo.loadFavorites(for: uid)
     }
     
     func toggleFavorite(_ media: MediaItem) {
-        guard let _ = sessionRepo.currentUserId else { return }
+        guard let _ = authenticationRepo.currentUserId else { return }
         if isFavorite(media) {
             removeFavorite(media)
         } else {
@@ -49,13 +49,13 @@ final class FavoritesManager: ObservableObject {
     }
     
     private func addFavorite(_ media: MediaItem) {
-        guard let uid = sessionRepo.currentUserId else { return }
+        guard let uid = authenticationRepo.currentUserId else { return }
         favorites.append(media)
         favoritesRepo.saveFavorites(favorites, for: uid)
     }
     
     private func removeFavorite(_ media: MediaItem) {
-        guard let uid = sessionRepo.currentUserId else { return }
+        guard let uid = authenticationRepo.currentUserId else { return }
         favorites.removeAll { $0.id == media.id }
         favoritesRepo.saveFavorites(favorites, for: uid)
     }

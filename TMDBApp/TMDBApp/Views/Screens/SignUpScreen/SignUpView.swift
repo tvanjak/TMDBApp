@@ -10,9 +10,7 @@ import SwiftUI
 
 struct SignUpView: View {
     @ObservedObject var authViewModel: AuthenticationViewModel
-    
-    @State private var localErrorMessage: String?
-    
+        
     @State private var showAlert = false
     @State private var alertMessage = ""
     
@@ -29,12 +27,9 @@ struct SignUpView: View {
                             
                             SignUpInputTextfields(authViewModel: authViewModel)
                             
-                            // Display error messages
-                            ErrorMessage(authViewModel: authViewModel, localErrorMessage: $localErrorMessage)
-                            
                             CustomDivider()
                             
-                            SignUpButton(authViewModel: authViewModel, localErrorMessage: $localErrorMessage, alertMessage: $alertMessage, showAlert: $showAlert)
+                            SignUpButton(authViewModel: authViewModel, alertMessage: $alertMessage, showAlert: $showAlert)
                             
                             
                             LoginLink(authViewModel: authViewModel)
@@ -48,5 +43,5 @@ struct SignUpView: View {
 }
 
 #Preview {
-    SignUpView(authViewModel: AuthenticationViewModel(sessionManager: SessionManager(sessionRepo: SessionRepository())))
+    SignUpView(authViewModel: AuthenticationViewModel(authenticationRepository: AuthenticationRepository()))
 }
