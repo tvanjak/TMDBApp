@@ -13,7 +13,7 @@ import Combine
 @MainActor
 final class AuthenticationViewModel: ObservableObject {
     private let authenticationRepository: AuthenticationRepositoryProtocol
-    private var cancellables = Set<AnyCancellable>()
+//    private var cancellables = Set<AnyCancellable>()
 
     @Published var email: String = ""
     @Published var password: String = ""

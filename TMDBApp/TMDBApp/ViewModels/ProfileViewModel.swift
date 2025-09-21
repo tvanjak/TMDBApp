@@ -12,7 +12,7 @@ import Combine
 @MainActor
 final class ProfileViewModel: ObservableObject {
     private let profileRepository: ProfileRepositoryProtocol
-    private var cancellables = Set<AnyCancellable>()
+//    private var cancellables = Set<AnyCancellable>()
     @Published private(set) var currentUser: User?
     
     @Published var profile: UserProfile = UserProfile()
