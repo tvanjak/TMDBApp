@@ -8,7 +8,7 @@ import SwiftUI
 
 
 struct CrewView: View {
-    var crew: [CrewMember]
+    var crew: [CrewMemberUI]
     
     var body: some View {
         VStack {
@@ -28,7 +28,7 @@ struct CrewView: View {
 
 
 struct CrewMemberCard: View {
-    var crew: [CrewMember]
+    var crew: [CrewMemberUI]
     var index: Int
     
     var body: some View {

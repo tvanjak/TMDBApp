@@ -91,6 +91,7 @@ final class AuthenticationRepository: AuthenticationRepositoryProtocol {
     
     func signIn(email: String, password: String) async throws {
         let result = try await Auth.auth().signIn(withEmail: email, password: password)
+        /// Publishing changes from background threads is not allowed; make sure to publish values from the main thread (via operators like receive(on:)) on model updates.
         self.currentUser = result.user
         print("[Auth] Signed in as \(result.user.email ?? "unknown")")
     }

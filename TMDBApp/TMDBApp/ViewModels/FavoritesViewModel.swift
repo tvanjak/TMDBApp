@@ -9,7 +9,7 @@ import SwiftUI
 
 @MainActor
 final class FavoritesViewModel: ObservableObject {
-    @Published var favorites: [MediaItem] = []
+    @Published var favorites: [MediaItemUI] = []
     
     private let favoritesManager: FavoritesManager
     private let navigationService: NavigationViewModelProtocol
@@ -27,19 +27,19 @@ final class FavoritesViewModel: ObservableObject {
     }
     
     // FAVORITES FUNCTIONS -------------------------------
-    func toggleFavorite(_ media: MediaItem) {
+    func toggleFavorite(_ media: MediaItemUI) {
         favoritesManager.toggleFavorite(media)
     }
     
-    func isFavorite(_ media: MediaItem) -> Bool {
+    func isFavorite(_ media: MediaItemUI) -> Bool {
         return favoritesManager.isFavorite(media)
     }
     
-    func getFavoriteIcon(_ media: MediaItem) -> String {
+    func getFavoriteIcon(_ media: MediaItemUI) -> String {
         return favoritesManager.getFavoriteIcon(media)
     }
     
-    func getFavoriteColor(_ media: MediaItem) -> Color {
+    func getFavoriteColor(_ media: MediaItemUI) -> Color {
         return favoritesManager.getFavoriteColor(media)
     }
     // ------------------------------------------------------------

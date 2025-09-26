@@ -10,7 +10,7 @@ import SwiftUI
 
 struct FavoriteCardView: View {
     @ObservedObject var favoritesViewModel: FavoritesViewModel
-    var media: MediaItem
+    var media: MediaItemUI
     
     var body: some View {
 //        Button(action: { mediaViewModel.navigateToMedia(media) }) {

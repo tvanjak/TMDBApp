@@ -6,7 +6,7 @@ class TMDBService {
     private init() {}
 
     //MOVIES
-    func fetchPopularMovies() async throws -> [MediaItem] {
+    func fetchPopularMovies() async throws -> [MediaItemUI] {
         let urlString = "\(Constants.baseURL)/movie/popular?api_key=\(Constants.apiKey)&language=en-US"
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
@@ -19,12 +19,14 @@ class TMDBService {
             throw URLError(.badServerResponse)
         }
         
-        let decodedResponse = try JSONDecoder().decode(MediaItemResponse.self, from: data)
-        return decodedResponse.results
+        let decodedResponse = try JSONDecoder().decode(MediaItemDTOResponse.self, from: data)
+        let dtos = decodedResponse.results
+        let uiModels = dtos.map(MediaItemUI.init)
+        return uiModels
     }
 
     
-    func fetchTrendingMovies() async throws -> [MediaItem] {
+    func fetchTrendingMovies() async throws -> [MediaItemUI] {
         let urlString = "\(Constants.baseURL)/trending/movie/day?api_key=\(Constants.apiKey)"
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
@@ -37,12 +39,14 @@ class TMDBService {
             throw URLError(.badServerResponse)
         }
 
-        let decodedResponse = try JSONDecoder().decode(MediaItemResponse.self, from: data)
-        return decodedResponse.results
+        let decodedResponse = try JSONDecoder().decode(MediaItemDTOResponse.self, from: data)
+        let dtos = decodedResponse.results
+        let uiModels = dtos.map(MediaItemUI.init)
+        return uiModels
     }
     
 
-    func fetchUpcomingMovies() async throws -> [MediaItem] {
+    func fetchUpcomingMovies() async throws -> [MediaItemUI] {
         let urlString = "\(Constants.baseURL)/movie/upcoming?api_key=\(Constants.apiKey)"
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
@@ -55,12 +59,14 @@ class TMDBService {
             throw URLError(.badServerResponse)
         }
 
-        let decodedResponse = try JSONDecoder().decode(MediaItemResponse.self, from: data)
-        return decodedResponse.results
+        let decodedResponse = try JSONDecoder().decode(MediaItemDTOResponse.self, from: data)
+        let dtos = decodedResponse.results
+        let uiModels = dtos.map(MediaItemUI.init)
+        return uiModels
     }
     
 
-    func fetchNowPlayingMovies() async throws -> [MediaItem] {
+    func fetchNowPlayingMovies() async throws -> [MediaItemUI] {
         let urlString = "\(Constants.baseURL)/movie/now_playing?api_key=\(Constants.apiKey)"
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
@@ -73,13 +79,15 @@ class TMDBService {
             throw URLError(.badServerResponse)
         }
 
-        let decodedResponse = try JSONDecoder().decode(MediaItemResponse.self, from: data)
-        return decodedResponse.results
+        let decodedResponse = try JSONDecoder().decode(MediaItemDTOResponse.self, from: data)
+        let dtos = decodedResponse.results
+        let uiModels = dtos.map(MediaItemUI.init)
+        return uiModels
     }
     
     
-    // MOVIE DETAILS
-    func fetchDetails(for media: MediaType) async throws -> any MediaItemDetails {
+    // MEDIA DETAILS
+    func fetchDetails(for media: MediaType) async throws -> any MediaDetailsUI {
         let urlString: String
         
         switch media {
@@ -95,16 +103,18 @@ class TMDBService {
         
         switch media {
         case .movie:
-            return try JSONDecoder().decode(MovieDetails.self, from: data)
+            let dtoData = try JSONDecoder().decode(MovieDetailsDTO.self, from: data)
+            return MovieDetailsUI(from: dtoData)
         case .tvShow:
-            return try JSONDecoder().decode(TVShowDetails.self, from: data)
+            let dtoData = try JSONDecoder().decode(TVShowDetailsDTO.self, from: data)
+            return TVShowDetailsUI(from: dtoData)
         }
     }
     
     
     
     // TV SHOWS
-    func fetchPopularTVShows() async throws -> [MediaItem] {
+    func fetchPopularTVShows() async throws -> [MediaItemUI] {
         let urlString = "\(Constants.baseURL)/tv/popular?api_key=\(Constants.apiKey)&language=en-US"
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
@@ -117,11 +127,13 @@ class TMDBService {
             throw URLError(.badServerResponse)
         }
 
-        let decodedResponse = try JSONDecoder().decode(MediaItemResponse.self, from: data)
-        return decodedResponse.results
+        let decodedResponse = try JSONDecoder().decode(MediaItemDTOResponse.self, from: data)
+        let dtos = decodedResponse.results
+        let uiModels = dtos.map(MediaItemUI.init)
+        return uiModels
     }
     
-    func fetchTopRatedTVShows() async throws -> [MediaItem] {
+    func fetchTopRatedTVShows() async throws -> [MediaItemUI] {
         let urlString = "\(Constants.baseURL)/tv/top_rated?api_key=\(Constants.apiKey)&language=en-US"
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
@@ -134,14 +146,16 @@ class TMDBService {
             throw URLError(.badServerResponse)
         }
 
-        let decodedResponse = try JSONDecoder().decode(MediaItemResponse.self, from: data)
-        return decodedResponse.results
+        let decodedResponse = try JSONDecoder().decode(MediaItemDTOResponse.self, from: data)
+        let dtos = decodedResponse.results
+        let uiModels = dtos.map(MediaItemUI.init)
+        return uiModels
     }
     
     
     
     // SEARCH
-    func fetchSearchedMovies(query: String) async throws -> [MediaItem] {
+    func fetchSearchedMovies(query: String) async throws -> [MediaItemUI] {
         let urlString = "\(Constants.baseURL)/search/movie?api_key=\(Constants.apiKey)&query=\(query)"
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
@@ -154,11 +168,13 @@ class TMDBService {
             throw URLError(.badServerResponse)
         }
         
-        let decodedResponse = try JSONDecoder().decode(MediaItemResponse.self, from: data)
-        return decodedResponse.results
+        let decodedResponse = try JSONDecoder().decode(MediaItemDTOResponse.self, from: data)
+        let dtos = decodedResponse.results
+        let uiModels = dtos.map(MediaItemUI.init)
+        return uiModels
     }
     
-    func fetchSearchedTVShows(query: String) async throws -> [MediaItem] {
+    func fetchSearchedTVShows(query: String) async throws -> [MediaItemUI] {
         let urlString = "\(Constants.baseURL)/search/tv?api_key=\(Constants.apiKey)&query=\(query)"
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
@@ -171,7 +187,9 @@ class TMDBService {
             throw URLError(.badServerResponse)
         }
         
-        let decodedResponse = try JSONDecoder().decode(MediaItemResponse.self, from: data)
-        return decodedResponse.results
+        let decodedResponse = try JSONDecoder().decode(MediaItemDTOResponse.self, from: data)
+        let dtos = decodedResponse.results
+        let uiModels = dtos.map(MediaItemUI.init)
+        return uiModels
     }
 }

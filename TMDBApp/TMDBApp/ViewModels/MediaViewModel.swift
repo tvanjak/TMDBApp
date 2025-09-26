@@ -10,8 +10,8 @@ import SwiftUI
 @MainActor
 final class MediaViewModel: ObservableObject {
     @Published var errorMessage: String?
-    @Published var mediaDetail: (any MediaItemDetails)?
-    @Published var favorites: [MediaItem] = []
+    @Published var mediaDetail: (any MediaDetailsUI)?
+    @Published var favorites: [MediaItemUI] = []
     
     private let favoritesManager: FavoritesManager
     
@@ -26,34 +26,34 @@ final class MediaViewModel: ObservableObject {
     }
     
     // FAVORITES FUNCTIONS -------------------------------
-    func toggleFavorite(_ media: MediaItem) {
+    func toggleFavorite(_ media: MediaItemUI) {
         favoritesManager.toggleFavorite(media)
     }
     
-    func isFavorite(_ media: MediaItem) -> Bool {
+    func isFavorite(_ media: MediaItemUI) -> Bool {
         return favoritesManager.isFavorite(media)
     }
     
-    func getFavoriteIcon(_ media: MediaItem) -> String {
+    func getFavoriteIcon(_ media: MediaItemUI) -> String {
         return favoritesManager.getFavoriteIcon(media)
     }
     
-    func getFavoriteColor(_ media: MediaItem) -> Color {
+    func getFavoriteColor(_ media: MediaItemUI) -> Color {
         return favoritesManager.getFavoriteColor(media)
     }
     // ------------------------------------------------------------
 
     
-    // MOVIE DETAILS
+    // MEDIA DETAILS
     func loadDetails(media: MediaType) async {
         do {
             switch media {
             case .movie(let id):
-                let movie: any MediaItemDetails = try await TMDBService.shared.fetchDetails(for: .movie(id: id))
+                let movie: any MediaDetailsUI = try await TMDBService.shared.fetchDetails(for: .movie(id: id))
                 self.mediaDetail = movie
                 
             case .tvShow(let id):
-                let tvShow: any MediaItemDetails = try await TMDBService.shared.fetchDetails(for: .tvShow(id: id))
+                let tvShow: any MediaDetailsUI = try await TMDBService.shared.fetchDetails(for: .tvShow(id: id))
                 self.mediaDetail = tvShow
             }
         } catch {

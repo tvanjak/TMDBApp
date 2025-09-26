@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SearchMediaCard: View {
-    var media: MediaItem
+    var media: MediaItemUI
     
     var body: some View {
         ZStack (alignment: .center) {
@@ -61,7 +61,7 @@ struct SearchMediaCard: View {
                         .truncationMode(.tail)
                         .multilineTextAlignment(.leading)
                 }
-                .padding(AppTheme.Spacing.medium)
+                .padding(AppTheme.Spacing.small)
                 .frame(width: 210, height: 180)
             }
             .frame(height: 180)

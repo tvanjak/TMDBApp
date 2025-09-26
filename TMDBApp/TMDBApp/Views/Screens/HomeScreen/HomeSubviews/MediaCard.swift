@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MediaCard: View {
-    let media: MediaItem
+    let media: MediaItemUI
     @ObservedObject var homeViewModel: HomeViewModel
     
     var body: some View {

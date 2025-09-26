@@ -8,8 +8,8 @@
 import SwiftUI
 
 protocol FavoritesRepositoryProtocol {
-    func loadFavorites(for userId: String) -> [MediaItem]
-    func saveFavorites(_ favorites: [MediaItem], for userId: String)
+    func loadFavorites(for userId: String) -> [MediaItemUI]
+    func saveFavorites(_ favorites: [MediaItemUI], for userId: String)
 }
 
 
@@ -17,17 +17,17 @@ class FavoritesRepository: FavoritesRepositoryProtocol {
     
     private let userDefaults: UserDefaults = .standard
     
-    func loadFavorites(for userId: String) -> [MediaItem] {
+    func loadFavorites(for userId: String) -> [MediaItemUI] {
         guard let data = userDefaults.data(forKey: "favorites_\(userId)") else { return [] }
         do {
-            return try JSONDecoder().decode([MediaItem].self, from: data)
+            return try JSONDecoder().decode([MediaItemUI].self, from: data)
         } catch {
             print("Error decoding favorites: \(error)")
             return []
         }
     }
     
-    func saveFavorites(_ favorites: [MediaItem], for userId: String) {
+    func saveFavorites(_ favorites: [MediaItemUI], for userId: String) {
         do {
             let data = try JSONEncoder().encode(favorites)
             userDefaults.set(data, forKey: "favorites_\(userId)")

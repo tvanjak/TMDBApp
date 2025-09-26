@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CastView: View {
-    var cast: [CastMember]
+    var cast: [CastMemberUI]
     
     var body: some View {
         if !cast.isEmpty {
@@ -31,7 +31,7 @@ struct CastView: View {
 
 
 struct CastMemberCard: View {
-    var castMember: CastMember
+    var castMember: CastMemberUI
     
     var body: some View {
         VStack (alignment: .leading, spacing: AppTheme.Spacing.small) {

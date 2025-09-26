@@ -15,7 +15,7 @@ struct SearchMoviesList: View {
             Text("Movies")
                 .font(AppTheme.Typography.title)
                 .fontWeight(.bold)
-            ScrollView (.horizontal, showsIndicators: false) {
+            ScrollView (.horizontal) {
                 LazyHStack (spacing: AppTheme.Spacing.medium) {
                     ForEach(homeViewModel.searchedMovies, id: \.id) { movie in
                         Button(action: { homeViewModel.navigateToMedia(MediaType.movie(id: movie.id)) }) {
@@ -37,7 +37,7 @@ struct SearchTVShowsList: View {
             Text("TVShows")
                 .font(AppTheme.Typography.title)
                 .fontWeight(.bold)
-            ScrollView (.horizontal, showsIndicators: false) {
+            ScrollView (.horizontal) {
                 LazyHStack (spacing: AppTheme.Spacing.medium) {
                     ForEach(homeViewModel.searchedTVShows, id: \.id) { tvShow in
                         Button(action: { homeViewModel.navigateToMedia(MediaType.tvShow(id: tvShow.id)) }) {

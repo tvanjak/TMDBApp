@@ -3,16 +3,16 @@ import SwiftUI
 
 @MainActor
 final class HomeViewModel: ObservableObject {
-    @Published var popularMovies: [MediaItem] = []
-    @Published var trendingMovies: [MediaItem] = []
-    @Published var upcomingMovies: [MediaItem] = []
-    @Published var nowPlayingMovies: [MediaItem] = []
+    @Published var popularMovies: [MediaItemUI] = []
+    @Published var trendingMovies: [MediaItemUI] = []
+    @Published var upcomingMovies: [MediaItemUI] = []
+    @Published var nowPlayingMovies: [MediaItemUI] = []
     
-    @Published var popularTVShows: [MediaItem] = []
-    @Published var topRatedTVShows: [MediaItem] = []
+    @Published var popularTVShows: [MediaItemUI] = []
+    @Published var topRatedTVShows: [MediaItemUI] = []
 
-    @Published var searchedMovies: [MediaItem] = []
-    @Published var searchedTVShows: [MediaItem] = []
+    @Published var searchedMovies: [MediaItemUI] = []
+    @Published var searchedTVShows: [MediaItemUI] = []
 
     @Published var searchTerm = ""
     
@@ -38,11 +38,11 @@ final class HomeViewModel: ObservableObject {
         }
     }
     
-    @Published var currentMovies: [MediaItem] = []
-    @Published var currentTVShows: [MediaItem] = []
+    @Published var currentMovies: [MediaItemUI] = []
+    @Published var currentTVShows: [MediaItemUI] = []
     
     @Published var errorMessage: String?
-    @Published var favorites: [MediaItem] = []
+    @Published var favorites: [MediaItemUI] = []
     
     private let favoritesManager: FavoritesManager
     private let navigationService: NavigationViewModelProtocol
@@ -66,19 +66,19 @@ final class HomeViewModel: ObservableObject {
     }
     
     // FAVORITES FUNCTIONS -------------------------------
-    func toggleFavorite(_ media: MediaItem) {
+    func toggleFavorite(_ media: MediaItemUI) {
         favoritesManager.toggleFavorite(media)
     }
     
-    func isFavorite(_ media: MediaItem) -> Bool {
+    func isFavorite(_ media: MediaItemUI) -> Bool {
         return favoritesManager.isFavorite(media)
     }
     
-    func getFavoriteIcon(_ media: MediaItem) -> String {
+    func getFavoriteIcon(_ media: MediaItemUI) -> String {
         return favoritesManager.getFavoriteIcon(media)
     }
     
-    func getFavoriteColor(_ media: MediaItem) -> Color {
+    func getFavoriteColor(_ media: MediaItemUI) -> Color {
         return favoritesManager.getFavoriteColor(media)
     }
     // ------------------------------------------------------------
@@ -138,7 +138,7 @@ final class HomeViewModel: ObservableObject {
     // ------------------------------------------------------------
 
     
-    // MOVIE LOADING FUNCTIONS -------------------------------
+    // MOVIE LOADING FUNCTIONS ------------------------------------
     func loadPopularMovies() async {
         do {
             popularMovies = try await TMDBService.shared.fetchPopularMovies()
@@ -153,6 +153,7 @@ final class HomeViewModel: ObservableObject {
     func loadTrendingMovies() async {
         do {
             trendingMovies = try await TMDBService.shared.fetchTrendingMovies()
+            
             if selectedMovieSection == .trending {
                 currentMovies = trendingMovies
             }
@@ -163,7 +164,8 @@ final class HomeViewModel: ObservableObject {
     
     func loadUpcomingMovies() async {
         do {
-            upcomingMovies = try await TMDBService.shared.fetchUpcomingMovies()
+            upcomingMovies = try await TMDBService.shared.fetchTrendingMovies()
+            
             if selectedMovieSection == .upcoming {
                 currentMovies = upcomingMovies
             }
@@ -174,7 +176,8 @@ final class HomeViewModel: ObservableObject {
     
     func loadNowPlayingMovies() async {
         do {
-            nowPlayingMovies = try await TMDBService.shared.fetchNowPlayingMovies()
+            nowPlayingMovies = try await TMDBService.shared.fetchTrendingMovies()
+            
             if selectedMovieSection == .nowPlaying {
                 currentMovies = nowPlayingMovies
             }
@@ -204,6 +207,7 @@ final class HomeViewModel: ObservableObject {
     func loadPopularTVShows() async {
         do {
             popularTVShows = try await TMDBService.shared.fetchPopularTVShows()
+            
             if selectedTVShowSection == .popular {
                 currentTVShows = popularTVShows
             }
@@ -215,6 +219,7 @@ final class HomeViewModel: ObservableObject {
     func loadTopRatedTVShows() async {
         do {
             topRatedTVShows = try await TMDBService.shared.fetchTopRatedTVShows()
+            
             if selectedTVShowSection == .topRated {
                 currentTVShows = topRatedTVShows
             }
