@@ -22,8 +22,8 @@ struct MediaItemUI: Identifiable, Codable {
         // release year
         let rawDate = dto.releaseDate ?? dto.firstAirDate
         if let rawDate,
-           let date = DateFormatter.yyyyMMdd.date(from: rawDate) {
-            self.releaseYear = DateFormatter.yyyy.string(from: date)
+           let date = CustomDateFormatter.fromYYYYMMdd(rawDate) {
+            self.releaseYear = CustomDateFormatter.toYYYY(date)
         } else {
             self.releaseYear = "N/A"
         }
@@ -44,27 +44,3 @@ struct MediaItemUI: Identifiable, Codable {
         self.fullPosterPath = details.fullPosterPath
     }
 }
-
-
-
-extension DateFormatter {
-    static let yyyyMMdd: DateFormatter = {
-        let df = DateFormatter()
-        df.dateFormat = "yyyy-MM-dd"
-        return df
-    }()
-    
-    static let yyyy: DateFormatter = {
-        let df = DateFormatter()
-        df.dateFormat = "yyyy"
-        return df
-    }()
-    
-    static let ddMMyyyy: DateFormatter = {
-        let df = DateFormatter()
-        df.dateFormat = "dd/MM/yyyy"
-        return df
-    }()
-}
-
-

@@ -55,9 +55,9 @@ struct MovieDetailsUI: Identifiable, MediaDetailsUI {
         self.formattedGenres = dto.genres.map(\.name).joined(separator: ", ")
         
         // dates
-        if let date = DateFormatter.yyyyMMdd.date(from: dto.releaseDate) {
-            self.releaseYear = DateFormatter.yyyy.string(from: date)
-            self.invertedDate = DateFormatter.ddMMyyyy.string(from: date)
+        if let date = CustomDateFormatter.fromYYYYMMdd(dto.releaseDate) {
+            self.releaseYear = CustomDateFormatter.toYYYY(date)
+            self.invertedDate = CustomDateFormatter.toDDMMYYYY(date)
         } else {
             self.releaseYear = "N/A"
             self.invertedDate = "N/A"
