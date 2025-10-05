@@ -76,6 +76,7 @@ extension Container {
         self { @MainActor in
             MediaViewModel(
                 favoritesManager: self.favoritesManager(),
+                mediaRepo: self.mediaRepository()
             )
         }
         .singleton
