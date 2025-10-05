@@ -21,7 +21,6 @@ class TMDBService {
         
         let decodedResponse = try JSONDecoder().decode(MediaItemDTOResponse.self, from: data)
         let dtos = decodedResponse.results
-//        let uiModels = dtos.map(MediaItemUI.init)
         return dtos
     }
 
@@ -101,11 +100,9 @@ class TMDBService {
         switch media {
         case .movie:
             let dtoData = try JSONDecoder().decode(MovieDetailsDTO.self, from: data)
-//            return MovieDetailsUI(from: dtoData)
             return dtoData
         case .tvShow:
             let dtoData = try JSONDecoder().decode(TVShowDetailsDTO.self, from: data)
-//            return TVShowDetailsUI(from: dtoData)
             return dtoData
         }
     }
