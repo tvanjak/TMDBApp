@@ -8,14 +8,14 @@
 import SwiftUI
 
 // Protocol for ViewModels
-protocol NavigationServiceProtocol {
-    func navigateToMovie(_ movieId: Int)
+protocol NavigationViewModelProtocol {
+    func navigateToMedia(_ media: MediaType)
     func goBack()
     func canGoBack() -> Bool
 }
 
-// Protocol for Views 
-protocol NavigationManagerProtocol {
+// Protocol for Views
+protocol NavigationProtocol {
     var path: NavigationPath { get set }
     
     func goBack()
@@ -23,7 +23,9 @@ protocol NavigationManagerProtocol {
     func navigateTo(_ route: Route)
 }
 
-class Router: NavigationManagerProtocol, NavigationServiceProtocol, ObservableObject {
+
+// Router class
+class Router: NavigationProtocol, NavigationViewModelProtocol, ObservableObject {
     @Published var path = NavigationPath()
     
     func goBack() {
@@ -39,8 +41,8 @@ class Router: NavigationManagerProtocol, NavigationServiceProtocol, ObservableOb
     }
     
     // Implementation for ViewModels
-    func navigateToMovie(_ movieId: Int) {
-        navigateTo(.mediaDetail(id: movieId))
+    func navigateToMedia(_ media: MediaType) {
+        navigateTo(.mediaDetail(media: media))
     }
 }
 
@@ -48,5 +50,5 @@ enum Route: Hashable {
     case home
     case favorites
     case profile
-    case mediaDetail(id: Int)
+    case mediaDetail(media: MediaType)
 }

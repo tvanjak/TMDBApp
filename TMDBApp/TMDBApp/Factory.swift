@@ -7,18 +7,44 @@
 
 import SwiftUI
 import Factory
+import FirebaseFirestore
 
 extension Container {
     // Repositories
     var favoritesRepository: Factory<FavoritesRepositoryProtocol> {
         self { FavoritesRepository() }
-            .singleton  
-    }
-    
-    var sessionRepository: Factory<SessionRepositoryProtocol> {
-        self { SessionRepository() }
             .singleton
     }
+    
+    var authenticationRepository: Factory<AuthenticationRepository> {
+        self { @MainActor in
+            AuthenticationRepository(
+                db: Firestore.firestore()
+            )
+        }
+        .singleton
+    }
+    
+    var profileRepository: Factory<ProfileRepository> {
+        self { @MainActor in
+            ProfileRepository(
+                db: Firestore.firestore()
+            )
+        }
+        .singleton
+    }
+    
+    // Managers
+    var favoritesManager: Factory<FavoritesManager> {
+        self { @MainActor in
+            FavoritesManager(
+                favoritesRepo: self.favoritesRepository(),
+                authenticationRepo: self.authenticationRepository()
+            )
+        }
+        .singleton
+    }
+
     
     // Services
     var router: Factory<Router> {
@@ -27,12 +53,20 @@ extension Container {
     }
     
     // ViewModels
-    var movieViewModel: Factory<MovieViewModel> {
+    var homeViewModel: Factory<HomeViewModel> {
         self { @MainActor in
-            MovieViewModel(
-                favoritesRepo: self.favoritesRepository(),
-                sessionRepo: self.sessionRepository(),
+            HomeViewModel(
+                favoritesManager: self.favoritesManager(),
                 navigationService: self.router()
+            )
+        }
+        .singleton
+    }
+    
+    var mediaViewModel: Factory<MediaViewModel> {
+        self { @MainActor in
+            MediaViewModel(
+                favoritesManager: self.favoritesManager(),
             )
         }
         .singleton
@@ -41,7 +75,26 @@ extension Container {
     var authViewModel: Factory<AuthenticationViewModel> {
         self { @MainActor in
             AuthenticationViewModel(
-                sessionRepo: self.sessionRepository()
+                authenticationRepository: self.authenticationRepository()
+            )
+        }
+        .singleton
+    }
+    
+    var profileViewModel: Factory<ProfileViewModel> {
+        self { @MainActor in
+            ProfileViewModel(
+                profileRepository: self.profileRepository(),
+            )
+        }
+        .singleton
+    }
+    
+    var favoritesViewModel: Factory<FavoritesViewModel> {
+        self { @MainActor in
+            FavoritesViewModel(
+                favoritesManager: self.favoritesManager(),
+                navigationService: self.router()
             )
         }
         .singleton
