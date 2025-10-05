@@ -5,7 +5,6 @@
 //  Created by Toni Vanjak on 17.09.2025..
 //
 
-import SwiftUI
 import FirebaseAuth
 import FirebaseFirestore
 import Combine
