@@ -167,7 +167,7 @@ final class HomeViewModel: ObservableObject {
     
     func loadUpcomingMovies() async {
         do {
-            let dtoData = try await TMDBService.shared.fetchTrendingMovies()
+            let dtoData = try await TMDBService.shared.fetchUpcomingMovies()
             upcomingMovies = dtoData.map(MediaItemViewModel.init)
             
             if selectedMovieSection == .upcoming {
@@ -180,7 +180,7 @@ final class HomeViewModel: ObservableObject {
     
     func loadNowPlayingMovies() async {
         do {
-            let dtoData = try await TMDBService.shared.fetchTrendingMovies()
+            let dtoData = try await TMDBService.shared.fetchNowPlayingMovies()
             nowPlayingMovies = dtoData.map(MediaItemViewModel.init)
             
             if selectedMovieSection == .nowPlaying {
