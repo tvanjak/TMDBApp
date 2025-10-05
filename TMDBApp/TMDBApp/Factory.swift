@@ -13,7 +13,7 @@ extension Container {
     // Repositories
     var favoritesRepository: Factory<FavoritesRepositoryProtocol> {
         self { FavoritesRepository() }
-            .singleton  
+            .singleton
     }
     
     var authenticationRepository: Factory<AuthenticationRepository> {
@@ -33,6 +33,14 @@ extension Container {
         }
         .singleton
     }
+    
+    var mediaRepository: Factory<MediaRepository> {
+        self { @MainActor in
+            MediaRepository()
+        }
+        .singleton
+    }
+    
     
     // Managers
     var favoritesManager: Factory<FavoritesManager> {
@@ -57,7 +65,8 @@ extension Container {
         self { @MainActor in
             HomeViewModel(
                 favoritesManager: self.favoritesManager(),
-                navigationService: self.router()
+                navigationService: self.router(),
+                mediaRepo: self.mediaRepository()
             )
         }
         .singleton
@@ -67,6 +76,7 @@ extension Container {
         self { @MainActor in
             MediaViewModel(
                 favoritesManager: self.favoritesManager(),
+                mediaRepo: self.mediaRepository()
             )
         }
         .singleton

@@ -1,9 +1,22 @@
 import Foundation
 
-class TMDBService {
-    static let shared = TMDBService()
+protocol MediaRepositoryProtocol {
+    func fetchPopularMovies() async throws -> [MediaItemDTO]
+    func fetchTrendingMovies() async throws -> [MediaItemDTO]
+    func fetchUpcomingMovies() async throws -> [MediaItemDTO]
+    func fetchNowPlayingMovies() async throws -> [MediaItemDTO]
+    
+    func fetchPopularTVShows() async throws -> [MediaItemDTO]
+    func fetchTopRatedTVShows() async throws -> [MediaItemDTO]
+    
+    func fetchDetails(for media: MediaType) async throws -> any MediaDetailsDTO
+    
+    func fetchSearchedMovies(query: String) async throws -> [MediaItemDTO]
+    func fetchSearchedTVShows(query: String) async throws -> [MediaItemDTO]
+}
 
-    private init() {}
+
+final class MediaRepository: MediaRepositoryProtocol {
 
     //MOVIES
     func fetchPopularMovies() async throws -> [MediaItemDTO] {

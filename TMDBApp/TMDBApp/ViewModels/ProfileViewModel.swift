@@ -38,8 +38,8 @@ final class ProfileViewModel: ObservableObject {
             return
         }
         do {
-            let fetched = try await profileRepository.fetchUserProfile(uid: uid)
-            self.profile = fetched
+            let userProfile = try await profileRepository.fetchUserProfile(uid: uid)
+            self.profile = userProfile
             isProfileLoaded = true
         } catch {
             errorMessage = "Failed to load profile: \(error.localizedDescription)"
@@ -47,10 +47,6 @@ final class ProfileViewModel: ObservableObject {
     }
     
     func updateUserProfileData() async {
-//        guard !profile.firstName.isEmpty || !profile.lastName.isEmpty else {
-//            errorMessage = "Profile is incomplete."
-//            return
-//        }
         do {
             try await profileRepository.updateUserProfileData(profile: profile)
         } catch {
