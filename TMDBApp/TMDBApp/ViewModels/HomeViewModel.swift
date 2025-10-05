@@ -46,16 +46,16 @@ final class HomeViewModel: ObservableObject {
     
     private let favoritesManager: FavoritesManager
     private let navigationService: NavigationViewModelProtocol
-//    private let mediaRepo: MediaRepositoryProtocol
+    private let mediaRepo: MediaRepositoryProtocol
     
     init(
         favoritesManager: FavoritesManager,
         navigationService: NavigationViewModelProtocol,
-//        mediaRepo: MediaRepositoryProtocol
+        mediaRepo: MediaRepositoryProtocol
     ) {
         self.favoritesManager = favoritesManager
         self.navigationService = navigationService
-//        self.mediaRepo = mediaRepo
+        self.mediaRepo = mediaRepo
         
         // Observe FavoritesManager changes
         favoritesManager.$favorites
@@ -144,7 +144,7 @@ final class HomeViewModel: ObservableObject {
     // MOVIE LOADING FUNCTIONS ------------------------------------
     func loadPopularMovies() async {
         do {
-            let dtoData = try await MediaRepository.shared.fetchPopularMovies()
+            let dtoData = try await mediaRepo.fetchPopularMovies()
             popularMovies = dtoData.map(MediaItemViewModel.init)
             
             if selectedMovieSection == .popular {
@@ -157,7 +157,7 @@ final class HomeViewModel: ObservableObject {
     
     func loadTrendingMovies() async {
         do {
-            let dtoData = try await MediaRepository.shared.fetchTrendingMovies()
+            let dtoData = try await mediaRepo.fetchTrendingMovies()
             trendingMovies = dtoData.map(MediaItemViewModel.init)
 
             if selectedMovieSection == .trending {
@@ -170,7 +170,7 @@ final class HomeViewModel: ObservableObject {
     
     func loadUpcomingMovies() async {
         do {
-            let dtoData = try await MediaRepository.shared.fetchUpcomingMovies()
+            let dtoData = try await mediaRepo.fetchUpcomingMovies()
             upcomingMovies = dtoData.map(MediaItemViewModel.init)
             
             if selectedMovieSection == .upcoming {
@@ -183,7 +183,7 @@ final class HomeViewModel: ObservableObject {
     
     func loadNowPlayingMovies() async {
         do {
-            let dtoData = try await MediaRepository.shared.fetchNowPlayingMovies()
+            let dtoData = try await mediaRepo.fetchNowPlayingMovies()
             nowPlayingMovies = dtoData.map(MediaItemViewModel.init)
             
             if selectedMovieSection == .nowPlaying {
@@ -214,7 +214,7 @@ final class HomeViewModel: ObservableObject {
     // TVShow FUNCTIONS
     func loadPopularTVShows() async {
         do {
-            let dtoData = try await MediaRepository.shared.fetchPopularTVShows()
+            let dtoData = try await mediaRepo.fetchPopularTVShows()
             popularTVShows = dtoData.map(MediaItemViewModel.init)
             
             if selectedTVShowSection == .popular {
@@ -227,7 +227,7 @@ final class HomeViewModel: ObservableObject {
     
     func loadTopRatedTVShows() async {
         do {
-            let dtoData = try await MediaRepository.shared.fetchTopRatedTVShows()
+            let dtoData = try await mediaRepo.fetchTopRatedTVShows()
             topRatedTVShows = dtoData.map(MediaItemViewModel.init)
             
             if selectedTVShowSection == .topRated {
@@ -242,10 +242,10 @@ final class HomeViewModel: ObservableObject {
     // SEARCH FUNCTION
     func search() async {
         do {
-            let dtoData1 = try await MediaRepository.shared.fetchSearchedMovies(query: searchTerm)
+            let dtoData1 = try await mediaRepo.fetchSearchedMovies(query: searchTerm)
             searchedMovies = dtoData1.map(MediaItemViewModel.init)
             
-            let dtoData2 = try await MediaRepository.shared.fetchSearchedTVShows(query: searchTerm)
+            let dtoData2 = try await mediaRepo.fetchSearchedTVShows(query: searchTerm)
             searchedTVShows = dtoData2.map(MediaItemViewModel.init)
         } catch {
             errorMessage = error.localizedDescription

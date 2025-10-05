@@ -17,9 +17,6 @@ protocol MediaRepositoryProtocol {
 
 
 final class MediaRepository: MediaRepositoryProtocol {
-    static let shared = MediaRepository()
-
-    private init() {}
 
     //MOVIES
     func fetchPopularMovies() async throws -> [MediaItemDTO] {

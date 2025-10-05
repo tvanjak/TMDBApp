@@ -34,6 +34,14 @@ extension Container {
         .singleton
     }
     
+    var mediaRepository: Factory<MediaRepository> {
+        self { @MainActor in
+            MediaRepository()
+        }
+        .singleton
+    }
+    
+    
     // Managers
     var favoritesManager: Factory<FavoritesManager> {
         self { @MainActor in
@@ -57,7 +65,8 @@ extension Container {
         self { @MainActor in
             HomeViewModel(
                 favoritesManager: self.favoritesManager(),
-                navigationService: self.router()
+                navigationService: self.router(),
+                mediaRepo: self.mediaRepository()
             )
         }
         .singleton
