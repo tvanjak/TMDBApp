@@ -5,6 +5,7 @@
 //  Created by Toni Vanjak on 29.08.2025..
 //
 
+import Foundation
 
 protocol FavoritesRepositoryProtocol {
     func loadFavorites(for userId: String) -> [MediaItemViewModel]
