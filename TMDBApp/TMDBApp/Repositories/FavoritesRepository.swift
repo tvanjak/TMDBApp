@@ -13,7 +13,7 @@ protocol FavoritesRepositoryProtocol {
 }
 
 
-class FavoritesRepository: FavoritesRepositoryProtocol {
+final class FavoritesRepository: FavoritesRepositoryProtocol {
     
     private let userDefaults: UserDefaults = .standard
     

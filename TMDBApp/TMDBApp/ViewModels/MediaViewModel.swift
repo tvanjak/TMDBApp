@@ -49,11 +49,11 @@ final class MediaViewModel: ObservableObject {
         do {
             switch media {
             case .movie(let id):
-                let dtoData = try await TMDBService.shared.fetchDetails(for: .movie(id: id))
+                let dtoData = try await MediaRepository.shared.fetchDetails(for: .movie(id: id))
                 let movie: any MediaDetailsViewModel = MovieDetailsViewModel(from: dtoData as! MovieDetailsDTO)
                 self.mediaDetail = movie
             case .tvShow(let id):
-                let dtoData = try await TMDBService.shared.fetchDetails(for: .tvShow(id: id))
+                let dtoData = try await MediaRepository.shared.fetchDetails(for: .tvShow(id: id))
                 let tvShow: any MediaDetailsViewModel = TVShowDetailsViewModel(from: dtoData as! TVShowDetailsDTO)
                 self.mediaDetail = tvShow
             }
