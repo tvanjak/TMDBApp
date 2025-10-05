@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-protocol MediaDetailsUI: Identifiable {
+protocol MediaDetailsViewModel: Identifiable {
     var id: Int { get }
     var displayTitle: String { get }
     var overview: String { get }
@@ -18,12 +18,12 @@ protocol MediaDetailsUI: Identifiable {
     var releaseYear: String { get }
     var invertedDate: String { get }
     
-    var credits: CreditsUI { get }
+    var credits: CreditsViewModel { get }
 }
 
 
 
-struct MovieDetailsUI: Identifiable, MediaDetailsUI {
+struct MovieDetailsViewModel: Identifiable, MediaDetailsViewModel {
     let id: Int
     let displayTitle: String
     let overview: String
@@ -34,7 +34,7 @@ struct MovieDetailsUI: Identifiable, MediaDetailsUI {
     let releaseYear: String
     let invertedDate: String
     
-    let credits: CreditsUI
+    let credits: CreditsViewModel
     
     init(from dto: MovieDetailsDTO) {
         self.id = dto.id
@@ -55,21 +55,21 @@ struct MovieDetailsUI: Identifiable, MediaDetailsUI {
         self.formattedGenres = dto.genres.map(\.name).joined(separator: ", ")
         
         // dates
-        if let date = DateFormatter.yyyyMMdd.date(from: dto.releaseDate) {
-            self.releaseYear = DateFormatter.yyyy.string(from: date)
-            self.invertedDate = DateFormatter.ddMMyyyy.string(from: date)
+        if let date = CustomDateFormatter.fromYYYYMMdd(dto.releaseDate) {
+            self.releaseYear = CustomDateFormatter.toYYYY(date)
+            self.invertedDate = CustomDateFormatter.toDDMMYYYY(date)
         } else {
             self.releaseYear = "N/A"
             self.invertedDate = "N/A"
         }
         
-        self.credits = CreditsUI(from: dto.credits)
+        self.credits = CreditsViewModel(from: dto.credits)
     }
 }
 
 
 
-struct TVShowDetailsUI: Identifiable, MediaDetailsUI {
+struct TVShowDetailsViewModel: Identifiable, MediaDetailsViewModel {
     let id: Int
     let displayTitle: String
     let overview: String
@@ -80,7 +80,7 @@ struct TVShowDetailsUI: Identifiable, MediaDetailsUI {
     let releaseYear: String
     let invertedDate: String
     
-    let credits: CreditsUI
+    let credits: CreditsViewModel
 
     init(from dto: TVShowDetailsDTO) {
         self.id = dto.id
@@ -108,15 +108,15 @@ struct TVShowDetailsUI: Identifiable, MediaDetailsUI {
         self.formattedGenres = dto.genres.map(\.name).joined(separator: ", ")
 
         // dates
-        if let date = DateFormatter.yyyyMMdd.date(from: dto.firstAirDate) {
-            self.releaseYear = DateFormatter.yyyy.string(from: date)
-            self.invertedDate = DateFormatter.ddMMyyyy.string(from: date)
+        if let date = CustomDateFormatter.fromYYYYMMdd(dto.firstAirDate) {
+            self.releaseYear = CustomDateFormatter.toYYYY(date)
+            self.invertedDate = CustomDateFormatter.toDDMMYYYY(date)
         } else {
             self.releaseYear = "N/A"
             self.invertedDate = "N/A"
         }
         
-        self.credits = CreditsUI(from: dto.credits)
+        self.credits = CreditsViewModel(from: dto.credits)
     }
 }
 

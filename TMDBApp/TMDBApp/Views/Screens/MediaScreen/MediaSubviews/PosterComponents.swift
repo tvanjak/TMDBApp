@@ -133,8 +133,8 @@ struct PosterText: View {
 
 struct PosterButtons: View {
     @ObservedObject var mediaViewModel: MediaViewModel
-    var media: MediaItemUI {
-        MediaItemUI(from: mediaViewModel.mediaDetail!)
+    var media: MediaItemViewModel {
+        MediaItemViewModel(from: mediaViewModel.mediaDetail!)
     }
     
     var body: some View {

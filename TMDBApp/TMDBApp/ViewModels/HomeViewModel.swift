@@ -3,16 +3,16 @@ import SwiftUI
 
 @MainActor
 final class HomeViewModel: ObservableObject {
-    @Published var popularMovies: [MediaItemUI] = []
-    @Published var trendingMovies: [MediaItemUI] = []
-    @Published var upcomingMovies: [MediaItemUI] = []
-    @Published var nowPlayingMovies: [MediaItemUI] = []
+    @Published var popularMovies: [MediaItemViewModel] = []
+    @Published var trendingMovies: [MediaItemViewModel] = []
+    @Published var upcomingMovies: [MediaItemViewModel] = []
+    @Published var nowPlayingMovies: [MediaItemViewModel] = []
     
-    @Published var popularTVShows: [MediaItemUI] = []
-    @Published var topRatedTVShows: [MediaItemUI] = []
+    @Published var popularTVShows: [MediaItemViewModel] = []
+    @Published var topRatedTVShows: [MediaItemViewModel] = []
 
-    @Published var searchedMovies: [MediaItemUI] = []
-    @Published var searchedTVShows: [MediaItemUI] = []
+    @Published var searchedMovies: [MediaItemViewModel] = []
+    @Published var searchedTVShows: [MediaItemViewModel] = []
 
     @Published var searchTerm = ""
     
@@ -38,11 +38,11 @@ final class HomeViewModel: ObservableObject {
         }
     }
     
-    @Published var currentMovies: [MediaItemUI] = []
-    @Published var currentTVShows: [MediaItemUI] = []
+    @Published var currentMovies: [MediaItemViewModel] = []
+    @Published var currentTVShows: [MediaItemViewModel] = []
     
     @Published var errorMessage: String?
-    @Published var favorites: [MediaItemUI] = []
+    @Published var favorites: [MediaItemViewModel] = []
     
     private let favoritesManager: FavoritesManager
     private let navigationService: NavigationViewModelProtocol
@@ -66,19 +66,19 @@ final class HomeViewModel: ObservableObject {
     }
     
     // FAVORITES FUNCTIONS -------------------------------
-    func toggleFavorite(_ media: MediaItemUI) {
+    func toggleFavorite(_ media: MediaItemViewModel) {
         favoritesManager.toggleFavorite(media)
     }
     
-    func isFavorite(_ media: MediaItemUI) -> Bool {
+    func isFavorite(_ media: MediaItemViewModel) -> Bool {
         return favoritesManager.isFavorite(media)
     }
     
-    func getFavoriteIcon(_ media: MediaItemUI) -> String {
+    func getFavoriteIcon(_ media: MediaItemViewModel) -> String {
         return favoritesManager.getFavoriteIcon(media)
     }
     
-    func getFavoriteColor(_ media: MediaItemUI) -> Color {
+    func getFavoriteColor(_ media: MediaItemViewModel) -> Color {
         return favoritesManager.getFavoriteColor(media)
     }
     // ------------------------------------------------------------
@@ -141,7 +141,9 @@ final class HomeViewModel: ObservableObject {
     // MOVIE LOADING FUNCTIONS ------------------------------------
     func loadPopularMovies() async {
         do {
-            popularMovies = try await TMDBService.shared.fetchPopularMovies()
+            let dtoData = try await TMDBService.shared.fetchPopularMovies()
+            popularMovies = dtoData.map(MediaItemViewModel.init)
+            
             if selectedMovieSection == .popular {
                 currentMovies = popularMovies
             }
@@ -152,8 +154,9 @@ final class HomeViewModel: ObservableObject {
     
     func loadTrendingMovies() async {
         do {
-            trendingMovies = try await TMDBService.shared.fetchTrendingMovies()
-            
+            let dtoData = try await TMDBService.shared.fetchTrendingMovies()
+            trendingMovies = dtoData.map(MediaItemViewModel.init)
+
             if selectedMovieSection == .trending {
                 currentMovies = trendingMovies
             }
@@ -164,7 +167,8 @@ final class HomeViewModel: ObservableObject {
     
     func loadUpcomingMovies() async {
         do {
-            upcomingMovies = try await TMDBService.shared.fetchTrendingMovies()
+            let dtoData = try await TMDBService.shared.fetchTrendingMovies()
+            upcomingMovies = dtoData.map(MediaItemViewModel.init)
             
             if selectedMovieSection == .upcoming {
                 currentMovies = upcomingMovies
@@ -176,7 +180,8 @@ final class HomeViewModel: ObservableObject {
     
     func loadNowPlayingMovies() async {
         do {
-            nowPlayingMovies = try await TMDBService.shared.fetchTrendingMovies()
+            let dtoData = try await TMDBService.shared.fetchTrendingMovies()
+            nowPlayingMovies = dtoData.map(MediaItemViewModel.init)
             
             if selectedMovieSection == .nowPlaying {
                 currentMovies = nowPlayingMovies
@@ -206,7 +211,8 @@ final class HomeViewModel: ObservableObject {
     // TVShow FUNCTIONS
     func loadPopularTVShows() async {
         do {
-            popularTVShows = try await TMDBService.shared.fetchPopularTVShows()
+            let dtoData = try await TMDBService.shared.fetchPopularTVShows()
+            popularTVShows = dtoData.map(MediaItemViewModel.init)
             
             if selectedTVShowSection == .popular {
                 currentTVShows = popularTVShows
@@ -218,7 +224,8 @@ final class HomeViewModel: ObservableObject {
     
     func loadTopRatedTVShows() async {
         do {
-            topRatedTVShows = try await TMDBService.shared.fetchTopRatedTVShows()
+            let dtoData = try await TMDBService.shared.fetchTopRatedTVShows()
+            topRatedTVShows = dtoData.map(MediaItemViewModel.init)
             
             if selectedTVShowSection == .topRated {
                 currentTVShows = topRatedTVShows
@@ -232,8 +239,11 @@ final class HomeViewModel: ObservableObject {
     // SEARCH FUNCTION
     func search() async {
         do {
-            searchedMovies = try await TMDBService.shared.fetchSearchedMovies(query: searchTerm)
-            searchedTVShows = try await TMDBService.shared.fetchSearchedTVShows(query: searchTerm)
+            let dtoData1 = try await TMDBService.shared.fetchSearchedMovies(query: searchTerm)
+            searchedMovies = dtoData1.map(MediaItemViewModel.init)
+            
+            let dtoData2 = try await TMDBService.shared.fetchSearchedTVShows(query: searchTerm)
+            searchedTVShows = dtoData2.map(MediaItemViewModel.init)
         } catch {
             errorMessage = error.localizedDescription
         }

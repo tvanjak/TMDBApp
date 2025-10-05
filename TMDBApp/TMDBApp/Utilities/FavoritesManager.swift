@@ -11,7 +11,7 @@ import SwiftUI
 
 @MainActor
 final class FavoritesManager: ObservableObject {
-    @Published var favorites: [MediaItemUI] = []
+    @Published var favorites: [MediaItemViewModel] = []
     
     private let favoritesRepo: FavoritesRepositoryProtocol
     private let authenticationRepo: AuthenticationRepositoryProtocol
@@ -27,7 +27,7 @@ final class FavoritesManager: ObservableObject {
         favorites = favoritesRepo.loadFavorites(for: uid)
     }
     
-    func toggleFavorite(_ media: MediaItemUI) {
+    func toggleFavorite(_ media: MediaItemViewModel) {
         guard let _ = authenticationRepo.currentUserId else { return }
         if isFavorite(media) {
             removeFavorite(media)
@@ -36,25 +36,25 @@ final class FavoritesManager: ObservableObject {
         }
     }
     
-    func isFavorite(_ media: MediaItemUI) -> Bool {
+    func isFavorite(_ media: MediaItemViewModel) -> Bool {
         return favorites.contains { $0.id == media.id }
     }
     
-    func getFavoriteIcon(_ media: MediaItemUI) -> String {
+    func getFavoriteIcon(_ media: MediaItemViewModel) -> String {
         return isFavorite(media) ? "heart.fill" : "heart"
     }
     
-    func getFavoriteColor(_ media: MediaItemUI) -> Color {
+    func getFavoriteColor(_ media: MediaItemViewModel) -> Color {
         return isFavorite(media) ? .red : .white
     }
     
-    private func addFavorite(_ media: MediaItemUI) {
+    private func addFavorite(_ media: MediaItemViewModel) {
         guard let uid = authenticationRepo.currentUserId else { return }
         favorites.append(media)
         favoritesRepo.saveFavorites(favorites, for: uid)
     }
     
-    private func removeFavorite(_ media: MediaItemUI) {
+    private func removeFavorite(_ media: MediaItemViewModel) {
         guard let uid = authenticationRepo.currentUserId else { return }
         favorites.removeAll { $0.id == media.id }
         favoritesRepo.saveFavorites(favorites, for: uid)

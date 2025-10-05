@@ -10,8 +10,8 @@ import SwiftUI
 @MainActor
 final class MediaViewModel: ObservableObject {
     @Published var errorMessage: String?
-    @Published var mediaDetail: (any MediaDetailsUI)?
-    @Published var favorites: [MediaItemUI] = []
+    @Published var mediaDetail: (any MediaDetailsViewModel)?
+    @Published var favorites: [MediaItemViewModel] = []
     
     private let favoritesManager: FavoritesManager
     
@@ -26,19 +26,19 @@ final class MediaViewModel: ObservableObject {
     }
     
     // FAVORITES FUNCTIONS -------------------------------
-    func toggleFavorite(_ media: MediaItemUI) {
+    func toggleFavorite(_ media: MediaItemViewModel) {
         favoritesManager.toggleFavorite(media)
     }
     
-    func isFavorite(_ media: MediaItemUI) -> Bool {
+    func isFavorite(_ media: MediaItemViewModel) -> Bool {
         return favoritesManager.isFavorite(media)
     }
     
-    func getFavoriteIcon(_ media: MediaItemUI) -> String {
+    func getFavoriteIcon(_ media: MediaItemViewModel) -> String {
         return favoritesManager.getFavoriteIcon(media)
     }
     
-    func getFavoriteColor(_ media: MediaItemUI) -> Color {
+    func getFavoriteColor(_ media: MediaItemViewModel) -> Color {
         return favoritesManager.getFavoriteColor(media)
     }
     // ------------------------------------------------------------
@@ -49,11 +49,12 @@ final class MediaViewModel: ObservableObject {
         do {
             switch media {
             case .movie(let id):
-                let movie: any MediaDetailsUI = try await TMDBService.shared.fetchDetails(for: .movie(id: id))
+                let dtoData = try await TMDBService.shared.fetchDetails(for: .movie(id: id))
+                let movie: any MediaDetailsViewModel = MovieDetailsViewModel(from: dtoData as! MovieDetailsDTO)
                 self.mediaDetail = movie
-                
             case .tvShow(let id):
-                let tvShow: any MediaDetailsUI = try await TMDBService.shared.fetchDetails(for: .tvShow(id: id))
+                let dtoData = try await TMDBService.shared.fetchDetails(for: .tvShow(id: id))
+                let tvShow: any MediaDetailsViewModel = TVShowDetailsViewModel(from: dtoData as! TVShowDetailsDTO)
                 self.mediaDetail = tvShow
             }
         } catch {

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SearchMediaCard: View {
-    var media: MediaItemUI
+    var media: MediaItemViewModel
     
     var body: some View {
         ZStack (alignment: .center) {
