@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct GenreUI: Identifiable {
+struct GenreViewModel: Identifiable {
     let id: Int
     let name: String
 
@@ -18,18 +18,18 @@ struct GenreUI: Identifiable {
 }
 
 
-struct CreditsUI {
-    let cast: [CastMemberUI]
-    let crew: [CrewMemberUI]
+struct CreditsViewModel {
+    let cast: [CastMemberViewModel]
+    let crew: [CrewMemberViewModel]
 
     init(from dto: CreditsDTO) {
-        self.cast = dto.cast.map(CastMemberUI.init)
-        self.crew = dto.crew.map(CrewMemberUI.init)
+        self.cast = dto.cast.map(CastMemberViewModel.init)
+        self.crew = dto.crew.map(CrewMemberViewModel.init)
     }
 }
 
 
-struct CastMemberUI: Identifiable {
+struct CastMemberViewModel: Identifiable {
     let id: Int
     let name: String
     let character: String
@@ -46,7 +46,7 @@ struct CastMemberUI: Identifiable {
 }
 
 
-struct CrewMemberUI: Identifiable {
+struct CrewMemberViewModel: Identifiable {
     let id: Int
     let name: String
     let job: String

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct MediaItemUI: Identifiable, Codable {
+struct MediaItemViewModel: Identifiable, Codable {
     let id: Int
     let displayTitle: String
     let overview: String?
@@ -36,7 +36,7 @@ struct MediaItemUI: Identifiable, Codable {
         }
     }
     
-    init(from details: any MediaDetailsUI) {
+    init(from details: any MediaDetailsViewModel) {
         self.id = details.id
         self.displayTitle = details.displayTitle
         self.overview = details.overview
