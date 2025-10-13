@@ -13,36 +13,36 @@ final class MediaViewModel: ObservableObject {
     @Published var mediaDetail: (any MediaDetailsViewModel)?
     @Published var favorites: [MediaItemViewModel] = []
     
-    private let favoritesManager: FavoritesManager
+    private let favoritesViewModel: FavoritesViewModel
     private let mediaRepo: MediaRepositoryProtocol
     
     init(
-        favoritesManager: FavoritesManager,
+        favoritesViewModel: FavoritesViewModel,
         mediaRepo: MediaRepositoryProtocol
     ) {
-        self.favoritesManager = favoritesManager
+        self.favoritesViewModel = favoritesViewModel
         self.mediaRepo = mediaRepo
         
         // Observe FavoritesManager changes
-        favoritesManager.$favorites
+        favoritesViewModel.$favorites
             .assign(to: &$favorites)
     }
     
     // FAVORITES FUNCTIONS -------------------------------
     func toggleFavorite(_ media: MediaItemViewModel) {
-        favoritesManager.toggleFavorite(media)
+        favoritesViewModel.toggleFavorite(media)
     }
     
     func isFavorite(_ media: MediaItemViewModel) -> Bool {
-        return favoritesManager.isFavorite(media)
+        return favoritesViewModel.isFavorite(media)
     }
     
     func getFavoriteIcon(_ media: MediaItemViewModel) -> String {
-        return favoritesManager.getFavoriteIcon(media)
+        return favoritesViewModel.getFavoriteIcon(media)
     }
     
     func getFavoriteColor(_ media: MediaItemViewModel) -> Color {
-        return favoritesManager.getFavoriteColor(media)
+        return favoritesViewModel.getFavoriteColor(media)
     }
     // ------------------------------------------------------------
 

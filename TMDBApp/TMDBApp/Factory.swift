@@ -43,9 +43,9 @@ extension Container {
     
     
     // Managers
-    var favoritesManager: Factory<FavoritesManager> {
+    var favoritesUseCase: Factory<FavoritesUseCase> {
         self { @MainActor in
-            FavoritesManager(
+            FavoritesUseCase(
                 favoritesRepo: self.favoritesRepository(),
                 authenticationRepo: self.authenticationRepository()
             )
@@ -64,7 +64,7 @@ extension Container {
     var homeViewModel: Factory<HomeViewModel> {
         self { @MainActor in
             HomeViewModel(
-                favoritesManager: self.favoritesManager(),
+                favoritesViewModel: self.favoritesViewModel(),
                 navigationService: self.router(),
                 mediaRepo: self.mediaRepository()
             )
@@ -75,7 +75,7 @@ extension Container {
     var mediaViewModel: Factory<MediaViewModel> {
         self { @MainActor in
             MediaViewModel(
-                favoritesManager: self.favoritesManager(),
+                favoritesViewModel: self.favoritesViewModel(),
                 mediaRepo: self.mediaRepository()
             )
         }
@@ -103,7 +103,7 @@ extension Container {
     var favoritesViewModel: Factory<FavoritesViewModel> {
         self { @MainActor in
             FavoritesViewModel(
-                favoritesManager: self.favoritesManager(),
+                favoritesUseCase: self.favoritesUseCase(),
                 navigationService: self.router()
             )
         }

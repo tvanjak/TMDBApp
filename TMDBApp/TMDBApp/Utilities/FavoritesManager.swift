@@ -7,11 +7,9 @@
 
 import SwiftUI
 
-// ADD PROTOCOL
 
-@MainActor
-final class FavoritesManager: ObservableObject {
-    @Published var favorites: [MediaItemViewModel] = []
+final class FavoritesUseCase {
+    private var favorites: [MediaItemViewModel] = []
     
     private let favoritesRepo: FavoritesRepositoryProtocol
     private let authenticationRepo: AuthenticationRepositoryProtocol
@@ -19,12 +17,13 @@ final class FavoritesManager: ObservableObject {
     init(favoritesRepo: FavoritesRepositoryProtocol, authenticationRepo: AuthenticationRepositoryProtocol) {
         self.favoritesRepo = favoritesRepo
         self.authenticationRepo = authenticationRepo
-        loadFavorites()
+        self.favorites = loadFavorites()
     }
     
-    private func loadFavorites() {
-        guard let uid = authenticationRepo.currentUserId else { return }
+    func loadFavorites() -> [MediaItemViewModel]{
+        guard let uid = authenticationRepo.currentUserId else { return [] }
         favorites = favoritesRepo.loadFavorites(for: uid)
+        return favorites
     }
     
     func toggleFavorite(_ media: MediaItemViewModel) {
@@ -38,14 +37,6 @@ final class FavoritesManager: ObservableObject {
     
     func isFavorite(_ media: MediaItemViewModel) -> Bool {
         return favorites.contains { $0.id == media.id }
-    }
-    
-    func getFavoriteIcon(_ media: MediaItemViewModel) -> String {
-        return isFavorite(media) ? "heart.fill" : "heart"
-    }
-    
-    func getFavoriteColor(_ media: MediaItemViewModel) -> Color {
-        return isFavorite(media) ? .red : .white
     }
     
     private func addFavorite(_ media: MediaItemViewModel) {

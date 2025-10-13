@@ -33,7 +33,7 @@ struct FavoritesView: View {
 
 #Preview {
     FavoritesView(favoritesViewModel: FavoritesViewModel(
-        favoritesManager: FavoritesManager(favoritesRepo: FavoritesRepository(), authenticationRepo: AuthenticationRepository()),
+        favoritesUseCase: FavoritesUseCase(favoritesRepo: FavoritesRepository(), authenticationRepo: AuthenticationRepository()),
         navigationService: Router()
     ))
 }
