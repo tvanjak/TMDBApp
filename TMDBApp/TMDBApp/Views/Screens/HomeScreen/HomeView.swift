@@ -11,7 +11,7 @@ import SwiftUI
 struct HomeView: View {
     @ObservedObject var homeViewModel: HomeViewModel
     @FocusState var searchFocused: Bool
-
+    
     var body: some View {
         ScrollView {
             VStack {
@@ -20,7 +20,7 @@ struct HomeView: View {
                             get: { searchFocused },
                             set: { searchFocused = $0 }
                           ))
-                    .focused($searchFocused)
+                .focused($searchFocused)
                 
                 if searchFocused && homeViewModel.searchedMovies.isEmpty {
                     EmptyView()
@@ -33,12 +33,14 @@ struct HomeView: View {
                 }
                 
             }
-            .onAppear {
-                // Data loading is now handled in ViewModel initialization
+            .task {
+                await homeViewModel.loadPopularMovies()
+                await homeViewModel.loadPopularTVShows()
             }
         }
     }
 }
+
 
 
 #Preview {
