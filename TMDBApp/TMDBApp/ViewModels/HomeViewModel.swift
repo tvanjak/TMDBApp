@@ -60,12 +60,6 @@ final class HomeViewModel: ObservableObject {
         // Observe FavoritesManager changes
         favoritesManager.$favorites
             .assign(to: &$favorites)
-        
-        // Initialize current arrays and load data
-        Task { @MainActor in
-            await loadPopularMovies()
-            await loadPopularTVShows()
-        }
     }
     
     // FAVORITES FUNCTIONS -------------------------------
