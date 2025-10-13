@@ -44,45 +44,39 @@ final class HomeViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var favorites: [MediaItemViewModel] = []
     
-    private let favoritesManager: FavoritesManager
+    private let favoritesViewModel: FavoritesViewModel
     private let navigationService: NavigationViewModelProtocol
     private let mediaRepo: MediaRepositoryProtocol
     
     init(
-        favoritesManager: FavoritesManager,
+        favoritesViewModel: FavoritesViewModel,
         navigationService: NavigationViewModelProtocol,
         mediaRepo: MediaRepositoryProtocol
     ) {
-        self.favoritesManager = favoritesManager
+        self.favoritesViewModel = favoritesViewModel
         self.navigationService = navigationService
         self.mediaRepo = mediaRepo
         
         // Observe FavoritesManager changes
-        favoritesManager.$favorites
+        favoritesViewModel.$favorites
             .assign(to: &$favorites)
-        
-        // Initialize current arrays and load data
-        Task { @MainActor in
-            await loadPopularMovies()
-            await loadPopularTVShows()
-        }
     }
     
     // FAVORITES FUNCTIONS -------------------------------
     func toggleFavorite(_ media: MediaItemViewModel) {
-        favoritesManager.toggleFavorite(media)
+        favoritesViewModel.toggleFavorite(media)
     }
     
     func isFavorite(_ media: MediaItemViewModel) -> Bool {
-        return favoritesManager.isFavorite(media)
+        return favoritesViewModel.isFavorite(media)
     }
     
     func getFavoriteIcon(_ media: MediaItemViewModel) -> String {
-        return favoritesManager.getFavoriteIcon(media)
+        return favoritesViewModel.getFavoriteIcon(media)
     }
     
     func getFavoriteColor(_ media: MediaItemViewModel) -> Color {
-        return favoritesManager.getFavoriteColor(media)
+        return favoritesViewModel.getFavoriteColor(media)
     }
     // ------------------------------------------------------------
     
