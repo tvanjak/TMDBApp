@@ -11,36 +11,35 @@ import SwiftUI
 final class FavoritesViewModel: ObservableObject {
     @Published var favorites: [MediaItemViewModel] = []
     
-    private let favoritesManager: FavoritesManager
+    private let favoritesUseCase: FavoritesUseCase
     private let navigationService: NavigationViewModelProtocol
     
     init(
-        favoritesManager: FavoritesManager,
+        favoritesUseCase: FavoritesUseCase,
         navigationService: NavigationViewModelProtocol
     ) {
-        self.favoritesManager = favoritesManager
+        self.favoritesUseCase = favoritesUseCase
         self.navigationService = navigationService
         
-        // Observe FavoritesManager changes
-        favoritesManager.$favorites
-            .assign(to: &$favorites)
+        favorites = favoritesUseCase.loadFavorites()
     }
     
     // FAVORITES FUNCTIONS -------------------------------
     func toggleFavorite(_ media: MediaItemViewModel) {
-        favoritesManager.toggleFavorite(media)
+        favoritesUseCase.toggleFavorite(media)
+        favorites = favoritesUseCase.loadFavorites()
     }
     
     func isFavorite(_ media: MediaItemViewModel) -> Bool {
-        return favoritesManager.isFavorite(media)
+        return favoritesUseCase.isFavorite(media)
     }
     
     func getFavoriteIcon(_ media: MediaItemViewModel) -> String {
-        return favoritesManager.getFavoriteIcon(media)
+        return isFavorite(media) ? "heart.fill" : "heart"
     }
     
     func getFavoriteColor(_ media: MediaItemViewModel) -> Color {
-        return favoritesManager.getFavoriteColor(media)
+        return isFavorite(media) ? .red : .white
     }
     // ------------------------------------------------------------
 
